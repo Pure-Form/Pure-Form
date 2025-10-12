@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Lexend%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<title>Stitch Design</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#007BFF", // Electric Blue
+              "background-light": "#ffffff",
+              "background-dark": "#000000",
+              "text-light": "#ffffff",
+              "text-dark": "#1f2937", // A dark gray
+              "gray-light": "#f3f4f6",
+              "gray-dark": "#1a1a1a" // A slightly lighter black for cards
+            },
+            fontFamily: {
+              "display": ["Lexend"]
+            },
+            borderRadius: {
+              "DEFAULT": "1rem",
+              "lg": "2rem",
+              "xl": "3rem",
+              "full": "9999px"
+            },
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-dark text-text-light">
+<div class="relative flex h-auto min-h-screen w-full flex-col justify-between overflow-x-hidden">
+<div class="flex-grow">
+<header class="sticky top-0 z-10 flex items-center justify-between bg-background-dark/80 p-4 pb-2 backdrop-blur-sm">
+<div class="w-12"></div>
+<h1 class="flex-1 text-center text-lg font-bold">Kontrol Paneli</h1>
+<div class="flex w-12 items-center justify-end">
+<button class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full">
+<span class="material-symbols-outlined text-gray-400">
+                settings
+              </span>
+</button>
+</div>
+</header>
+<main class="p-4">
+<section class="mb-6">
+<h2 class="px-4 pb-3 pt-5 text-xl font-bold">Bugün</h2>
+<div class="rounded-lg bg-gray-dark p-4">
+<div class="flex items-center gap-4">
+<div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-white">
+<span class="material-symbols-outlined">
+                    pie_chart
+                  </span>
+</div>
+<div class="flex-grow">
+<p class="font-semibold">Kalori Alımı</p>
+<p class="text-sm text-gray-400">1800 / 2200 kcal</p>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-6">
+<h2 class="px-4 pb-3 pt-5 text-xl font-bold">Fitness Planı</h2>
+<div class="rounded-lg bg-gray-dark p-4">
+<div class="flex items-center gap-4">
+<div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-white">
+<span class="material-symbols-outlined">
+                    fitness_center
+                  </span>
+</div>
+<div class="flex-grow">
+<p class="font-semibold">Günlük Hedef</p>
+<p class="text-sm text-gray-400">30 dakika koşu</p>
+</div>
+</div>
+</div>
+</section>
+<section>
+<h2 class="px-4 pb-3 pt-5 text-xl font-bold">İlerleme</h2>
+<div class="rounded-lg bg-gray-dark p-4">
+<div class="flex items-center gap-4">
+<div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-white">
+<span class="material-symbols-outlined">
+                    monitoring
+                  </span>
+</div>
+<div class="flex-grow">
+<p class="font-semibold">Toplam Ağırlık Kaldırma</p>
+<p class="text-sm text-gray-400">15 kg</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<footer class="sticky bottom-0 border-t border-gray-dark/50 bg-background-dark/80 pb-safe backdrop-blur-sm">
+<nav class="flex items-center justify-around p-2">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 p-2 text-primary" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-xs font-medium">Ana Ekran</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 p-2 text-gray-400" href="#">
+<span class="material-symbols-outlined">pie_chart</span>
+<p class="text-xs font-medium">Kalori</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 p-2 text-gray-400" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<p class="text-xs font-medium">Plan</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 p-2 text-gray-400" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+<p class="text-xs font-medium">İlerleme</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 p-2 text-gray-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<p class="text-xs font-medium">Profil</p>
+</a>
+</nav>
+</footer>
+</div>
+
+</body></html>

@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "Pure Form",
+    "slug": "pure-form",
+    "version": "0.1.0",
+    "sdkVersion": "48.0.0",
+    "platforms": ["android","ios","web"],
+    "orientation": "portrait"
+  }
+}

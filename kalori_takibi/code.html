@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stitch Design</title>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Lexend:wght@400;500;700;900&amp;family=Noto+Sans:wght@400;500;700;900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#3B82F6",
+              "background-light": "#f0f2f5",
+              "background-dark": "#000000",
+              "card-dark": "#1A1A1A"
+            },
+            fontFamily: {
+              "display": ["Lexend"]
+            },
+            borderRadius: {
+              "DEFAULT": "1rem",
+              "lg": "2rem",
+              "xl": "3rem",
+              "full": "9999px"
+            },
+          },
+        },
+      }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex min-h-screen w-full flex-col justify-between">
+<div class="flex-grow">
+<header class="flex items-center justify-between p-4">
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-card-dark text-gray-400">
+<span class="material-symbols-outlined">
+              widgets
+            </span>
+</button>
+<h1 class="text-lg font-bold text-black dark:text-white">Kalori Takibi</h1>
+<div class="w-10"></div>
+</header>
+<main class="p-4">
+<section class="mb-8">
+<h2 class="mb-4 text-2xl font-bold text-black dark:text-white">Bugün</h2>
+<div class="rounded-lg bg-card-dark p-4">
+<div class="mb-3 flex items-baseline justify-between">
+<p class="font-medium text-white">Kalan Kalori</p>
+<p class="text-sm text-gray-400">1200 / 2000 kcal</p>
+</div>
+<div class="h-2 w-full rounded-full bg-gray-700">
+<div class="h-2 rounded-full bg-primary" style="width: 60%;"></div>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-4">
+<div class="rounded-lg bg-card-dark p-3">
+<p class="text-sm text-gray-400">Protein</p>
+<p class="font-bold text-white">80g</p>
+</div>
+<div class="rounded-lg bg-card-dark p-3">
+<p class="text-sm text-gray-400">Karbonhidrat</p>
+<p class="font-bold text-white">150g</p>
+</div>
+<div class="rounded-lg bg-card-dark p-3">
+<p class="text-sm text-gray-400">Yağ</p>
+<p class="font-bold text-white">50g</p>
+</div>
+<div class="rounded-lg bg-card-dark p-3">
+<p class="text-sm text-gray-400">Su</p>
+<p class="font-bold text-white">2L</p>
+</div>
+</div>
+</section>
+<section>
+<h2 class="mb-4 text-2xl font-bold text-black dark:text-white">Yemekler</h2>
+<div class="space-y-2">
+<div class="flex items-center justify-between rounded-lg bg-card-dark p-4">
+<div>
+<p class="font-medium text-white">Kahvaltı</p>
+<p class="text-sm text-gray-400">300 kcal</p>
+</div>
+<button class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-700 text-white">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<div class="flex items-center justify-between rounded-lg bg-card-dark p-4">
+<div>
+<p class="font-medium text-white">Öğle Yemeği</p>
+<p class="text-sm text-gray-400">450 kcal</p>
+</div>
+<button class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-700 text-white">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<div class="flex items-center justify-between rounded-lg bg-card-dark p-4">
+<div>
+<p class="font-medium text-white">Akşam Yemeği</p>
+<p class="text-sm text-gray-400">450 kcal</p>
+</div>
+<button class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-700 text-white">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<div class="flex items-center justify-between rounded-lg bg-card-dark p-4">
+<div>
+<p class="font-medium text-white">Atıştırmalıklar</p>
+<p class="text-sm text-gray-400">0 kcal</p>
+</div>
+<button class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-700 text-white">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<footer class="sticky bottom-0 border-t border-gray-800 bg-background-dark/80 backdrop-blur-sm">
+<nav class="flex justify-around px-4 pb-3 pt-2">
+<a class="flex flex-col items-center gap-1 text-gray-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-xs font-medium">Ana Ekran</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined">lunch_dining</span>
+<p class="text-xs font-medium">Kalori Takibi</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-400" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<p class="text-xs font-medium">Fitness Planı</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-400" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+<p class="text-xs font-medium">İlerleme</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<p class="text-xs font-medium">Profil</p>
+</a>
+</nav>
+</footer>
+</div>
+
+</body></html>
