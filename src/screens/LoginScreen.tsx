@@ -1,68 +1,135 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from "react";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import PrimaryButton from "@/components/PrimaryButton";
+import FormTextInput from "@/components/FormTextInput";
+import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
+import type { RootStackParamList } from "@/navigation/AppNavigator";
 
-import { useNavigation } from '@react-navigation/native';
+const initialErrors = {
+  email: "",
+  password: ""
+};
 
-export default function LoginScreen() {
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('30');
-  const [weight, setWeight] = useState('70');
-  const [height, setHeight] = useState('175');
-  const [activityLevel, setActivityLevel] = useState<'sedentary'|'light'|'moderate'|'active'|'very_active'>('moderate');
-  const [goal, setGoal] = useState<'lose'|'maintain'|'gain'>('maintain');
+type ErrorState = typeof initialErrors;
 
-  async function submit() {
-    const profile = {
-      name: name || 'User',
-      age: Number(age || 30),
-      weightKg: Number(weight || 70),
-      heightCm: Number(height || 175),
-      activityLevel,
-      goal,
-    };
-    try {
-      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-      await AsyncStorage.setItem('user_profile', JSON.stringify(profile));
-    } catch (e) {
-      // ignore
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Login">;
+
+const LoginScreen = () => {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
+  const navigation = useNavigation<NavigationProp>();
+  const { signIn } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<ErrorState>(initialErrors);
+  const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState("");
+
+  const handleSubmit = async () => {
+    setErrors(initialErrors);
+    setFormError("");
+
+    if (!email) {
+  setErrors((prev: ErrorState) => ({ ...prev, email: "Email required" }));
+      return;
     }
-    // navigate to main tabs
-    const nav = useNavigation();
-    // @ts-ignore - dynamic route names
-    nav.navigate('Main');
-  }
+    if (!password) {
+  setErrors((prev: ErrorState) => ({ ...prev, password: "Password required" }));
+      return;
+    }
+
+    setLoading(true);
+    const success = await signIn({ email, password });
+    setLoading(false);
+    if (!success) {
+      setFormError("Account not found. Please register.");
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <Image source={require('../../assets/stitch/onboarding_screen.png')} style={styles.hero} resizeMode="cover" />
-      <View style={styles.card}>
-        <Text style={styles.headline}>Sağlıklı Yaşam Yolculuğunuza Başlayın</Text>
-        <Text style={styles.lead}>Kilo verme, kas yapma veya daha sağlıklı bir yaşam için başlayın.</Text>
-        <TouchableOpacity style={styles.primaryButton} onPress={submit}>
-          <Text style={styles.primaryButtonText}>Giriş Yap</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.secondaryButton} onPress={() => alert('Kaydol - demo')}>
-          <Text style={styles.secondaryButtonText}>Kaydol</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]}> 
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+          <View style={styles.header}>
+            <Text style={[styles.headline, { color: theme.colors.text }]}>{t("auth.welcomeBack")}</Text>
+            <Text style={[styles.subtext, { color: theme.colors.subText }]}>
+              Track nutrition, workouts and progress in one place.
+            </Text>
+          </View>
+
+          <View>
+            <FormTextInput
+              label={t("auth.email")}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+              error={errors.email}
+            />
+            <FormTextInput
+              label={t("auth.password")}
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+              error={errors.password}
+            />
+            {formError ? <Text style={[styles.error, { color: theme.colors.danger }]}>{formError}</Text> : null}
+          </View>
+
+          <View style={styles.footer}>
+            <PrimaryButton title={t("auth.login")} onPress={handleSubmit} loading={loading} />
+            <PrimaryButton
+              title={t("auth.switchToRegister")}
+              variant="secondary"
+              onPress={() => navigation.navigate("Register")}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 12 },
-  input: { borderWidth: 1, borderColor: '#ccc', padding: 8, marginBottom: 12 },
-  picker: { height: 44, marginBottom: 12 },
-  row: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 12 },
-  option: { padding: 8, borderWidth: 1, borderColor: '#ccc', marginRight: 8, marginTop: 8, borderRadius: 6 },
-  optionActive: { backgroundColor: '#007AFF', borderColor: '#007AFF' },
-  hero: { width: '100%', height: 300, backgroundColor: '#eee' },
-  card: { backgroundColor: '#000', padding: 20, alignItems: 'center' },
-  headline: { fontSize: 28, fontWeight: '800', color: '#fff', textAlign: 'center', marginBottom: 12 },
-  lead: { color: '#bfc7d0', textAlign: 'center', marginBottom: 20 },
-  primaryButton: { backgroundColor: '#0580FF', paddingVertical: 16, paddingHorizontal: 24, borderRadius: 40, width: '90%', alignItems: 'center', marginBottom: 12 },
-  primaryButtonText: { color: '#fff', fontWeight: '700', fontSize: 18 },
-  secondaryButton: { backgroundColor: '#2b2b2b', paddingVertical: 16, paddingHorizontal: 24, borderRadius: 40, width: '90%', alignItems: 'center' },
-  secondaryButtonText: { color: '#fff', fontWeight: '700', fontSize: 18 }
+  flex: {
+    flex: 1
+  },
+  safeArea: {
+    flex: 1
+  },
+  scroll: {
+    flexGrow: 1,
+    padding: 24,
+    justifyContent: "space-between"
+  },
+  header: {
+    gap: 8,
+    marginBottom: 24
+  },
+  headline: {
+    fontSize: 26,
+    fontWeight: "700"
+  },
+  subtext: {
+    fontSize: 15,
+    lineHeight: 22
+  },
+  footer: {
+    marginTop: 24,
+    gap: 12
+  },
+  error: {
+    marginTop: 8,
+    fontSize: 13
+  }
 });
+
+export default LoginScreen;

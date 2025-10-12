@@ -1,9 +1,1 @@
-node_modules/
-.expo/
-dist/
-build/
-*.log
-coverage/
-android/
-ios/
-web-build/
+node_modules

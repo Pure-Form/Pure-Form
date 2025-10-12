@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2f8ad679-82ec-4859-82a7-e5ecffe6dae3" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PROJECT_FUNDAMENTALS.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ana_ekran_/_kontrol_paneli/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ana_ekran_/_kontrol_paneli/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/STITCH_MANIFEST.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/stitch/calorie_screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/stitch/fitness_plan_screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/stitch/login_screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/stitch/onboarding_screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/stitch/profile_onboarding_screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/stitch/progress_screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fitness_planı_oluşturma/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fitness_planı_oluşturma/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/giriş_ekranı/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/giriş_ekranı/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/i̇lerleme_takibi/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/i̇lerleme_takibi/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/kalori_takibi/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/kalori_takibi/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profil_oluşturma_/_hedef_belirleme/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profil_oluşturma_/_hedef_belirleme/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Navigation.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/i18n/en.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/i18n/tr.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/planEngine.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/planEngine.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/storage.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/CalorieScreen.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/HomeScreen.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/LoginScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/LoginScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/OnboardingScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/OnboardingScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/PlanScreen.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/ProfileOnboarding.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/ProgressScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/ProgressScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/planEngine.test.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 6
+}]]></component>
+  <component name="ProjectId" id="33yqkhLNWyW3jB51hes366w92qq" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "main",
+    "settings.editor.selected.configurable": "AndroidSdkUpdater"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2f8ad679-82ec-4859-82a7-e5ecffe6dae3" name="Changes" comment="" />
+      <created>1760299806000</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1760299806000</updated>
+    </task>
+    <servers />
+  </component>
+</project>

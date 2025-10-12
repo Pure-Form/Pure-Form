@@ -1,15 +1,20 @@
 {
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "CommonJS",
-    "jsx": "react-jsx",
     "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "allowJs": true
+    "baseUrl": "./",
+    "lib": ["DOM", "ES2017"],
+    "paths": {
+      "@/components/*": ["src/components/*"],
+      "@/screens/*": ["src/screens/*"],
+      "@/navigation/*": ["src/navigation/*"],
+      "@/hooks/*": ["src/hooks/*"],
+      "@/context/*": ["src/context/*"],
+      "@/services/*": ["src/services/*"],
+      "@/theme": ["src/theme"],
+      "@/i18n": ["src/i18n"]
+    }
   },
-  "extends": "expo/tsconfig.base"
+  "include": ["App.tsx", "src"],
+  "exclude": ["node_modules"]
 }
