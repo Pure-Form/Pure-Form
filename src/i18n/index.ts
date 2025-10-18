@@ -9,7 +9,7 @@ const resources = {
         headline: "Elevate Your Everyday",
         body: "Personalized workouts, smart nutrition insights, and daily progress tracking to keep your goals on course.",
         getStarted: "Get Started",
-        login: "I already have an account"
+        login: "I already have an account",
       },
       auth: {
         welcomeBack: "Welcome back",
@@ -23,12 +23,12 @@ const resources = {
         goals: {
           lose: "Lose weight",
           maintain: "Maintain",
-          gain: "Gain muscle"
+          gain: "Gain muscle",
         },
         register: "Sign up",
         login: "Sign in",
         switchToLogin: "Already registered? Sign in",
-        switchToRegister: "New here? Create an account"
+        switchToRegister: "New here? Create an account",
       },
       dashboard: {
         greeting: "Hi {{name}}",
@@ -40,27 +40,66 @@ const resources = {
         viewAll: "View all",
         nutritionHeading: "Stay in your deficit",
         plannerHeading: "Workout planner",
-        progressHeading: "Progress overview"
+        progressHeading: "Progress overview",
       },
       planner: {
         title: "Weekly Planner",
         primary: "Primary muscle",
         duration: "Duration",
-        intensity: "Intensity"
+        intensity: "Intensity",
       },
       progress: {
         title: "Progress",
         weight: "Weight",
         bodyFat: "Body fat",
-        steps: "Steps"
+        steps: "Steps",
       },
       settings: {
         language: "Language",
         theme: "Theme",
         dark: "Dark",
-        light: "Light"
-      }
-    }
+        light: "Light",
+      },
+      nutrition: {
+        tabTitle: "Nutrition",
+        heading: "Nutrition Library",
+        subtitle:
+          "Browse macro-friendly foods, portion sizes, and quick tags to plan smarter meals.",
+        searchLabel: "Search foods",
+        searchPlaceholder: "Try \"chicken\", \"kahvalti\", \"protein\"",
+        calories: "{{value}} kcal",
+        portion: "Portion: {{value}}",
+        portionGrams: "({{value}} g)",
+        category: "Category: {{value}}",
+        source: "Source: {{value}}",
+        macros: {
+          protein: "Protein",
+          carbs: "Carbs",
+          fat: "Fat",
+        },
+        loading: "Fetching foods...",
+        error: "We couldn't refresh foods. Please try again.",
+        empty: "No foods matched your search.",
+        categories: {
+          "Dairy and Egg Products": "Dairy and Egg Products",
+          "Fats and Oils": "Fats and Oils",
+          "Soups, Sauces, and Gravies": "Soups, Sauces, and Gravies",
+          Other: "Other",
+        },
+        sources: {
+          foundation_food: "Foundation Food",
+          branded_food: "Branded Food",
+          sr_legacy_food: "SR Legacy",
+          survey_fndds_food: "Survey FNDDS",
+        },
+        tags: {
+          carb: "Carb",
+          protein: "Protein",
+          fat: "Fat",
+          produce: "Produce",
+        },
+      },
+    },
   },
   tr: {
     translation: {
@@ -68,7 +107,7 @@ const resources = {
         headline: "Her Gününü Güçlendir",
         body: "Kişiselleştirilmiş antrenmanlar, akıllı beslenme içgörüleri ve günlük ilerleme takibi ile hedeflerinde kal.",
         getStarted: "Başla",
-        login: "Zaten hesabım var"
+        login: "Zaten hesabım var",
       },
       auth: {
         welcomeBack: "Tekrar hoş geldin",
@@ -82,12 +121,12 @@ const resources = {
         goals: {
           lose: "Kilo ver",
           maintain: "Koru",
-          gain: "Kas kazan"
+          gain: "Kas kazan",
         },
         register: "Kayıt ol",
         login: "Giriş yap",
         switchToLogin: "Zaten hesabın var mı? Giriş yap",
-        switchToRegister: "Yeni misin? Kayıt ol"
+        switchToRegister: "Yeni misin? Kayıt ol",
       },
       dashboard: {
         greeting: "Merhaba {{name}}",
@@ -99,28 +138,67 @@ const resources = {
         viewAll: "Hepsini gör",
         nutritionHeading: "Kalori açığını koru",
         plannerHeading: "Antrenman planlayıcı",
-        progressHeading: "İlerleme özeti"
+        progressHeading: "İlerleme özeti",
       },
       planner: {
         title: "Haftalık Plan",
         primary: "Ana kas",
         duration: "Süre",
-        intensity: "Yoğunluk"
+        intensity: "Yoğunluk",
       },
       progress: {
         title: "İlerleme",
         weight: "Kilo",
         bodyFat: "Yağ oranı",
-        steps: "Adımlar"
+        steps: "Adımlar",
       },
       settings: {
         language: "Dil",
         theme: "Tema",
         dark: "Karanlık",
-        light: "Aydınlık"
-      }
-    }
-  }
+        light: "Aydınlık",
+      },
+      nutrition: {
+        tabTitle: "Beslenme",
+        heading: "Besin Kütüphanesi",
+        subtitle:
+          "Kalorisi ve makro değerleri belirli yiyecekleri keşfederek planını oluştur.",
+        searchLabel: "Yemek ara",
+        searchPlaceholder: "Örn. \"tavuk\", \"kahvalti\", \"protein\"",
+        calories: "{{value}} kcal",
+        portion: "Porsiyon: {{value}}",
+        portionGrams: "({{value}} g)",
+        category: "Kategori: {{value}}",
+        source: "Kaynak: {{value}}",
+        macros: {
+          protein: "Protein",
+          carbs: "Karbonhidrat",
+          fat: "Yağ",
+        },
+        loading: "Besinler yükleniyor...",
+        error: "Besinler yüklenemedi. Lütfen tekrar dene.",
+        empty: "Aramanla eşleşen besin bulunamadı.",
+        categories: {
+          "Dairy and Egg Products": "Süt ve Yumurta Ürünleri",
+          "Fats and Oils": "Yağlar",
+          "Soups, Sauces, and Gravies": "Çorbalar ve Soslar",
+          Other: "Diğer",
+        },
+        sources: {
+          foundation_food: "Foundation Food",
+          branded_food: "Markalı Ürün",
+          sr_legacy_food: "SR Legacy",
+          survey_fndds_food: "Survey FNDDS",
+        },
+        tags: {
+          carb: "Karbonhidrat",
+          protein: "Protein",
+          fat: "Yağ",
+          produce: "Ürün",
+        },
+      },
+    },
+  },
 };
 
 if (!i18n.isInitialized) {
@@ -130,8 +208,8 @@ if (!i18n.isInitialized) {
     lng: Localization.getLocales()[0]?.languageCode === "tr" ? "tr" : "en",
     fallbackLng: "en",
     interpolation: {
-      escapeValue: false
-    }
+      escapeValue: false,
+    },
   });
 }
 

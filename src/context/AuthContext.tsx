@@ -1,19 +1,24 @@
-import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
+import * as Linking from "expo-linking";
+import React, {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-const STORAGE_KEY = "@purelife:user";
+import { supabase, supabasePasswordRedirect } from "@/lib/supabase";
 
-type AuthUser = {
+export type AuthUser = {
   id: string;
   email: string;
   name: string;
   heightCm: number;
   weightKg: number;
   goal: "lose" | "maintain" | "gain";
-};
-
-type StoredUser = AuthUser & {
-  password: string;
 };
 
 type Credentials = {
@@ -28,20 +33,43 @@ type RegistrationPayload = Credentials & {
   goal: AuthUser["goal"];
 };
 
+type AuthResult = {
+  ok: boolean;
+  error?: string;
+  requiresVerification?: boolean;
+};
+
 type AuthContextValue = {
   user: AuthUser | null;
   loading: boolean;
-  signIn: (creds: Credentials) => Promise<boolean>;
+  signIn: (creds: Credentials) => Promise<AuthResult>;
   signOut: () => Promise<void>;
-  register: (payload: RegistrationPayload) => Promise<boolean>;
+  register: (payload: RegistrationPayload) => Promise<AuthResult>;
+  requestPasswordReset: (email: string) => Promise<AuthResult>;
+  completePasswordReset: (password: string) => Promise<AuthResult>;
+  pendingPasswordReset: boolean;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const delay = (ms: number) =>
-  new Promise<void>((resolve: () => void) => {
-    setTimeout(() => resolve(), ms);
-  });
+const defaultGoal: AuthUser["goal"] = "maintain";
+
+const mapUserFromSupabase = (incoming: User): AuthUser => {
+  const metadata = (incoming.user_metadata ?? {}) as Partial<
+    AuthUser & {
+      goal?: AuthUser["goal"];
+    }
+  >;
+
+  return {
+    id: incoming.id,
+    email: incoming.email ?? "",
+    name: metadata.name ?? "",
+    heightCm: Number(metadata.heightCm ?? 0),
+    weightKg: Number(metadata.weightKg ?? 0),
+    goal: (metadata.goal as AuthUser["goal"]) ?? defaultGoal,
+  };
+};
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -50,78 +78,242 @@ type AuthProviderProps = {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pendingPasswordReset, setPendingPasswordReset] = useState(false);
 
   useEffect(() => {
-    const bootstrap = async () => {
+    const restoreSession = async () => {
       try {
-        const serialized = await AsyncStorage.getItem(STORAGE_KEY);
-        if (serialized) {
-          const parsed = JSON.parse(serialized) as StoredUser;
-          const { password: _ignored, ...publicUser } = parsed;
-          setUser(publicUser);
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          console.warn("Failed to load session", error.message);
         }
+        const currentUser = data.session?.user ?? null;
+        setUser(currentUser ? mapUserFromSupabase(currentUser) : null);
       } catch (error) {
-        console.warn("Failed to restore user", error);
+        console.warn("Unexpected session restore failure", error);
       } finally {
         setLoading(false);
       }
     };
-    bootstrap();
+
+    restoreSession();
+
+    const parseRecoveryParams = (url: string | null) => {
+      if (!url) {
+        return null;
+      }
+
+      const { queryParams, path } = Linking.parse(url);
+      const hashSection = url.includes("#") ? (url.split("#")[1] ?? "") : "";
+      const hashParams = new URLSearchParams(hashSection);
+
+      const params = new URLSearchParams();
+
+      Object.entries(queryParams ?? {}).forEach(([key, value]) => {
+        if (typeof value === "string") {
+          params.set(key, value);
+        }
+      });
+
+      hashParams.forEach((value, key) => {
+        params.set(key, value);
+      });
+
+      const type = params.get("type") ?? params.get("event");
+
+      if (!type || type !== "recovery") {
+        return null;
+      }
+
+      return {
+        accessToken: params.get("access_token") ?? undefined,
+        refreshToken: params.get("refresh_token") ?? undefined,
+        token: params.get("token") ?? undefined,
+        email: params.get("email") ?? undefined,
+        path,
+      };
+    };
+
+    const handleDeepLink = async (incomingUrl: string | null) => {
+      const parsed = parseRecoveryParams(incomingUrl);
+      if (!parsed) {
+        return;
+      }
+
+      try {
+        if (parsed.accessToken && parsed.refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: parsed.accessToken,
+            refresh_token: parsed.refreshToken,
+          });
+          if (error) {
+            console.warn(
+              "Failed to restore session from recovery link",
+              error.message,
+            );
+            return;
+          }
+        } else if (parsed.token && parsed.email) {
+          const { error } = await supabase.auth.verifyOtp({
+            type: "recovery",
+            email: parsed.email,
+            token: parsed.token,
+          });
+          if (error) {
+            console.warn(
+              "Failed to verify OTP from recovery link",
+              error.message,
+            );
+            return;
+          }
+        }
+
+        setPendingPasswordReset(true);
+      } catch (error) {
+        console.warn("Unexpected error while handling recovery link", error);
+      }
+    };
+
+    const subscribeToDeepLinks = () => {
+      const subscription = Linking.addEventListener("url", (event) => {
+        handleDeepLink(event.url).catch((error) => {
+          console.warn("Deep link handling failed", error);
+        });
+      });
+      return () => subscription.remove();
+    };
+
+    Linking.getInitialURL()
+      .then((initialUrl) => handleDeepLink(initialUrl))
+      .catch((error) => {
+        console.warn("Failed to load initial link", error);
+      });
+
+    const unsubscribe = subscribeToDeepLinks();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (event: AuthChangeEvent, session: Session | null) => {
+        if (
+          event === "INITIAL_SESSION" ||
+          event === "TOKEN_REFRESHED" ||
+          event === "SIGNED_IN" ||
+          event === "USER_UPDATED"
+        ) {
+          const currentUser = session?.user ?? null;
+          setUser(currentUser ? mapUserFromSupabase(currentUser) : null);
+        }
+
+        if (event === "PASSWORD_RECOVERY") {
+          setPendingPasswordReset(true);
+        }
+
+        if (event === "SIGNED_OUT") {
+          setUser(null);
+          setPendingPasswordReset(false);
+        }
+      },
+    );
+
+    return () => {
+      unsubscribe();
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const signIn = useCallback(async ({ email, password }: Credentials) => {
-    await delay(600);
-    try {
-      const serialized = await AsyncStorage.getItem(STORAGE_KEY);
-      if (!serialized) {
-        return false;
+  const register = useCallback(
+    async (payload: RegistrationPayload): Promise<AuthResult> => {
+      const { data, error } = await supabase.auth.signUp({
+        email: payload.email,
+        password: payload.password,
+        options: {
+          data: {
+            name: payload.name,
+            heightCm: payload.heightCm,
+            weightKg: payload.weightKg,
+            goal: payload.goal,
+          },
+        },
+      });
+
+      if (error) {
+        return { ok: false, error: error.message };
       }
-      const storedUser = JSON.parse(serialized) as StoredUser;
-      if (storedUser.email !== email) {
-        return false;
+
+      if (data.user) {
+        setUser(mapUserFromSupabase(data.user));
       }
-      const verified = storedUser.password === password;
-      if (!verified) {
-        return false;
+
+      return {
+        ok: true,
+        requiresVerification: !data.session,
+      };
+    },
+    [],
+  );
+
+  const signIn = useCallback(
+    async ({ email, password }: Credentials): Promise<AuthResult> => {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        return { ok: false, error: error.message };
       }
-      const { password: _ignored, ...publicUser } = storedUser;
-      setUser(publicUser);
-      return true;
-    } catch (error) {
-      console.warn("Sign-in failed", error);
-      return false;
-    }
-  }, []);
+
+      if (data.user) {
+        setUser(mapUserFromSupabase(data.user));
+      }
+
+      return { ok: true };
+    },
+    [],
+  );
 
   const signOut = useCallback(async () => {
-    await delay(400);
-    await AsyncStorage.removeItem(STORAGE_KEY).catch((error: unknown) => {
-      console.warn("Failed to clear user", error);
-    });
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.warn("Sign-out failed", error.message);
+    }
     setUser(null);
+    setPendingPasswordReset(false);
   }, []);
 
-  const register = useCallback(async (payload: RegistrationPayload) => {
-    await delay(800);
-    const newUser: StoredUser = {
-      id: Date.now().toString(),
-      email: payload.email,
-      name: payload.name,
-      heightCm: payload.heightCm,
-      weightKg: payload.weightKg,
-      goal: payload.goal,
-      password: payload.password
-    };
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
-      const { password: _ignored, ...publicUser } = newUser;
-      setUser(publicUser);
-      return true;
-    } catch (error) {
-      console.warn("Registration failed", error);
-      return false;
-    }
-  }, []);
+  const requestPasswordReset = useCallback(
+    async (email: string): Promise<AuthResult> => {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: supabasePasswordRedirect || undefined,
+      });
+
+      if (error) {
+        return { ok: false, error: error.message };
+      }
+
+      return { ok: true };
+    },
+    [],
+  );
+
+  const completePasswordReset = useCallback(
+    async (password: string): Promise<AuthResult> => {
+      const { data, error } = await supabase.auth.updateUser({ password });
+
+      if (error) {
+        return { ok: false, error: error.message };
+      }
+
+      if (data.user) {
+        setUser(mapUserFromSupabase(data.user));
+      }
+
+      setPendingPasswordReset(false);
+      return { ok: true };
+    },
+    [],
+  );
 
   const value = useMemo(
     () => ({
@@ -129,9 +321,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       loading,
       signIn,
       signOut,
-      register
+      register,
+      requestPasswordReset,
+      completePasswordReset,
+      pendingPasswordReset,
     }),
-    [loading, register, signIn, signOut, user]
+    [
+      completePasswordReset,
+      loading,
+      pendingPasswordReset,
+      register,
+      requestPasswordReset,
+      signIn,
+      signOut,
+      user,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

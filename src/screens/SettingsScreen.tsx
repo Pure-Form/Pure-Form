@@ -1,16 +1,26 @@
-import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@/context/ThemeContext";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 
 const SettingsScreen = () => {
   const { theme, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const { user, signOut } = useAuth();
-  const [language, setLanguage] = useState(i18n.language.startsWith("tr") ? "tr" : "en");
+  const [language, setLanguage] = useState(
+    i18n.language.startsWith("tr") ? "tr" : "en",
+  );
 
   const handleLanguageChange = async (next: "en" | "tr") => {
     setLanguage(next);
@@ -18,60 +28,98 @@ const SettingsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]}> 
-      <ScrollView contentContainerStyle={styles.container}> 
-        <View style={styles.profileCard}> 
-          <View style={[styles.avatar, { backgroundColor: theme.colors.accentSoft }]}> 
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: theme.colors.background }]}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.profileCard}>
+          <View
+            style={[
+              styles.avatar,
+              { backgroundColor: theme.colors.accentSoft },
+            ]}
+          >
             <Ionicons name="person" size={28} color={theme.colors.accent} />
           </View>
           <View>
-            <Text style={[styles.name, { color: theme.colors.text }]}>{user?.name ?? "Pure Athlete"}</Text>
-            <Text style={[styles.email, { color: theme.colors.subText }]}>{user?.email ?? "guest@pure.life"}</Text>
+            <Text style={[styles.name, { color: theme.colors.text }]}>
+              {user?.name ?? "Pure Athlete"}
+            </Text>
+            <Text style={[styles.email, { color: theme.colors.subText }]}>
+              {user?.email ?? "guest@pure.life"}
+            </Text>
           </View>
         </View>
 
-        <View style={styles.section}> 
-          <Text style={[styles.sectionTitle, { color: theme.colors.subText }]}>{t("settings.theme")}</Text>
-          <View style={[styles.row, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}> 
-            <Text style={[styles.rowText, { color: theme.colors.text }]}>{theme.mode === "dark" ? t("settings.dark") : t("settings.light")}</Text>
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.subText }]}>
+            {t("settings.theme")}
+          </Text>
+          <View
+            style={[
+              styles.row,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
+            ]}
+          >
+            <Text style={[styles.rowText, { color: theme.colors.text }]}>
+              {theme.mode === "dark" ? t("settings.dark") : t("settings.light")}
+            </Text>
             <Switch
               value={theme.mode === "dark"}
               onValueChange={toggleTheme}
-              thumbColor={theme.mode === "dark" ? theme.colors.accent : "#f4f3f4"}
-              trackColor={{ false: theme.colors.border, true: theme.colors.accentSoft }}
+              thumbColor={
+                theme.mode === "dark" ? theme.colors.accent : "#f4f3f4"
+              }
+              trackColor={{
+                false: theme.colors.border,
+                true: theme.colors.accentSoft,
+              }}
             />
           </View>
         </View>
 
-        <View style={styles.section}> 
-          <Text style={[styles.sectionTitle, { color: theme.colors.subText }]}>{t("settings.language")}</Text>
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.subText }]}>
+            {t("settings.language")}
+          </Text>
           <View style={styles.languageRow}>
-            {(
-              [
-                { code: "en" as const, label: "English" },
-                { code: "tr" as const, label: "Türkçe" }
-              ]
-            ).map((option) => {
+            {[
+              { code: "en" as const, label: "English" },
+              { code: "tr" as const, label: "Türkçe" },
+            ].map((option) => {
               const isActive = option.code === language;
               return (
                 <Pressable
                   key={option.code}
                   onPress={() => {
-                    void handleLanguageChange(option.code);
+                    handleLanguageChange(option.code).catch((error) => {
+                      console.warn("Language change failed", error);
+                    });
                   }}
                   style={({ pressed }: { pressed: boolean }) => [
                     styles.languageChip,
                     {
-                      backgroundColor: isActive ? theme.colors.accent : theme.colors.surface,
-                      borderColor: isActive ? theme.colors.accent : theme.colors.border,
-                      opacity: pressed ? 0.85 : 1
-                    }
+                      backgroundColor: isActive
+                        ? theme.colors.accent
+                        : theme.colors.surface,
+                      borderColor: isActive
+                        ? theme.colors.accent
+                        : theme.colors.border,
+                      opacity: pressed ? 0.85 : 1,
+                    },
                   ]}
                 >
                   <Text
                     style={[
                       styles.languageText,
-                      { color: isActive ? theme.colors.background : theme.colors.text }
+                      {
+                        color: isActive
+                          ? theme.colors.background
+                          : theme.colors.text,
+                      },
                     ]}
                   >
                     {option.label}
@@ -84,18 +132,28 @@ const SettingsScreen = () => {
 
         <Pressable
           onPress={() => {
-            void signOut();
+            signOut().catch((error) => {
+              console.warn("Failed to sign out", error);
+            });
           }}
           style={({ pressed }: { pressed: boolean }) => [
             styles.signOut,
             {
               backgroundColor: theme.colors.danger,
-              opacity: pressed ? 0.85 : 1
-            }
+              opacity: pressed ? 0.85 : 1,
+            },
           ]}
         >
-          <Ionicons name="log-out-outline" size={18} color={theme.colors.background} />
-          <Text style={[styles.signOutText, { color: theme.colors.background }]}>Sign out</Text>
+          <Ionicons
+            name="log-out-outline"
+            size={18}
+            color={theme.colors.background}
+          />
+          <Text
+            style={[styles.signOutText, { color: theme.colors.background }]}
+          >
+            Sign out
+          </Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
@@ -104,38 +162,38 @@ const SettingsScreen = () => {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1
+    flex: 1,
   },
   container: {
     flexGrow: 1,
     padding: 20,
-    gap: 24
+    gap: 24,
   },
   profileCard: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16
+    gap: 16,
   },
   avatar: {
     width: 60,
     height: 60,
     borderRadius: 20,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   name: {
     fontSize: 18,
-    fontWeight: "700"
+    fontWeight: "700",
   },
   email: {
-    fontSize: 13
+    fontSize: 13,
   },
   section: {
-    gap: 12
+    gap: 12,
   },
   sectionTitle: {
     fontSize: 14,
-    textTransform: "uppercase"
+    textTransform: "uppercase",
   },
   row: {
     padding: 16,
@@ -143,26 +201,26 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   rowText: {
     fontSize: 16,
-    fontWeight: "600"
+    fontWeight: "600",
   },
   languageRow: {
     flexDirection: "row",
-    gap: 12
+    gap: 12,
   },
   languageChip: {
     flex: 1,
     borderRadius: 16,
     borderWidth: 1,
     paddingVertical: 12,
-    alignItems: "center"
+    alignItems: "center",
   },
   languageText: {
     fontSize: 14,
-    fontWeight: "600"
+    fontWeight: "600",
   },
   signOut: {
     marginTop: "auto",
@@ -171,12 +229,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8
+    gap: 8,
   },
   signOutText: {
     fontSize: 15,
-    fontWeight: "600"
-  }
+    fontWeight: "600",
+  },
 });
 
 export default SettingsScreen;

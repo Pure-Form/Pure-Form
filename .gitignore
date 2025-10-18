@@ -1,1 +1,4 @@
+FoodData_Central_csv_*/
+scripts/output/
 node_modules
+.env

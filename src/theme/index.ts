@@ -41,8 +41,8 @@ export const lightTheme: AppTheme = {
     warning: "#FFC542",
     danger: "#FF575F",
     border: "#E0E6ED",
-    chartGradient: ["rgba(0, 182, 255, 0.6)", "rgba(0, 182, 255, 0.1)"]
-  }
+    chartGradient: ["rgba(0, 182, 255, 0.6)", "rgba(0, 182, 255, 0.1)"],
+  },
 };
 
 export const darkTheme: AppTheme = {
@@ -59,6 +59,6 @@ export const darkTheme: AppTheme = {
     warning: "#FFC542",
     danger: "#FF575F",
     border: "#1F2332",
-    chartGradient: ["rgba(0, 182, 255, 0.7)", "rgba(0, 182, 255, 0.05)"]
-  }
+    chartGradient: ["rgba(0, 182, 255, 0.7)", "rgba(0, 182, 255, 0.05)"],
+  },
 };

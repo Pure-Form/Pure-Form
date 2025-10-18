@@ -1,5 +1,6 @@
 import React from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text } from "react-native";
+
 import { useTheme } from "@/context/ThemeContext";
 
 type PrimaryButtonProps = {
@@ -10,26 +11,38 @@ type PrimaryButtonProps = {
   variant?: "primary" | "secondary";
 };
 
-const PrimaryButton = ({ title, onPress, disabled = false, loading = false, variant = "primary" }: PrimaryButtonProps) => {
+const PrimaryButton = ({
+  title,
+  onPress,
+  disabled = false,
+  loading = false,
+  variant = "primary",
+}: PrimaryButtonProps) => {
   const { theme } = useTheme();
 
-  const backgroundColor = variant === "primary" ? theme.colors.accent : theme.colors.accentSoft;
-  const textColor = variant === "primary" ? theme.colors.background : theme.colors.accent;
+  const backgroundColor =
+    variant === "primary" ? theme.colors.accent : theme.colors.accentSoft;
+  const textColor =
+    variant === "primary" ? theme.colors.background : theme.colors.accent;
 
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled || loading}
-  style={({ pressed }: { pressed: boolean }) => [
+      style={({ pressed }: { pressed: boolean }) => [
         styles.button,
         {
           backgroundColor,
           opacity: pressed || disabled ? 0.8 : 1,
-          borderColor: theme.colors.border
-        }
+          borderColor: theme.colors.border,
+        },
       ]}
     >
-      {loading ? <ActivityIndicator color={textColor} /> : <Text style={[styles.title, { color: textColor }]}>{title}</Text>}
+      {loading ? (
+        <ActivityIndicator color={textColor} />
+      ) : (
+        <Text style={[styles.title, { color: textColor }]}>{title}</Text>
+      )}
     </Pressable>
   );
 };
@@ -41,12 +54,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 8,
-    borderWidth: 1
+    borderWidth: 1,
   },
   title: {
     fontWeight: "600",
-    fontSize: 16
-  }
+    fontSize: 16,
+  },
 });
 
 export default PrimaryButton;

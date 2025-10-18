@@ -1,12 +1,13 @@
-import "react-native-gesture-handler";
-import React from "react";
 import { StatusBar } from "expo-status-bar";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import React from "react";
 import { I18nextProvider } from "react-i18next";
-import { ThemeProvider } from "@/context/ThemeContext";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 import { AuthProvider } from "@/context/AuthContext";
-import AppNavigator from "@/navigation/AppNavigator";
+import { CoachProvider } from "@/context/CoachContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import i18n from "@/i18n";
+import AppNavigator from "@/navigation/AppNavigator";
 
 const App = () => {
   return (
@@ -14,8 +15,10 @@ const App = () => {
       <I18nextProvider i18n={i18n}>
         <ThemeProvider>
           <AuthProvider>
-            <StatusBar style="light" />
-            <AppNavigator />
+            <CoachProvider>
+              <StatusBar style="light" />
+              <AppNavigator />
+            </CoachProvider>
           </AuthProvider>
         </ThemeProvider>
       </I18nextProvider>
