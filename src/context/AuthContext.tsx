@@ -9,8 +9,14 @@ import React, {
   useMemo,
   useState,
 } from "react";
+// YENİ IMPORTLAR: SSO akışını yönetmek için gerekli
+import * as WebBrowser from "expo-web-browser";
+import * as AuthSession from "expo-auth-session";
 
 import { supabase, supabasePasswordRedirect } from "@/lib/supabase";
+
+// Expo SSO için hazırlık: Uygulamanın tarayıcı geri dönüşünü tanımasını sağlar
+WebBrowser.maybeCompleteAuthSession();
 
 export type AuthUser = {
   id: string;
@@ -39,6 +45,9 @@ type AuthResult = {
   requiresVerification?: boolean;
 };
 
+// YENİ TIP: SSO Sağlayıcıları
+type Provider = "google" | "apple";
+
 type AuthContextValue = {
   user: AuthUser | null;
   loading: boolean;
@@ -48,6 +57,8 @@ type AuthContextValue = {
   requestPasswordReset: (email: string) => Promise<AuthResult>;
   completePasswordReset: (password: string) => Promise<AuthResult>;
   pendingPasswordReset: boolean;
+  // YENİ ALAN: SSO fonksiyonu Context'e eklendi
+  signInWithProvider: (provider: Provider) => Promise<AuthResult>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -272,6 +283,55 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     },
     [],
   );
+  
+  // YENİ FONKSİYON: SSO (Google/Apple) ile Oturum Açma Mantığı
+  const signInWithProvider = useCallback(
+    async (provider: Provider): Promise<AuthResult> => {
+      setLoading(true);
+      try {
+        // 1. Geri Dönüş URL'sini Oluşturma
+        const redirectUrl = AuthSession.makeRedirectUri({
+          path: '/auth/callback',
+        });
+        
+        // 2. Supabase'ten OAuth (SSO) Başlatma URL'sini Alma
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: provider,
+          options: {
+            redirectTo: redirectUrl,
+            skipBrowserRedirect: true, // Expo'nun tarayıcıyı açmasını sağlar
+          },
+        });
+
+        if (error) {
+          throw new Error(`SSO Başlatma Hatası: ${error.message}`);
+        }
+
+        if (data?.url) {
+          // 3. Tarayıcı Penceresini Açma ve Akışı Yönetme
+          const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+
+          // 4. Başarılı Geri Dönüşü Yakalama ve Oturumu Doğrulama
+          if (result.type === 'success' && result.url) {
+            // Supabase'in bu URL'den gelen oturum bilgisini işlemesini sağla
+            await supabase.auth.getSessionFromUrl({ url: result.url });
+            // onAuthStateChange dinleyicisi zaten user/session durumunu otomatik güncelleyecektir.
+          }
+        }
+        
+        // Hata olmadıkça başarılı sayılır
+        return { ok: true };
+
+      } catch (e: any) {
+        console.error(`SSO Giriş İşlemi Hata Verdi (${provider}):`, e.message);
+        return { ok: false, error: e.message || 'Bilinmeyen SSO hatası' };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+  // YENİ FONKSİYON BİTİŞİ
 
   const signOut = useCallback(async () => {
     const { error } = await supabase.auth.signOut();
@@ -325,6 +385,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       requestPasswordReset,
       completePasswordReset,
       pendingPasswordReset,
+      // YENİ ALAN: SSO fonksiyonu context değerine dahil edildi
+      signInWithProvider,
     }),
     [
       completePasswordReset,
@@ -335,6 +397,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       signIn,
       signOut,
       user,
+      // Yeni eklenen bağımlılık
+      signInWithProvider,
     ],
   );
 
