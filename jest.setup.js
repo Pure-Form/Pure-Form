@@ -1,5 +1,5 @@
-// Jest setup for React Native testing library
+// Jest setup for React Native Testing Library
 require('@testing-library/jest-native/extend-expect');
 
-// Silence some expo warnings if needed
+// Silence native animated warnings
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
