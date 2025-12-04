@@ -1,4 +1,5 @@
-import 'react-native-url-polyfill/auto';
+//import 'react-native-url-polyfill/auto';
+//import 'react-native-url-polyfill/auto';
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { I18nextProvider } from "react-i18next";

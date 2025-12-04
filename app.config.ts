@@ -19,9 +19,12 @@ const config: ExpoConfig = {
   },
   assetBundlePatterns: ["**/*"],
   ios: {
-    supportsTablet: true,
-    bundleIdentifier: "com.purelife.app",
-  },
+  supportsTablet: true,
+  bundleIdentifier: "com.purelife.app",
+  infoPlist: {
+    ITSAppUsesNonExemptEncryption: false
+  }
+},
   android: {
     adaptiveIcon: {
       foregroundImage: "./assets/adaptive-icon.png",
@@ -47,11 +50,14 @@ const config: ExpoConfig = {
     ],
     "expo-font",
   ],
-  extra: {
+    extra: {
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? "",
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "",
     supabasePasswordRedirect:
       process.env.EXPO_PUBLIC_SUPABASE_PASSWORD_REDIRECT ?? "",
+    eas: {
+      projectId: "0902bb6d-9bc2-4b5c-804d-a2273e16eb63",
+    },
   },
 };
 
