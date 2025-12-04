@@ -9,6 +9,9 @@ import { useCoach } from "@/context/CoachContext";
 import { useTheme } from "@/context/ThemeContext";
 import type { PlannerStackParamList } from "@/navigation/PlannerNavigator";
 import {
+  type AiCoachPlan,
+  type AiWeekPlan,
+  type AiWorkoutPlanItem,
   WEEK_DAYS,
   type BodyFocus,
   type DietMeal,
@@ -59,6 +62,7 @@ const CoachPlanScreen = ({ navigation }: Props) => {
   const profile = state.profile;
   const summary = state.summary;
   const schedule = state.schedule;
+  const aiPlan = state.aiPlan;
 
   const today = useMemo(() => {
     const todayKey = JS_WEEKDAY_TO_KEY[new Date().getDay()];
@@ -212,6 +216,8 @@ const CoachPlanScreen = ({ navigation }: Props) => {
             />
           </View>
         </View>
+
+        {aiPlan ? <AiPlanSection aiPlan={aiPlan} /> : null}
 
         {today ? (
           <View
@@ -409,6 +415,187 @@ const DietRow = ({ label, calories, meals }: DietRowProps) => {
   );
 };
 
+type AiPlanSectionProps = {
+  aiPlan: AiCoachPlan;
+};
+
+const AiPlanSection = ({ aiPlan }: AiPlanSectionProps) => {
+  const { theme } = useTheme();
+  const summaryTr = aiPlan.summary?.tr ?? aiPlan.summary?.en ?? "";
+  const summaryEn = aiPlan.summary?.en ?? aiPlan.summary?.tr ?? "";
+  const habitFocus =
+    aiPlan.habitFocus?.tr?.length
+      ? aiPlan.habitFocus.tr
+      : aiPlan.habitFocus?.en ?? [];
+
+  return (
+    <View
+      style={[
+        styles.aiCard,
+        {
+          backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.border,
+        },
+      ]}
+    >
+      <Text style={[styles.sectionHeading, { color: theme.colors.text }]}>
+        AI Koç Özeti
+      </Text>
+      <Text style={[styles.aiSummaryText, { color: theme.colors.text }]}>
+        {summaryTr}
+      </Text>
+      {summaryEn ? (
+        <Text style={[styles.aiSubText, { color: theme.colors.subText }]}>
+          {summaryEn}
+        </Text>
+      ) : null}
+
+      {habitFocus.length ? (
+        <View style={styles.aiHabitList}>
+          <Text style={[styles.aiHabitTitle, { color: theme.colors.text }]}>
+            Ayın alışkanlık odakları
+          </Text>
+          {habitFocus.map((habit, index) => (
+            <Text
+              key={`${habit}-${index}`}
+              style={[styles.aiHabitItem, { color: theme.colors.subText }]}
+            >
+              • {habit}
+            </Text>
+          ))}
+        </View>
+      ) : null}
+
+      {Array.isArray(aiPlan.weeklyPlan)
+        ? aiPlan.weeklyPlan.map((week) => (
+            <AiWeekCard key={week.week} week={week} />
+          ))
+        : null}
+    </View>
+  );
+};
+
+type AiWeekCardProps = {
+  week: AiWeekPlan;
+};
+
+const AiWeekCard = ({ week }: AiWeekCardProps) => {
+  const { theme } = useTheme();
+  const sampleMeals = week.nutrition?.sampleMeals?.tr ?? [];
+  const focusCopy = week.focus?.tr ?? week.focus?.en ?? "";
+  const tipsCopy = week.nutrition?.tips?.tr ?? week.nutrition?.tips?.en ?? "";
+  const mealList = sampleMeals.length
+    ? sampleMeals
+    : week.nutrition?.sampleMeals?.en ?? [];
+  const dailyCalories = week.nutrition?.dailyCalories ?? 0;
+
+  return (
+    <View
+      style={[
+        styles.aiWeekBlock,
+        {
+          backgroundColor: theme.colors.card,
+          borderColor: theme.colors.border,
+        },
+      ]}
+    >
+      <Text style={[styles.aiWeekHeader, { color: theme.colors.text }]}>
+        Hafta {week.week}
+      </Text>
+      <Text style={[styles.aiWeekFocus, { color: theme.colors.subText }]}>
+        {focusCopy}
+      </Text>
+
+      <View style={styles.aiWorkoutList}>
+        {week.workouts.map((workout) => (
+          <AiWorkoutItem
+            key={`${week.week}-${workout.day}-${workout.title.tr}`}
+            workout={workout}
+          />
+        ))}
+      </View>
+
+      <View
+        style={[
+          styles.aiNutritionBox,
+          {
+            borderColor: theme.colors.border,
+            backgroundColor: theme.colors.surface,
+          },
+        ]}
+      >
+        <Text
+          style={[styles.aiNutritionHeading, { color: theme.colors.text }]}
+        >
+          Beslenme
+        </Text>
+        <Text style={[styles.aiNutritionText, { color: theme.colors.subText }]}>
+          Günlük kalori: {dailyCalories}
+        </Text>
+        <Text style={[styles.aiNutritionText, { color: theme.colors.subText }]}>
+          {tipsCopy}
+        </Text>
+        {mealList.slice(0, 3).map((meal, index) => (
+          <Text
+            key={`${meal}-${index}`}
+            style={[styles.aiMealItem, { color: theme.colors.subText }]}
+          >
+            • {meal}
+          </Text>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+type AiWorkoutItemProps = {
+  workout: AiWorkoutPlanItem;
+};
+
+const AiWorkoutItem = ({ workout }: AiWorkoutItemProps) => {
+  const { theme } = useTheme();
+  const dayLabel =
+    WEEK_DAYS.find((day) => day.key === workout.day)?.label ?? workout.day;
+  const intensityColor =
+    intensityColors[workout.intensity as keyof typeof intensityColors] ??
+    theme.colors.accent;
+  const titleCopy = workout.title?.tr ?? workout.title?.en ?? "";
+  const detailCopy = workout.details?.tr ?? workout.details?.en ?? "";
+
+  return (
+    <View
+      style={[styles.aiWorkoutItem, { borderColor: theme.colors.border }]}
+    >
+      <View style={styles.aiWorkoutHeader}>
+        <Text style={[styles.aiWorkoutDay, { color: theme.colors.text }]}>
+          {dayLabel}
+        </Text>
+        <View
+          style={[styles.aiIntensityBadge, { borderColor: intensityColor }]}
+        >
+          <Text
+            style={[styles.aiIntensityText, { color: intensityColor }]}
+          >
+            {workout.intensity.toUpperCase()}
+          </Text>
+        </View>
+      </View>
+      {titleCopy ? (
+        <Text style={[styles.aiWorkoutTitle, { color: theme.colors.text }]}>
+          {titleCopy}
+        </Text>
+      ) : null}
+      {detailCopy ? (
+        <Text
+          style={[styles.aiWorkoutDetails, { color: theme.colors.subText }]}
+        >
+          {detailCopy}
+        </Text>
+      ) : null}
+    </View>
+  );
+};
+
 type DayScheduleCardProps = {
   dayKey: WeekdayKey;
   workout: WorkoutSession;
@@ -573,6 +760,98 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     borderWidth: 1,
     gap: 12,
+  },
+  aiCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 18,
+    gap: 14,
+  },
+  aiSummaryText: {
+    fontSize: 15,
+    fontWeight: "600",
+    lineHeight: 22,
+  },
+  aiSubText: {
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  aiHabitList: {
+    gap: 4,
+  },
+  aiHabitTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  aiHabitItem: {
+    fontSize: 12,
+  },
+  aiWeekBlock: {
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 14,
+    gap: 12,
+  },
+  aiWeekHeader: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  aiWeekFocus: {
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  aiWorkoutList: {
+    gap: 10,
+  },
+  aiWorkoutItem: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    gap: 6,
+  },
+  aiWorkoutHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  aiWorkoutDay: {
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  aiIntensityBadge: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  aiIntensityText: {
+    fontSize: 10,
+    fontWeight: "700",
+  },
+  aiWorkoutTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  aiWorkoutDetails: {
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  aiNutritionBox: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    gap: 6,
+  },
+  aiNutritionHeading: {
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  aiNutritionText: {
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  aiMealItem: {
+    fontSize: 12,
   },
   listHeader: {
     flexDirection: "row",

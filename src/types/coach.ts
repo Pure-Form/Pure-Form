@@ -11,6 +11,21 @@ export type ActivityLevel =
   | "active"
   | "athlete";
 
+export type TrainingExperience = "beginner" | "intermediate" | "advanced";
+
+export type DietPreference =
+  | "omnivore"
+  | "vegetarian"
+  | "vegan"
+  | "pescatarian"
+  | "keto";
+
+export type EquipmentAccess =
+  | "full_gym"
+  | "basic_gym"
+  | "home_dumbbells"
+  | "bodyweight";
+
 export type WeekdayKey =
   | "monday"
   | "tuesday"
@@ -46,6 +61,10 @@ export type GoalProfile = {
   focus: BodyFocus;
   activityLevel: ActivityLevel;
   workoutsPerWeek: number;
+  experience: TrainingExperience;
+  equipment: EquipmentAccess;
+  dietPreference: DietPreference;
+  injuries?: string;
 };
 
 export type MacroTargets = {
@@ -62,6 +81,46 @@ export type GoalSummary = {
   activityFactor: number;
   macroTargets: MacroTargets;
   hydrationLiters: number;
+};
+
+export type LocaleCopy = {
+  tr: string;
+  en: string;
+};
+
+export type LocaleStringList = {
+  tr: string[];
+  en: string[];
+};
+
+export type AiPlanMetadata = {
+  generatedAt: string;
+  locale: "tr" | "en";
+};
+
+export type AiWorkoutPlanItem = {
+  day: WeekdayKey | string;
+  title: LocaleCopy;
+  details: LocaleCopy;
+  intensity: "low" | "medium" | "high";
+};
+
+export type AiWeekPlan = {
+  week: number;
+  focus: LocaleCopy;
+  workouts: AiWorkoutPlanItem[];
+  nutrition: {
+    dailyCalories: number;
+    tips: LocaleCopy;
+    sampleMeals: LocaleStringList;
+  };
+};
+
+export type AiCoachPlan = {
+  metadata: AiPlanMetadata;
+  summary: LocaleCopy;
+  weeklyPlan: AiWeekPlan[];
+  habitFocus: LocaleStringList;
 };
 
 export type FoodItem = {
@@ -155,6 +214,7 @@ export type StoredCoachState = {
   summary: GoalSummary;
   dietPlan: WeeklyDietPlan;
   workoutPlan: WeeklyWorkoutPlan;
+  aiPlan?: AiCoachPlan | null;
 };
 
 export const WORKOUT_FOCUS_ORDER: WorkoutFocus[] = [

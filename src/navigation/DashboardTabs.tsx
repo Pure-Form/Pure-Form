@@ -7,14 +7,14 @@ import { useTheme } from "@/context/ThemeContext";
 import PlannerNavigator from "@/navigation/PlannerNavigator";
 import DashboardScreen from "@/screens/DashboardScreen";
 import NutritionLibraryScreen from "@/screens/NutritionLibraryScreen";
-import ProgressScreen from "@/screens/ProgressScreen";
+import CoachChatScreen from "@/screens/CoachChatScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
 
 export type DashboardTabParamList = {
   Dashboard: undefined;
   Planner: undefined;
   Nutrition: undefined;
-  Progress: undefined;
+  CoachAI: undefined;
   Settings: undefined;
 };
 
@@ -38,6 +38,7 @@ const DashboardTabs = () => {
           backgroundColor: theme.colors.card,
           borderTopColor: theme.colors.border,
         },
+        tabBarShowLabel: false,
         tabBarIcon: ({ color, size }: { color: string; size: number }) => {
           const iconMap: Record<
             keyof DashboardTabParamList,
@@ -46,14 +47,11 @@ const DashboardTabs = () => {
             Dashboard: "speedometer-outline",
             Planner: "barbell-outline",
             Nutrition: "restaurant-outline",
-            Progress: "stats-chart-outline",
+            CoachAI: "chatbox-ellipses-outline",
             Settings: "settings-outline",
           };
           const iconName = iconMap[route.name as keyof DashboardTabParamList];
           return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
         },
       })}
     >
@@ -73,9 +71,9 @@ const DashboardTabs = () => {
         options={{ title: t("nutrition.tabTitle") }}
       />
       <Tab.Screen
-        name="Progress"
-        component={ProgressScreen}
-        options={{ title: t("dashboard.progressHeading") }}
+        name="CoachAI"
+        component={CoachChatScreen}
+        options={{ title: t("dashboard.aiCoachHeading") }}
       />
       <Tab.Screen
         name="Settings"

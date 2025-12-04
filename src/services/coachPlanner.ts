@@ -1,6 +1,8 @@
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { getFoodById } from "@/services/nutritionLibrary";
 import {
   ActivityLevel,
+  type AiCoachPlan,
   BodyGoal,
   DailySchedule,
   DietMeal,
@@ -761,6 +763,53 @@ export const buildSchedule = (
     diet: dietPlan ? (dietPlan[day.key] ?? null) : null,
     workout: workoutPlan[day.key],
   }));
+
+type AiPlanRequestInput = {
+  profile: GoalProfile;
+  summary: GoalSummary;
+  locale?: "tr" | "en";
+  notes?: string;
+};
+
+export const requestAiCoachPlan = async ({
+  profile,
+  summary,
+  locale = "tr",
+  notes,
+}: AiPlanRequestInput): Promise<AiCoachPlan> => {
+  if (!isSupabaseConfigured) {
+    throw new Error("Supabase configuration is missing");
+  }
+
+  try {
+    const { data, error } = await supabase.functions.invoke<AiCoachPlan>(
+      "generate-plan",
+      {
+        body: {
+          profile,
+          summary,
+          locale,
+          notes,
+        },
+      },
+    );
+
+    if (error) {
+      throw new Error(error.message ?? "Failed to generate AI coach plan");
+    }
+
+    if (!data) {
+      throw new Error("AI coach plan response is empty");
+    }
+
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Unknown error while generating AI coach plan");
+  }
+};
 
 export const cycleFocus = (current: WorkoutFocus): WorkoutFocus => {
   const index = WORKOUT_FOCUS_ORDER.findIndex((item) => item === current);

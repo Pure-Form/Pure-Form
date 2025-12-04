@@ -4,7 +4,7 @@ import { FoodItem } from "@/types/coach";
 export const FOOD_LIBRARY: FoodItem[] = [
   {
     id: "oats",
-    name: "Yulaf ezmesi",
+    name: "Yulaf Ezmesi",
     category: "carb",
     portion: "1/2 cup (dry)",
     calories: 150,
@@ -15,7 +15,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "greek_yogurt",
-    name: "Sade Yunan yogurdu",
+    name: "Sade Yunan Yoğurdu",
     category: "protein",
     portion: "170 g",
     calories: 100,
@@ -26,7 +26,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "berries",
-    name: "Karisik orman meyvesi",
+    name: "Karışık Orman Meyveleri",
     category: "produce",
     portion: "1 cup",
     calories: 60,
@@ -37,7 +37,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "egg_whites",
-    name: "Yumurta beyazi",
+    name: "Yumurta Beyazı",
     category: "protein",
     portion: "4 adet",
     calories: 70,
@@ -48,7 +48,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "whole_egg",
-    name: "Tam yumurta",
+    name: "Tam Yumurta",
     category: "protein",
     portion: "2 adet",
     calories: 150,
@@ -70,7 +70,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "chicken_breast",
-    name: "Izgara tavuk gogsu",
+    name: "Izgara Tavuk Göğsü",
     category: "protein",
     portion: "120 g",
     calories: 165,
@@ -81,7 +81,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "salmon",
-    name: "Firinda somon",
+    name: "Fırında Somon",
     category: "protein",
     portion: "120 g",
     calories: 210,
@@ -92,7 +92,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "brown_rice",
-    name: "Esmer pirinc",
+    name: "Esmer Pirinç",
     category: "carb",
     portion: "1 cup (pismis)",
     calories: 215,
@@ -114,7 +114,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "sweet_potato",
-    name: "Tatli patates",
+    name: "Tatlı Patates",
     category: "carb",
     portion: "1 orta boy",
     calories: 180,
@@ -147,7 +147,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "almonds",
-    name: "Badem",
+    name: "Çiğ Badem",
     category: "fat",
     portion: "28 g",
     calories: 165,
@@ -158,7 +158,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "whey_shake",
-    name: "Whey protein shake",
+    name: "Whey Protein Shake",
     category: "supplement",
     portion: "1 olcek",
     calories: 140,
@@ -191,7 +191,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "chickpeas",
-    name: "Haslanmis nohut",
+    name: "Haşlanmış Nohut",
     category: "protein",
     portion: "1 cup",
     calories: 210,
@@ -202,7 +202,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "turkey_breast",
-    name: "Hindi gogsu",
+    name: "Hindi Göğsü",
     category: "protein",
     portion: "120 g",
     calories: 150,
@@ -213,7 +213,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "olive_oil",
-    name: "Zeytinyagi",
+    name: "Sızma Zeytinyağı",
     category: "fat",
     portion: "1 yemek kasigi",
     calories: 120,
@@ -224,7 +224,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "chia_seed",
-    name: "Chia tohumu",
+    name: "Chia Tohumu",
     category: "fat",
     portion: "2 yemek kasigi",
     calories: 120,
@@ -235,7 +235,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "cottage_cheese",
-    name: "Lor peyniri",
+    name: "Lor Peyniri",
     category: "protein",
     portion: "150 g",
     calories: 130,
@@ -246,7 +246,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "lentil_soup",
-    name: "Mercimek corbasi",
+    name: "Mercimek Çorbası",
     category: "protein",
     portion: "1 kase",
     calories: 180,
@@ -257,7 +257,7 @@ export const FOOD_LIBRARY: FoodItem[] = [
   },
   {
     id: "protein_pancake",
-    name: "Protein pankek",
+    name: "Protein Pankek",
     category: "carb",
     portion: "2 adet",
     calories: 230,
@@ -315,14 +315,54 @@ const toTags = (value: SupabaseFoodRow["tags"]): string[] => {
 
 const normalizeQuery = (value: string) => value.trim();
 
+const toSearchToken = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ı/g, "i");
+
 const escapeLikePattern = (value: string) =>
   value
     .replace(/[%_]/g, (match) => `\\${match}`)
     .replace(/'/g, "''");
 
+const toTitleCase = (value: string) =>
+  value
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+const prettifyFoodName = (raw: string | null | undefined) => {
+  const cleaned = (raw ?? "")
+    .replace(/[_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!cleaned) {
+    return "";
+  }
+
+  const normalized = cleaned.replace(/^[^0-9A-Za-zÇĞİÖŞÜçğıöşü]+/, "");
+
+  if (!normalized) {
+    return "";
+  }
+
+  const isAllUpper = normalized === normalized.toUpperCase();
+  const isAllLower = normalized === normalized.toLowerCase();
+
+  if (isAllUpper || isAllLower) {
+    return toTitleCase(normalized.toLowerCase());
+  }
+
+  return normalized;
+};
+
 const supabaseRowToFoodItem = (row: SupabaseFoodRow): FoodItem => ({
   id: String(row.fdc_id),
-  name: row.name?.trim() || "",
+  name: prettifyFoodName(row.name),
   category: row.category?.trim() || "Other",
   categoryKey: row.category?.trim() || undefined,
   portion: row.portion?.trim() || "100 g",
@@ -347,12 +387,14 @@ const fallbackSearchFoods = (query: string) => {
     return FOOD_LIBRARY;
   }
 
-  const lower = trimmed.toLowerCase();
+  const searchToken = toSearchToken(trimmed);
 
   return FOOD_LIBRARY.filter(
     (item) =>
-      item.name.toLowerCase().includes(lower) ||
-      item.tags.some((tag: string) => tag.toLowerCase().includes(lower)),
+      toSearchToken(item.name).includes(searchToken) ||
+      item.tags.some((tag: string) =>
+        toSearchToken(tag).includes(searchToken),
+      ),
   );
 };
 

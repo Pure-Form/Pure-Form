@@ -13,8 +13,11 @@ import type {
   ActivityLevel,
   BodyFocus,
   BodyGoal,
+  DietPreference,
+  EquipmentAccess,
   GoalProfile,
   Sex,
+  TrainingExperience,
 } from "@/types/coach";
 
 type Props = NativeStackScreenProps<PlannerStackParamList, "CoachSetup">;
@@ -29,6 +32,10 @@ type FormState = {
   focus: BodyFocus;
   activityLevel: ActivityLevel;
   workoutsPerWeek: number;
+  experience: TrainingExperience;
+  equipment: EquipmentAccess;
+  dietPreference: DietPreference;
+  injuries: string;
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
@@ -117,6 +124,10 @@ const createInitialState = (profile: GoalProfile | null): FormState => ({
   focus: profile?.focus ?? "lean",
   activityLevel: profile?.activityLevel ?? "moderate",
   workoutsPerWeek: profile?.workoutsPerWeek ?? 4,
+  experience: profile?.experience ?? "intermediate",
+  equipment: profile?.equipment ?? "basic_gym",
+  dietPreference: profile?.dietPreference ?? "omnivore",
+  injuries: profile?.injuries ?? "",
 });
 
 const CoachSetupScreen = ({ navigation }: Props) => {
@@ -221,12 +232,16 @@ const CoachSetupScreen = ({ navigation }: Props) => {
     [],
   );
 
-  const handleTextChange = (
+  const handleNumericChange = (
     key: "age" | "heightCm" | "weightKg" | "targetWeightKg",
     value: string,
   ) => {
     const sanitized = value.replace(/[^0-9.]/g, "");
     setForm((prev) => ({ ...prev, [key]: sanitized }));
+  };
+
+  const handleFreeTextChange = (key: "injuries", value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSelect = <TKey extends keyof FormState>(
@@ -235,6 +250,71 @@ const CoachSetupScreen = ({ navigation }: Props) => {
   ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
+
+  const experienceOptions: Option<TrainingExperience>[] = useMemo(
+    () => [
+      {
+        value: "beginner",
+        label: "Yeni Başlayan",
+        subtitle: "0-6 ay düzenli antrenman",
+        icon: "flag-outline",
+      },
+      {
+        value: "intermediate",
+        label: "Orta Seviye",
+        subtitle: "6-24 ay deneyim",
+        icon: "trending-up-outline",
+      },
+      {
+        value: "advanced",
+        label: "İleri Seviye",
+        subtitle: "2+ yıl sistemli çalışma",
+        icon: "trophy-outline",
+      },
+    ],
+    [],
+  );
+
+  const equipmentOptions: Option<EquipmentAccess>[] = useMemo(
+    () => [
+      {
+        value: "full_gym",
+        label: "Tam Donanımlı Spor Salonu",
+        subtitle: "Serbest ağırlık + makineler",
+        icon: "fitness-outline",
+      },
+      {
+        value: "basic_gym",
+        label: "Temel Spor Salonu",
+        subtitle: "Dumbbell, bench, kablo",
+        icon: "barbell-outline",
+      },
+      {
+        value: "home_dumbbells",
+        label: "Ev + Dumbbell",
+        subtitle: "Adjustable dumbbell / kettlebell",
+        icon: "cube-outline",
+      },
+      {
+        value: "bodyweight",
+        label: "Sadece Vücut Ağırlığı",
+        subtitle: "Barfiks, elastik bant, mat",
+        icon: "body-outline",
+      },
+    ],
+    [],
+  );
+
+  const dietOptions: Option<DietPreference>[] = useMemo(
+    () => [
+      { value: "omnivore", label: "Dengeli / Omnivor" },
+      { value: "vegetarian", label: "Vejetaryen" },
+      { value: "vegan", label: "Vegan" },
+      { value: "pescatarian", label: "Pesketaryen" },
+      { value: "keto", label: "Ketojenik" },
+    ],
+    [],
+  );
 
   const validate = (): boolean => {
     const nextErrors: FormErrors = {};
@@ -285,6 +365,10 @@ const CoachSetupScreen = ({ navigation }: Props) => {
       focus: form.focus,
       activityLevel: form.activityLevel,
       workoutsPerWeek: form.workoutsPerWeek,
+      experience: form.experience,
+      equipment: form.equipment,
+      dietPreference: form.dietPreference,
+      injuries: form.injuries.trim() || undefined,
     };
 
     await saveProfile(profile);
@@ -331,21 +415,21 @@ const CoachSetupScreen = ({ navigation }: Props) => {
             label="Yaş"
             keyboardType="numeric"
             value={form.age}
-            onChangeText={(text: string) => handleTextChange("age", text)}
+            onChangeText={(text: string) => handleNumericChange("age", text)}
             error={errors.age}
           />
           <FormTextInput
             label="Boy (cm)"
             keyboardType="numeric"
             value={form.heightCm}
-            onChangeText={(text: string) => handleTextChange("heightCm", text)}
+            onChangeText={(text: string) => handleNumericChange("heightCm", text)}
             error={errors.heightCm}
           />
           <FormTextInput
             label="Kilo (kg)"
             keyboardType="numeric"
             value={form.weightKg}
-            onChangeText={(text: string) => handleTextChange("weightKg", text)}
+            onChangeText={(text: string) => handleNumericChange("weightKg", text)}
             error={errors.weightKg}
           />
           <FormTextInput
@@ -353,7 +437,7 @@ const CoachSetupScreen = ({ navigation }: Props) => {
             keyboardType="numeric"
             value={form.targetWeightKg}
             onChangeText={(text: string) =>
-              handleTextChange("targetWeightKg", text)
+                    handleNumericChange("targetWeightKg", text)
             }
             error={errors.targetWeightKg}
           />
@@ -415,6 +499,57 @@ const CoachSetupScreen = ({ navigation }: Props) => {
               />
             ))}
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            Antrenman Deneyimi
+          </Text>
+          {experienceOptions.map((option) => (
+            <OptionPill
+              key={option.value}
+              {...option}
+              selected={form.experience === option.value}
+              onPress={() => handleSelect("experience", option.value)}
+            />
+          ))}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            Ekipman Erişimi
+          </Text>
+          {equipmentOptions.map((option) => (
+            <OptionPill
+              key={option.value}
+              {...option}
+              selected={form.equipment === option.value}
+              onPress={() => handleSelect("equipment", option.value)}
+            />
+          ))}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            Beslenme Tercihi
+          </Text>
+          <View style={styles.rowWrap}>
+            {dietOptions.map((option) => (
+              <OptionPill
+                key={option.value}
+                {...option}
+                selected={form.dietPreference === option.value}
+                onPress={() => handleSelect("dietPreference", option.value)}
+              />
+            ))}
+          </View>
+          <FormTextInput
+            label="Sakatlık / Dikkat Notu"
+            placeholder="Bilek sakatlığı, bel hassasiyeti vb."
+            value={form.injuries}
+            onChangeText={(text: string) => handleFreeTextChange("injuries", text)}
+            multiline
+          />
         </View>
 
         <PrimaryButton

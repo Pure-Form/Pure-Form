@@ -14,8 +14,10 @@ import {
   calculateSummary,
   generateDietPlan,
   generateWorkoutPlan,
+  requestAiCoachPlan,
 } from "@/services/coachPlanner";
 import {
+  type AiCoachPlan,
   DailySchedule,
   GoalProfile,
   GoalSummary,
@@ -31,6 +33,7 @@ type CoachState = {
   dietPlan: WeeklyDietPlan | null;
   workoutPlan: WeeklyWorkoutPlan | null;
   schedule: DailySchedule[];
+  aiPlan: AiCoachPlan | null;
 };
 
 type CompleteState = CoachState & {
@@ -38,6 +41,7 @@ type CompleteState = CoachState & {
   summary: GoalSummary;
   dietPlan: WeeklyDietPlan;
   workoutPlan: WeeklyWorkoutPlan;
+  aiPlan: AiCoachPlan | null;
 };
 
 type CoachContextValue = {
@@ -53,6 +57,7 @@ type StoredState = {
   summary: GoalSummary;
   dietPlan: WeeklyDietPlan;
   workoutPlan: WeeklyWorkoutPlan;
+  aiPlan?: AiCoachPlan | null;
 };
 
 const emptyState: CoachState = {
@@ -61,6 +66,7 @@ const emptyState: CoachState = {
   dietPlan: null,
   workoutPlan: null,
   schedule: [],
+  aiPlan: null,
 };
 
 const CoachContext = createContext<CoachContextValue | undefined>(undefined);
@@ -69,16 +75,26 @@ type CoachProviderProps = {
   children: ReactNode;
 };
 
-const buildFullState = (profile: GoalProfile): CompleteState => {
+const buildFullState = async (profile: GoalProfile): Promise<CompleteState> => {
   const summary = calculateSummary(profile);
   const dietPlan = generateDietPlan(profile, summary);
   const workoutPlan = generateWorkoutPlan(profile);
+  const schedule = buildSchedule(dietPlan, workoutPlan);
+
+  let aiPlan: AiCoachPlan | null = null;
+  try {
+    aiPlan = await requestAiCoachPlan({ profile, summary, locale: "tr" });
+  } catch (error) {
+    console.warn("AI coach plan generation failed", error);
+  }
+
   return {
     profile,
     summary,
     dietPlan,
     workoutPlan,
-    schedule: buildSchedule(dietPlan, workoutPlan),
+    schedule,
+    aiPlan,
   };
 };
 
@@ -101,6 +117,7 @@ export const CoachProvider = ({ children }: CoachProviderProps) => {
           dietPlan: parsed.dietPlan,
           workoutPlan: parsed.workoutPlan,
           schedule,
+          aiPlan: parsed.aiPlan ?? null,
         });
       } catch (error) {
         console.warn("Coach state restore failed", error);
@@ -123,13 +140,14 @@ export const CoachProvider = ({ children }: CoachProviderProps) => {
     async (profile: GoalProfile) => {
       setLoading(true);
       try {
-        const fullState = buildFullState(profile);
+        const fullState = await buildFullState(profile);
         setState(fullState);
         await persist({
           profile: fullState.profile,
           summary: fullState.summary,
           dietPlan: fullState.dietPlan,
           workoutPlan: fullState.workoutPlan,
+          aiPlan: fullState.aiPlan ?? null,
         });
       } finally {
         setLoading(false);
@@ -144,13 +162,14 @@ export const CoachProvider = ({ children }: CoachProviderProps) => {
     }
     setLoading(true);
     try {
-      const fullState = buildFullState(state.profile);
+      const fullState = await buildFullState(state.profile);
       setState(fullState);
       await persist({
         profile: fullState.profile,
         summary: fullState.summary,
         dietPlan: fullState.dietPlan,
         workoutPlan: fullState.workoutPlan,
+        aiPlan: fullState.aiPlan ?? null,
       });
     } finally {
       setLoading(false);

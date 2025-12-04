@@ -41,6 +41,7 @@ const resources = {
         nutritionHeading: "Stay in your deficit",
         plannerHeading: "Workout planner",
         progressHeading: "Progress overview",
+        aiCoachHeading: "Coach AI",
       },
       planner: {
         title: "Weekly Planner",
@@ -53,6 +54,16 @@ const resources = {
         weight: "Weight",
         bodyFat: "Body fat",
         steps: "Steps",
+      },
+      coachAI: {
+        title: "Coach AI",
+        subtitle: "Ask anything about training or nutrition",
+        placeholder: "Ask your coach...",
+        suggestions: {
+          focus: "What muscles should I train today?",
+          calories: "Is my calorie deficit too aggressive?",
+          recovery: "What should I eat after a workout?",
+        },
       },
       settings: {
         language: "Language",
@@ -139,6 +150,7 @@ const resources = {
         nutritionHeading: "Kalori açığını koru",
         plannerHeading: "Antrenman planlayıcı",
         progressHeading: "İlerleme özeti",
+        aiCoachHeading: "Koç AI",
       },
       planner: {
         title: "Haftalık Plan",
@@ -151,6 +163,16 @@ const resources = {
         weight: "Kilo",
         bodyFat: "Yağ oranı",
         steps: "Adımlar",
+      },
+      coachAI: {
+        title: "Koç AI",
+        subtitle: "Antrenman ve beslenme sorularını sor",
+        placeholder: "Koçuna sor...",
+        suggestions: {
+          focus: "Bugün hangi kas gruplarına odaklanmalıyım?",
+          calories: "Kalori açığım çok mu agresif?",
+          recovery: "Antrenman sonrası ne yemeliyim?",
+        },
       },
       settings: {
         language: "Dil",

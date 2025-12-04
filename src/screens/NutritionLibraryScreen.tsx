@@ -23,12 +23,17 @@ const MACRO_KEYS: Array<"protein" | "carbs" | "fat"> = [
 
 const NutritionLibraryScreen = () => {
   const { theme } = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [query, setQuery] = React.useState("");
   const [results, setResults] = React.useState<FoodItem[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
+  const locale = React.useMemo(
+    () => (i18n.language?.toLowerCase().startsWith("tr") ? "tr" : "en"),
+    [i18n.language],
+  );
 
   const { colors } = theme;
 
@@ -36,8 +41,8 @@ const NutritionLibraryScreen = () => {
     let isCancelled = false;
     setIsLoading(true);
     setErrorMessage(null);
-    // load translations for current locale (try tr)
-    translationService.loadTranslations("tr").catch((e) =>
+    // preload translations for active locale so fallback data appears polished
+    translationService.loadTranslations(locale).catch((e) =>
       console.warn("translation load failed", e),
     );
 
@@ -65,7 +70,7 @@ const NutritionLibraryScreen = () => {
       isCancelled = true;
       clearTimeout(timer);
     };
-  }, [query, t]);
+  }, [locale, query, t]);
 
   const handleRefresh = React.useCallback(async () => {
     setIsRefreshing(true);
@@ -95,7 +100,8 @@ const NutritionLibraryScreen = () => {
       >
         <View style={styles.cardHeader}>
           <Text style={[styles.name, { color: colors.text }]}>
-            {item.name}
+            {translationService.translate("foods", item.id, locale) ??
+              item.name}
           </Text>
           <Text style={[styles.calories, { color: colors.accent }]}>
             {t("nutrition.calories", { value: item.calories })}
@@ -110,7 +116,7 @@ const NutritionLibraryScreen = () => {
             : ""}
         </Text>
         <View style={styles.metaRow}>
-          <Text style={[styles.metaText, { color: colors.subText }]}>\
+          <Text style={[styles.metaText, { color: colors.subText }]}>
             {translationService.translate(
               "categories",
               item.categoryKey ?? item.category,
@@ -120,7 +126,7 @@ const NutritionLibraryScreen = () => {
               })}
           </Text>
           {item.dataSourceKey ? (
-            <Text style={[styles.metaText, { color: colors.subText }]}>\
+            <Text style={[styles.metaText, { color: colors.subText }]}>
               {translationService.translate("sources", item.dataSourceKey) ??
                 t(`nutrition.sources.${item.dataSourceKey}`, {
                   defaultValue: item.dataSource,
@@ -130,45 +136,20 @@ const NutritionLibraryScreen = () => {
         </View>
         <View style={styles.macroRow}>
           {MACRO_KEYS.map((macro) => (
-            <View
+            <Text
               key={macro}
-              style={[
-                styles.macroChip,
-                { backgroundColor: colors.card },
-              ]}
+              style={[styles.macroText, { color: colors.subText }]}
             >
-              <Text style={[styles.macroLabel, { color: colors.subText }]}>
-                {t(`nutrition.macros.${macro}` as const)}
-              </Text>
+              {t(`nutrition.macros.${macro}` as const)}:
               <Text style={[styles.macroValue, { color: colors.text }]}>
-                {item[macro]}g
+                {` ${item[macro]}g`}
               </Text>
-            </View>
+            </Text>
           ))}
         </View>
-        {item.tags.length ? (
-          <View style={styles.tagRow}>
-            {item.tags.map((tag) => (
-              <View
-                key={tag}
-                style={[
-                  styles.tag,
-                  {
-                    backgroundColor: colors.background,
-                    borderColor: colors.border,
-                  },
-                ]}
-              >
-                <Text style={[styles.tagText, { color: colors.subText }]}>
-                  {t(`nutrition.tags.${tag}`, { defaultValue: tag })}
-                </Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
       </View>
     ),
-    [colors, t],
+    [colors, locale, t],
   );
 
   return (
@@ -280,8 +261,13 @@ const styles = StyleSheet.create({
   },
   macroRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     marginBottom: 12,
+  },
+  macroText: {
+    fontSize: 12,
+    letterSpacing: 0.2,
   },
   metaRow: {
     flexDirection: "row",
@@ -293,34 +279,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textTransform: "capitalize",
   },
-  macroChip: {
-    borderRadius: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    flex: 1,
-  },
-  macroLabel: {
-    fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: 0.2,
-  },
   macroValue: {
     fontSize: 16,
     fontWeight: "700",
-    marginTop: 2,
   },
-  tagRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  tag: {
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderWidth: 1,
-  },
-  tagText: {
+  tagsText: {
     fontSize: 12,
   },
   emptyState: {
