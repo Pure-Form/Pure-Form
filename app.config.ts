@@ -4,7 +4,7 @@ import "dotenv/config";
 const config: ExpoConfig = {
   name: "Pure Life",
   slug: "pure-life",
-  version: "0.1.0",
+  version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
   scheme: "purelife",
@@ -19,18 +19,20 @@ const config: ExpoConfig = {
   },
   assetBundlePatterns: ["**/*"],
   ios: {
-  supportsTablet: true,
-  bundleIdentifier: "com.purelife.app",
-  infoPlist: {
-    ITSAppUsesNonExemptEncryption: false
-  }
-},
+    supportsTablet: true,
+    bundleIdentifier: "com.purelife.app",
+    buildNumber: "1",
+    infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
+    },
+  },
   android: {
     adaptiveIcon: {
       foregroundImage: "./assets/adaptive-icon.png",
       backgroundColor: "#020205",
     },
     package: "com.purelife.app",
+    versionCode: 1,
   },
   web: {
     bundler: "metro",
@@ -45,6 +47,7 @@ const config: ExpoConfig = {
         android: {
           compileSdkVersion: 35,
           targetSdkVersion: 34,
+          kotlinVersion: "1.9.24",
         },
       },
     ],
@@ -56,7 +59,7 @@ const config: ExpoConfig = {
     supabasePasswordRedirect:
       process.env.EXPO_PUBLIC_SUPABASE_PASSWORD_REDIRECT ?? "",
     eas: {
-      projectId: "0902bb6d-9bc2-4b5c-804d-a2273e16eb63",
+      projectId: "601cfd90-5fe3-4c18-9edc-9f28146c3b64",
     },
   },
 };

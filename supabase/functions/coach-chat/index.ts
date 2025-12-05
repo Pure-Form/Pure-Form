@@ -1,8 +1,17 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
-const GEMINI_API_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
+const GEMINI_API_VERSION = "v1beta";
+const GEMINI_MODELS = (() => {
+  const models = (Deno.env.get("GEMINI_MODELS")
+    ?? "models/gemini-1.5-flash-latest")
+    .split(",")
+    .map((model) => model.trim())
+    .filter((model) => model.length > 0);
+  return models.length > 0 ? models : ["models/gemini-pro"];
+})();
+const buildGeminiUrl = (model: string) =>
+  `https://generativelanguage.googleapis.com/${GEMINI_API_VERSION}/${model}:generateContent`;
 
 interface CoachChatRequest {
   question: string;
@@ -41,30 +50,41 @@ const createGeminiPayload = (prompt: string) => ({
 });
 
 const callGemini = async (apiKey: string, prompt: string): Promise<string> => {
-  const response = await fetch(GEMINI_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-goog-api-key": apiKey,
-    },
-    body: JSON.stringify(createGeminiPayload(prompt)),
-  });
+  const errors: string[] = [];
 
-  if (!response.ok) {
-    const message = await response.text();
-    throw new Error(`Gemini error ${response.status}: ${message}`);
+  for (const model of GEMINI_MODELS) {
+    const response = await fetch(buildGeminiUrl(model), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      body: JSON.stringify(createGeminiPayload(prompt)),
+    });
+
+    if (!response.ok) {
+      const message = await response.text();
+      errors.push(`Gemini error ${response.status} (${model}): ${message}`);
+      if (response.status !== 404) {
+        break;
+      }
+      continue;
+    }
+
+    const data = await response.json();
+    const text =
+      data?.candidates?.[0]?.content?.parts?.map((part: { text?: string }) => part?.text ?? "").join("") ??
+      "";
+
+    if (!text) {
+      errors.push(`Gemini returned empty response for ${model}`);
+      continue;
+    }
+
+    return text.trim();
   }
 
-  const data = await response.json();
-  const text =
-    data?.candidates?.[0]?.content?.parts?.map((part: { text?: string }) => part?.text ?? "").join("" ) ??
-    "";
-
-  if (!text) {
-    throw new Error("Gemini returned empty response");
-  }
-
-  return text.trim();
+  throw new Error(errors.join(" | "));
 };
 
 const corsHeaders = {

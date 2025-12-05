@@ -1,11 +1,23 @@
 #!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
-const sharp = require('sharp');
+let sharp;
+try {
+  sharp = require('sharp');
+} catch (error) {
+  console.error('Missing optional dependency "sharp". Install it with "npm install sharp" to run this script.');
+  process.exit(1);
+}
 
 const projectRoot = path.resolve(__dirname, '..');
 const assetsDir = path.join(projectRoot, 'assets');
-const source = path.join(assetsDir, 'source-icon.png');
+const pngSource = path.join(assetsDir, 'source-icon.png');
+const svgSource = path.join(assetsDir, 'source-icon.svg');
+const source = fs.existsSync(pngSource)
+  ? pngSource
+  : fs.existsSync(svgSource)
+    ? svgSource
+    : pngSource;
 const iosIcon = path.join(assetsDir, 'icon.png');
 const adaptiveIcon = path.join(assetsDir, 'adaptive-icon.png');
 
@@ -15,8 +27,8 @@ async function ensureDir(dir) {
 
 async function generate() {
   if (!fs.existsSync(source)) {
-    console.error(`Source image not found: ${source}`);
-    console.error('Please place your source icon (the image you attached) at assets/source-icon.png');
+    console.error(`Source image not found. Place a PNG or SVG at ${pngSource} or ${svgSource}.`);
+    console.error('Example: drop your square logo as source-icon.png and re-run this script.');
     process.exit(2);
   }
 
