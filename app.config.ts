@@ -32,7 +32,7 @@ const config: ExpoConfig = {
       backgroundColor: "#020205",
     },
     package: "com.purelife.app",
-    versionCode: 1,
+    versionCode: 2,
   },
   web: {
     bundler: "metro",
@@ -46,7 +46,7 @@ const config: ExpoConfig = {
         },
         android: {
           compileSdkVersion: 35,
-          targetSdkVersion: 34,
+          targetSdkVersion: 35,
           kotlinVersion: "1.9.24",
         },
       },

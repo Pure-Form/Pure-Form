@@ -1,3 +1,23 @@
+diff --git a/node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle b/node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle
+index bcf9b00..0482a6b 100644
+--- a/node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle
++++ b/node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle
+@@ -81,8 +81,13 @@ ext.useExpoPublishing = {
+   project.afterEvaluate {
+     publishing {
+       publications {
+-        release(MavenPublication) {
+-          from components.release
++        def releaseComponent = components.findByName("release")
++        if (releaseComponent != null) {
++          release(MavenPublication) {
++            from releaseComponent
++          }
++        } else {
++          project.logger.warn('[expo-modules-core] Skipping release publication because the release component was not found.')
+         }
+       }
+       repositories {
 diff --git a/node_modules/expo-modules-core/android/src/main/java/expo/modules/adapters/react/permissions/PermissionsService.kt b/node_modules/expo-modules-core/android/src/main/java/expo/modules/adapters/react/permissions/PermissionsService.kt
 index ae0a811..386f773 100644
 --- a/node_modules/expo-modules-core/android/src/main/java/expo/modules/adapters/react/permissions/PermissionsService.kt
