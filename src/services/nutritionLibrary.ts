@@ -414,7 +414,8 @@ export const searchFoods = async (
       .select(
         "fdc_id,name,category,portion,portion_grams,calories,protein,carbs,fat,tags,image_url,data_source",
       )
-      .limit(limit);
+      .limit(limit)
+      .abortSignal(AbortSignal.timeout(5000)); // 5 second timeout
 
     if (trimmed) {
       const pattern = escapeLikePattern(trimmed);
@@ -434,14 +435,19 @@ export const searchFoods = async (
     const { data, error } = await builder;
 
     if (error) {
-      console.warn("Supabase searchFoods error:", error);
+      console.warn("Supabase searchFoods error:", error.message || error);
       return fallbackSearchFoods(query);
     }
 
     const rows = (data ?? []) as SupabaseFoodRow[];
     return rows.map(supabaseRowToFoodItem);
-  } catch (error) {
-    console.warn("Supabase searchFoods unexpected error:", error);
+  } catch (error: any) {
+    // Timeout or network error - use local data
+    if (error?.name === 'AbortError' || error?.code === '57014') {
+      console.warn("Supabase timeout - using local data");
+    } else {
+      console.warn("Supabase searchFoods unexpected error:", error?.message || error);
+    }
     return fallbackSearchFoods(query);
   }
 };

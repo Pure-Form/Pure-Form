@@ -67,6 +67,42 @@ target 'PureLife' do
         end
       end
     end
+
+    # Remove duplicate -lc++ library flags and fix deployment target
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        if config.build_settings['OTHER_LDFLAGS']
+          flags = config.build_settings['OTHER_LDFLAGS']
+          if flags.is_a?(Array)
+            config.build_settings['OTHER_LDFLAGS'] = flags.uniq
+          elsif flags.is_a?(String)
+            config.build_settings['OTHER_LDFLAGS'] = flags.split.uniq.join(' ')
+          end
+        end
+        # Fix deployment target to minimum supported version (12.0)
+        if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 12.0
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+        end
+      end
+    end
+
+    # Update to recommended Xcode settings
+    installer.pods_project.build_configurations.each do |config|
+      config.build_settings['DEAD_CODE_STRIPPING'] = 'YES'
+    end
+
+    # Fix script phase warnings for missing outputs
+    installer.pods_project.targets.each do |target|
+      target.build_phases.each do |phase|
+        if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase) && phase.name
+          if phase.name.include?("Create Symlinks to Header Folders") ||
+             phase.name.include?("Generate app.config for prebuilt Constants.manifest") ||
+             phase.name.include?("[Hermes] Replace Hermes")
+            phase.always_out_of_date = "1"
+          end
+        end
+      end
+    end
   end
 
   post_integrate do |installer|
