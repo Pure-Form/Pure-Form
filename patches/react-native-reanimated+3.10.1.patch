@@ -1,0 +1,138 @@
+diff --git a/node_modules/react-native-reanimated/Common/cpp/NativeModules/NativeReanimatedModule.cpp b/node_modules/react-native-reanimated/Common/cpp/NativeModules/NativeReanimatedModule.cpp
+index a1ace04..401c588 100644
+--- a/node_modules/react-native-reanimated/Common/cpp/NativeModules/NativeReanimatedModule.cpp
++++ b/node_modules/react-native-reanimated/Common/cpp/NativeModules/NativeReanimatedModule.cpp
+@@ -1,5 +1,8 @@
+ #include "NativeReanimatedModule.h"
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-this-capture"
++
+ #ifdef RCT_NEW_ARCH_ENABLED
+ #include <react/renderer/uimanager/UIManagerBinding.h>
+ #include <react/renderer/uimanager/primitives.h>
+@@ -843,3 +846,5 @@ void NativeReanimatedModule::unsubscribeFromKeyboardEvents(
+ }
+ 
+ } // namespace reanimated
++
++#pragma clang diagnostic pop
+diff --git a/node_modules/react-native-reanimated/Common/cpp/ReanimatedRuntime/WorkletRuntimeDecorator.cpp b/node_modules/react-native-reanimated/Common/cpp/ReanimatedRuntime/WorkletRuntimeDecorator.cpp
+index cf1a33c..060f422 100644
+--- a/node_modules/react-native-reanimated/Common/cpp/ReanimatedRuntime/WorkletRuntimeDecorator.cpp
++++ b/node_modules/react-native-reanimated/Common/cpp/ReanimatedRuntime/WorkletRuntimeDecorator.cpp
+@@ -112,7 +112,10 @@ void WorkletRuntimeDecorator::decorate(
+             auto argsSize = argsArray.size(rt);
+             // number of arguments is typically relatively small so it is ok to
+             // to use VLAs here, hence disabling the lint rule
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wvla-cxx-extension"
+             jsi::Value args[argsSize]; // NOLINT(runtime/arrays)
++#pragma clang diagnostic pop
+             for (size_t i = 0; i < argsSize; i++) {
+               args[i] = argsArray.getValueAtIndex(rt, i);
+             }
+diff --git a/node_modules/react-native-reanimated/apple/LayoutReanimation/REASwizzledUIManager.mm b/node_modules/react-native-reanimated/apple/LayoutReanimation/REASwizzledUIManager.mm
+index 16a25ae..092bb8d 100644
+--- a/node_modules/react-native-reanimated/apple/LayoutReanimation/REASwizzledUIManager.mm
++++ b/node_modules/react-native-reanimated/apple/LayoutReanimation/REASwizzledUIManager.mm
+@@ -16,6 +16,9 @@ @interface RCTUIManager (Reanimated)
+                                                     atIndices:(NSArray<NSNumber *> *)atIndices;
+ @end
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wincomplete-implementation"
++#pragma clang diagnostic ignored "-Wundeclared-selector"
+ @implementation RCTUIManager (Reanimated)
+ @dynamic animationsManager;
+ - (void)setAnimationsManager:(REAAnimationsManager *)animationsManager
+@@ -380,3 +383,4 @@ - (void)reanimated_flushUIBlocksWithCompletion:(void (^)(void))completion
+ }
+ 
+ @end
++#pragma clang diagnostic pop
+diff --git a/node_modules/react-native-reanimated/apple/REANodesManager.h b/node_modules/react-native-reanimated/apple/REANodesManager.h
+index 90308a9..396faeb 100644
+--- a/node_modules/react-native-reanimated/apple/REANodesManager.h
++++ b/node_modules/react-native-reanimated/apple/REANodesManager.h
+@@ -9,10 +9,12 @@
+ 
+ @class REAModule;
+ 
+-typedef void (^REAOnAnimationCallback)(READisplayLink *displayLink);
+-typedef void (^REANativeAnimationOp)(RCTUIManager *uiManager);
+-typedef void (^REAEventHandler)(id<RCTEvent> event);
+-typedef void (^CADisplayLinkOperation)(READisplayLink *displayLink);
++NS_ASSUME_NONNULL_BEGIN
++
++typedef void (^REAOnAnimationCallback)(READisplayLink * _Nonnull displayLink);
++typedef void (^REANativeAnimationOp)(RCTUIManager * _Nonnull uiManager);
++typedef void (^REAEventHandler)(id<RCTEvent> _Nonnull event);
++typedef void (^CADisplayLinkOperation)(READisplayLink * _Nonnull displayLink);
+ 
+ #ifdef RCT_NEW_ARCH_ENABLED
+ typedef void (^REAPerformOperations)();
+@@ -28,11 +30,11 @@ typedef void (^REAPerformOperations)();
+ @property (nonatomic, nullable) NSSet<NSString *> *nativeProps;
+ 
+ #ifdef RCT_NEW_ARCH_ENABLED
+-- (nonnull instancetype)initWithModule:(REAModule *)reanimatedModule
+-                                bridge:(RCTBridge *)bridge
+-                      surfacePresenter:(id<RCTSurfacePresenterStub>)surfacePresenter;
++- (nonnull instancetype)initWithModule:(REAModule * _Nonnull)reanimatedModule
++                                bridge:(RCTBridge * _Nullable)bridge
++                      surfacePresenter:(id<RCTSurfacePresenterStub> _Nonnull)surfacePresenter;
+ #else
+-- (instancetype)initWithModule:(REAModule *)reanimatedModule uiManager:(RCTUIManager *)uiManager;
++- (instancetype)initWithModule:(REAModule * _Nonnull)reanimatedModule uiManager:(RCTUIManager * _Nonnull)uiManager;
+ #endif // RCT_NEW_ARCH_ENABLED
+ - (void)invalidate;
+ - (void)operationsBatchDidComplete;
+@@ -53,11 +55,13 @@ typedef void (^REAPerformOperations)();
+            withName:(nonnull NSString *)viewName;
+ - (void)maybeFlushUpdateBuffer;
+ - (void)enqueueUpdateViewOnNativeThread:(nonnull NSNumber *)reactTag
+-                               viewName:(NSString *)viewName
+-                            nativeProps:(NSMutableDictionary *)nativeProps
++                               viewName:(NSString * _Nullable)viewName
++                            nativeProps:(NSMutableDictionary * _Nullable)nativeProps
+                        trySynchronously:(BOOL)trySync;
+-- (NSString *)obtainProp:(nonnull NSNumber *)viewTag propName:(nonnull NSString *)propName;
++- (NSString * _Nullable)obtainProp:(nonnull NSNumber *)viewTag propName:(nonnull NSString *)propName;
+ #endif // RCT_NEW_ARCH_ENABLED
+ - (void)maybeFlushUIUpdatesQueue;
+ 
+ @end
++
++NS_ASSUME_NONNULL_END
+diff --git a/node_modules/react-native-reanimated/apple/REANodesManager.mm b/node_modules/react-native-reanimated/apple/REANodesManager.mm
+index 4fa8f44..91860f0 100644
+--- a/node_modules/react-native-reanimated/apple/REANodesManager.mm
++++ b/node_modules/react-native-reanimated/apple/REANodesManager.mm
+@@ -91,8 +91,11 @@ @interface REASyncUpdateObserver : NSObject <RCTUIManagerObserver>
+ @end
+ 
+ @implementation REASyncUpdateObserver {
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+   volatile void (^_mounting)(void);
+   volatile BOOL _waitTimedOut;
++#pragma clang diagnostic pop
+   dispatch_semaphore_t _semaphore;
+ }
+ 
+diff --git a/node_modules/react-native-reanimated/apple/sensor/ReanimatedSensor.m b/node_modules/react-native-reanimated/apple/sensor/ReanimatedSensor.m
+index 656a27a..8e18632 100644
+--- a/node_modules/react-native-reanimated/apple/sensor/ReanimatedSensor.m
++++ b/node_modules/react-native-reanimated/apple/sensor/ReanimatedSensor.m
+@@ -198,7 +198,10 @@ - (int)getInterfaceOrientation
+   if (@available(iOS 13.0, *)) {
+     orientation = UIApplication.sharedApplication.windows.firstObject.windowScene.interfaceOrientation;
+   } else {
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+     orientation = UIApplication.sharedApplication.statusBarOrientation;
++#pragma clang diagnostic pop
+   }
+   switch (orientation) {
+     case UIInterfaceOrientationLandscapeLeft:

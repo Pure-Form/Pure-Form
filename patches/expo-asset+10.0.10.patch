@@ -1,0 +1,32 @@
+diff --git a/node_modules/expo-asset/ios/AssetModule.swift b/node_modules/expo-asset/ios/AssetModule.swift
+index 4914792..0b7da57 100644
+--- a/node_modules/expo-asset/ios/AssetModule.swift
++++ b/node_modules/expo-asset/ios/AssetModule.swift
+@@ -1,13 +1,13 @@
+ import ExpoModulesCore
+ import CryptoKit
+ 
+-internal class UnableToDownloadAssetException: GenericException<URL> {
++internal final class UnableToDownloadAssetException: GenericException<URL>, @unchecked Sendable {
+   override var reason: String {
+     "Unable to download asset from url: '\(param.absoluteString)'"
+   }
+ }
+ 
+-internal class UnableToSaveAssetToDirectoryException: GenericException<URL> {
++internal final class UnableToSaveAssetToDirectoryException: GenericException<URL>, @unchecked Sendable {
+   override var reason: String {
+     "Unable to save asset to directory: '\(param.absoluteString)'"
+   }
+@@ -78,9 +78,9 @@ public class AssetModule: Module {
+         promise.reject(UnableToDownloadAssetException(url))
+         return
+       }
++      // the file may already exist, so we need to remove it first
++      _ = try? FileManager.default.removeItem(at: localUrl)
+       do {
+-        // the file may already exist, so we need to remove it first
+-        try? FileManager.default.removeItem(at: localUrl)
+         try FileManager.default.moveItem(at: fileURL, to: localUrl)
+         promise.resolve(localUrl.standardizedFileURL.absoluteString)
+       } catch {

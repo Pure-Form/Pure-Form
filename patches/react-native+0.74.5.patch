@@ -1,0 +1,2245 @@
+diff --git a/node_modules/react-native/Libraries/AppDelegate/RCTRootViewFactory.mm b/node_modules/react-native/Libraries/AppDelegate/RCTRootViewFactory.mm
+index 7131d3f..e395b26 100644
+--- a/node_modules/react-native/Libraries/AppDelegate/RCTRootViewFactory.mm
++++ b/node_modules/react-native/Libraries/AppDelegate/RCTRootViewFactory.mm
+@@ -51,6 +51,8 @@
+   return mutableProps;
+ }
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
+ @implementation RCTRootViewFactoryConfiguration
+ 
+ - (instancetype)initWithBundleURL:(NSURL *)bundleURL
+@@ -235,9 +237,12 @@ - (void)createReactHostIfNeeded:(NSDictionary *)launchOptions
+   }
+ 
+   __weak __typeof(self) weakSelf = self;
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wnonnull"
+   _reactHost = [[RCTHost alloc] initWithBundleURLProvider:self->_configuration.bundleURLBlock
+                                              hostDelegate:nil
+                                turboModuleManagerDelegate:_turboModuleManagerDelegate
++#pragma clang diagnostic pop
+                                          jsEngineProvider:^std::shared_ptr<facebook::react::JSRuntimeFactory>() {
+                                            return [weakSelf createJSRuntimeFactory];
+                                          }
+@@ -274,3 +279,4 @@ - (NSURL *)bundleURL
+ }
+ 
+ @end
++#pragma clang diagnostic pop
+diff --git a/node_modules/react-native/Libraries/Image/RCTLocalAssetImageLoader.mm b/node_modules/react-native/Libraries/Image/RCTLocalAssetImageLoader.mm
+index 8f6e1b5..bb371ba 100644
+--- a/node_modules/react-native/Libraries/Image/RCTLocalAssetImageLoader.mm
++++ b/node_modules/react-native/Libraries/Image/RCTLocalAssetImageLoader.mm
+@@ -18,6 +18,9 @@
+ @interface RCTLocalAssetImageLoader () <RCTTurboModule>
+ @end
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-implementations"
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+ @implementation RCTLocalAssetImageLoader
+ 
+ RCT_EXPORT_MODULE()
+@@ -81,3 +84,5 @@ Class RCTLocalAssetImageLoaderCls(void)
+ {
+   return RCTLocalAssetImageLoader.class;
+ }
++
++#pragma clang diagnostic pop
+diff --git a/node_modules/react-native/React/Base/RCTBridge.mm b/node_modules/react-native/React/Base/RCTBridge.mm
+index 9c18905..0f9857f 100644
+--- a/node_modules/react-native/React/Base/RCTBridge.mm
++++ b/node_modules/react-native/React/Base/RCTBridge.mm
+@@ -196,7 +196,10 @@ void RCTUIManagerSetDispatchAccessibilityManagerInitOntoMain(BOOL enabled)
+   void onReload(const PageReloadRequest &request) override
+   {
+     RCTAssertMainQueue();
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+     [bridge_ reload];
++#pragma clang diagnostic pop
+   }
+ 
+  private:
+diff --git a/node_modules/react-native/React/Base/RCTBridgeProxy.mm b/node_modules/react-native/React/Base/RCTBridgeProxy.mm
+index 5b3e065..ce95985 100644
+--- a/node_modules/react-native/React/Base/RCTBridgeProxy.mm
++++ b/node_modules/react-native/React/Base/RCTBridgeProxy.mm
+@@ -41,6 +41,9 @@ @implementation RCTBridgeProxy {
+   void *_runtime;
+ }
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
++
+ - (instancetype)initWithViewRegistry:(RCTViewRegistry *)viewRegistry
+                       moduleRegistry:(RCTModuleRegistry *)moduleRegistry
+                        bundleManager:(RCTBundleManager *)bundleManager
+@@ -50,7 +53,7 @@ - (instancetype)initWithViewRegistry:(RCTViewRegistry *)viewRegistry
+                              runtime:(void *)runtime
+                        launchOptions:(nullable NSDictionary *)launchOptions
+ {
+-  self = [super self];
++  // NSProxy doesn't have init method, we just assign self
+   if (self) {
+     _uiManagerProxy = [[RCTUIManagerProxy alloc] initWithViewRegistry:viewRegistry];
+     _moduleRegistry = moduleRegistry;
+@@ -64,6 +67,8 @@ - (instancetype)initWithViewRegistry:(RCTViewRegistry *)viewRegistry
+   return self;
+ }
+ 
++#pragma clang diagnostic pop
++
+ - (void)dispatchBlock:(dispatch_block_t)block queue:(dispatch_queue_t)queue
+ {
+   [self logWarning:@"Please migrate to dispatchToJSThread: @synthesize dispatchToJSThread = _dispatchToJSThread"
+@@ -414,9 +419,13 @@ @implementation RCTUIManagerProxy {
+   RCTViewRegistry *_viewRegistry;
+   NSMutableDictionary<NSNumber *, UIView *> *_legacyViewRegistry;
+ }
++
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
++
+ - (instancetype)initWithViewRegistry:(RCTViewRegistry *)viewRegistry
+ {
+-  self = [super self];
++  // NSProxy doesn't have init method, we just assign self
+   if (self) {
+     _viewRegistry = viewRegistry;
+     _legacyViewRegistry = [NSMutableDictionary new];
+@@ -424,6 +433,8 @@ - (instancetype)initWithViewRegistry:(RCTViewRegistry *)viewRegistry
+   return self;
+ }
+ 
++#pragma clang diagnostic pop
++
+ /**
+  * RCTViewRegistry
+  */
+diff --git a/node_modules/react-native/React/Base/RCTKeyCommands.m b/node_modules/react-native/React/Base/RCTKeyCommands.m
+index 19ef5b1..5e0e0eb 100644
+--- a/node_modules/react-native/React/Base/RCTKeyCommands.m
++++ b/node_modules/react-native/React/Base/RCTKeyCommands.m
+@@ -128,7 +128,10 @@ - (void)handleKeyUIEventSwizzle:(UIEvent *)event
+     isKeyDown = [event _isKeyDown];
+   }
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+   BOOL interactionEnabled = !RCTSharedApplication().isIgnoringInteractionEvents;
++#pragma clang diagnostic pop
+   BOOL hasFirstResponder = NO;
+   if (isKeyDown && modifiedInput.length > 0 && interactionEnabled) {
+     UIResponder *firstResponder = nil;
+diff --git a/node_modules/react-native/React/Base/RCTMultipartStreamReader.m b/node_modules/react-native/React/Base/RCTMultipartStreamReader.m
+index a57b9ea..3b96a77 100644
+--- a/node_modules/react-native/React/Base/RCTMultipartStreamReader.m
++++ b/node_modules/react-native/React/Base/RCTMultipartStreamReader.m
+@@ -96,7 +96,10 @@ - (BOOL)readAllPartsWithCompletionCallback:(RCTMultipartCallback)callback
+   NSUInteger currentHeadersLength = 0;
+ 
+   const NSUInteger bufferLen = 4 * 1024;
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wvla-extension"
+   uint8_t buffer[bufferLen];
++#pragma clang diagnostic pop
+ 
+   [_stream open];
+   while (true) {
+diff --git a/node_modules/react-native/React/Base/RCTUtils.m b/node_modules/react-native/React/Base/RCTUtils.m
+index 226a2bc..c3e711e 100644
+--- a/node_modules/react-native/React/Base/RCTUtils.m
++++ b/node_modules/react-native/React/Base/RCTUtils.m
+@@ -239,7 +239,10 @@ id RCTJSONClean(id object)
+ {
+   const char *str = string.UTF8String;
+   unsigned char result[CC_MD5_DIGEST_LENGTH];
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+   CC_MD5(str, (CC_LONG)strlen(str), result);
++#pragma clang diagnostic pop
+ 
+   return [NSString stringWithFormat:@"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+                                     result[0],
+diff --git a/node_modules/react-native/React/Base/Surface/SurfaceHostingView/RCTSurfaceHostingProxyRootView.mm b/node_modules/react-native/React/Base/Surface/SurfaceHostingView/RCTSurfaceHostingProxyRootView.mm
+index 39377fe..9ab0661 100644
+--- a/node_modules/react-native/React/Base/Surface/SurfaceHostingView/RCTSurfaceHostingProxyRootView.mm
++++ b/node_modules/react-native/React/Base/Surface/SurfaceHostingView/RCTSurfaceHostingProxyRootView.mm
+@@ -51,15 +51,25 @@ static RCTRootViewSizeFlexibility convertToRootViewSizeFlexibility(RCTSurfaceSiz
+ 
+ @implementation RCTSurfaceHostingProxyRootView
+ 
+-- (instancetype)initWithSurface:(id<RCTSurfaceProtocol>)surface
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
++
++- (instancetype)initWithSurface:(id<RCTSurfaceProtocol>)surface sizeMeasureMode:(RCTSurfaceSizeMeasureMode)sizeMeasureMode
+ {
+-  if (self = [super initWithSurface:surface
+-                    sizeMeasureMode:RCTSurfaceSizeMeasureModeWidthExact | RCTSurfaceSizeMeasureModeHeightExact]) {
++  if (self = [super initWithSurface:surface sizeMeasureMode:sizeMeasureMode]) {
+     [surface start];
+   }
+   return self;
+ }
+ 
++- (instancetype)initWithSurface:(id<RCTSurfaceProtocol>)surface
++{
++  return [self initWithSurface:surface 
++               sizeMeasureMode:RCTSurfaceSizeMeasureModeWidthExact | RCTSurfaceSizeMeasureModeHeightExact];
++}
++
++#pragma clang diagnostic pop
++
+ RCT_NOT_IMPLEMENTED(-(instancetype)initWithFrame : (CGRect)frame)
+ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : (NSCoder *)aDecoder)
+ 
+diff --git a/node_modules/react-native/React/Base/Surface/SurfaceHostingView/RCTSurfaceHostingView.h b/node_modules/react-native/React/Base/Surface/SurfaceHostingView/RCTSurfaceHostingView.h
+index 3de4c58..65accd5 100644
+--- a/node_modules/react-native/React/Base/Surface/SurfaceHostingView/RCTSurfaceHostingView.h
++++ b/node_modules/react-native/React/Base/Surface/SurfaceHostingView/RCTSurfaceHostingView.h
+@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
+  * When set to `YES`, the activity indicator is not automatically hidden when the Surface stage changes.
+  * In this scenario, users should invoke `hideActivityIndicator` to remove it.
+  *
+- * @param disabled: if `YES`, the auto-hide is disabled. Otherwise the loading view will be hidden automatically
++ * @param disabled if `YES`, the auto-hide is disabled. Otherwise the loading view will be hidden automatically
+  */
+ - (void)disableActivityIndicatorAutoHide:(BOOL)disabled;
+ @end
+diff --git a/node_modules/react-native/React/CoreModules/RCTAppearance.h b/node_modules/react-native/React/CoreModules/RCTAppearance.h
+index 9909ca9..905bb43 100644
+--- a/node_modules/react-native/React/CoreModules/RCTAppearance.h
++++ b/node_modules/react-native/React/CoreModules/RCTAppearance.h
+@@ -13,7 +13,7 @@
+ 
+ RCT_EXTERN void RCTEnableAppearancePreference(BOOL enabled);
+ RCT_EXTERN void RCTOverrideAppearancePreference(NSString *const);
+-RCT_EXTERN NSString *RCTCurrentOverrideAppearancePreference();
++RCT_EXTERN NSString *RCTCurrentOverrideAppearancePreference(void);
+ RCT_EXTERN NSString *RCTColorSchemePreference(UITraitCollection *traitCollection);
+ 
+ @interface RCTAppearance : RCTEventEmitter <RCTBridgeModule>
+diff --git a/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm b/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm
+index 573c0c3..9e7c3b5 100644
+--- a/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm
++++ b/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm
+@@ -5,6 +5,9 @@
+  * LICENSE file in the root directory of this source tree.
+  */
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
++
+ #import "RCTDeviceInfo.h"
+ 
+ #import <FBReactNativeSpec/FBReactNativeSpec.h>
+@@ -269,6 +272,8 @@ - (void)_interfaceFrameDidChange
+ 
+ @end
+ 
++#pragma clang diagnostic pop
++
+ Class RCTDeviceInfoCls(void)
+ {
+   return RCTDeviceInfo.class;
+diff --git a/node_modules/react-native/React/CoreModules/RCTEventDispatcher.mm b/node_modules/react-native/React/CoreModules/RCTEventDispatcher.mm
+index 3669e2e..b344351 100644
+--- a/node_modules/react-native/React/CoreModules/RCTEventDispatcher.mm
++++ b/node_modules/react-native/React/CoreModules/RCTEventDispatcher.mm
+@@ -5,6 +5,9 @@
+  * LICENSE file in the root directory of this source tree.
+  */
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-implementations"
++
+ #import "RCTEventDispatcher.h"
+ 
+ #import <React/RCTAssert.h>
+@@ -233,6 +236,8 @@ - (void)flushEventsQueue
+ 
+ @end
+ 
++#pragma clang diagnostic pop
++
+ Class RCTEventDispatcherCls(void)
+ {
+   return RCTEventDispatcher.class;
+diff --git a/node_modules/react-native/React/CoreModules/RCTPerfMonitor.mm b/node_modules/react-native/React/CoreModules/RCTPerfMonitor.mm
+index 776b5e7..db25c6f 100644
+--- a/node_modules/react-native/React/CoreModules/RCTPerfMonitor.mm
++++ b/node_modules/react-native/React/CoreModules/RCTPerfMonitor.mm
+@@ -5,6 +5,9 @@
+  * LICENSE file in the root directory of this source tree.
+  */
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
++
+ #import <React/RCTDefines.h>
+ 
+ #import "CoreModulesPlugins.h"
+@@ -544,6 +547,8 @@ - (CGFloat)tableView:(__unused UITableView *)tableView heightForRowAtIndexPath:(
+ 
+ #endif
+ 
++#pragma clang diagnostic pop
++
+ Class RCTPerfMonitorCls(void)
+ {
+ #if RCT_DEV
+diff --git a/node_modules/react-native/React/CoreModules/RCTStatusBarManager.mm b/node_modules/react-native/React/CoreModules/RCTStatusBarManager.mm
+index 015a910..e51706a 100644
+--- a/node_modules/react-native/React/CoreModules/RCTStatusBarManager.mm
++++ b/node_modules/react-native/React/CoreModules/RCTStatusBarManager.mm
+@@ -5,6 +5,9 @@
+  * LICENSE file in the root directory of this source tree.
+  */
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
++
+ #import "RCTStatusBarManager.h"
+ #import "CoreModulesPlugins.h"
+ 
+@@ -191,6 +194,8 @@ - (void)applicationWillChangeStatusBarFrame:(NSNotification *)notification
+ 
+ @end
+ 
++#pragma clang diagnostic pop
++
+ Class RCTStatusBarManagerCls(void)
+ {
+   return RCTStatusBarManager.class;
+diff --git a/node_modules/react-native/React/Fabric/Mounting/ComponentViews/Modal/RCTFabricModalHostViewController.mm b/node_modules/react-native/React/Fabric/Mounting/ComponentViews/Modal/RCTFabricModalHostViewController.mm
+index ff8810c..177f49d 100644
+--- a/node_modules/react-native/React/Fabric/Mounting/ComponentViews/Modal/RCTFabricModalHostViewController.mm
++++ b/node_modules/react-native/React/Fabric/Mounting/ComponentViews/Modal/RCTFabricModalHostViewController.mm
+@@ -61,8 +61,11 @@ - (BOOL)prefersStatusBarHidden
+ #if RCT_DEV
+ - (UIInterfaceOrientationMask)supportedInterfaceOrientations
+ {
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+   UIInterfaceOrientationMask appSupportedOrientationsMask =
+       [RCTSharedApplication() supportedInterfaceOrientationsForWindow:[RCTSharedApplication() keyWindow]];
++#pragma clang diagnostic pop
+   if (!(_supportedInterfaceOrientations & appSupportedOrientationsMask)) {
+     RCTLogError(
+         @"Modal was presented with 0x%x orientations mask but the application only supports 0x%x."
+diff --git a/node_modules/react-native/React/Fabric/RCTThirdPartyFabricComponentsProvider.h b/node_modules/react-native/React/Fabric/RCTThirdPartyFabricComponentsProvider.h
+new file mode 100644
+index 0000000..ef0ce76
+--- /dev/null
++++ b/node_modules/react-native/React/Fabric/RCTThirdPartyFabricComponentsProvider.h
+@@ -0,0 +1,54 @@
++
++/*
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by GenerateRCTThirdPartyFabricComponentsProviderH
++ */
++
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wreturn-type-c-linkage"
++
++#import <React/RCTComponentViewProtocol.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++Class<RCTComponentViewProtocol> RCTThirdPartyFabricComponentsProvider(const char *name);
++#if RCT_NEW_ARCH_ENABLED
++#ifndef RCT_DYNAMIC_FRAMEWORKS
++
++
++Class<RCTComponentViewProtocol> RNGestureHandlerButtonCls(void) __attribute__((used)); // 1
++Class<RCTComponentViewProtocol> RNGestureHandlerRootViewCls(void) __attribute__((used)); // 1
++
++#if !TARGET_OS_OSX
++Class<RCTComponentViewProtocol> RNCSafeAreaProviderCls(void) __attribute__((used)); // 3
++Class<RCTComponentViewProtocol> RNCSafeAreaViewCls(void) __attribute__((used)); // 3
++#endif
++
++#if !TARGET_OS_OSX
++Class<RCTComponentViewProtocol> RNSFullWindowOverlayCls(void) __attribute__((used)); // 4
++Class<RCTComponentViewProtocol> RNSModalScreenCls(void) __attribute__((used)); // 4
++Class<RCTComponentViewProtocol> RNSScreenContainerCls(void) __attribute__((used)); // 4
++Class<RCTComponentViewProtocol> RNSScreenCls(void) __attribute__((used)); // 4
++Class<RCTComponentViewProtocol> RNSScreenNavigationContainerCls(void) __attribute__((used)); // 4
++Class<RCTComponentViewProtocol> RNSScreenStackHeaderConfigCls(void) __attribute__((used)); // 4
++Class<RCTComponentViewProtocol> RNSScreenStackHeaderSubviewCls(void) __attribute__((used)); // 4
++Class<RCTComponentViewProtocol> RNSScreenStackCls(void) __attribute__((used)); // 4
++Class<RCTComponentViewProtocol> RNSSearchBarCls(void) __attribute__((used)); // 4
++#endif
++
++
++#endif
++#endif
++
++#ifdef __cplusplus
++}
++#endif
++
++#pragma GCC diagnostic pop
++
+diff --git a/node_modules/react-native/React/Fabric/RCTThirdPartyFabricComponentsProvider.mm b/node_modules/react-native/React/Fabric/RCTThirdPartyFabricComponentsProvider.mm
+new file mode 100644
+index 0000000..c7f84e4
+--- /dev/null
++++ b/node_modules/react-native/React/Fabric/RCTThirdPartyFabricComponentsProvider.mm
+@@ -0,0 +1,66 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by GenerateRCTThirdPartyFabricComponentsProviderCpp
++ */
++
++// OSS-compatibility layer
++
++#import "RCTThirdPartyFabricComponentsProvider.h"
++
++#import <string>
++#import <unordered_map>
++
++Class<RCTComponentViewProtocol> RCTThirdPartyFabricComponentsProvider(const char *name) {
++  static std::unordered_map<std::string, Class (*)(void)> sFabricComponentsClassMap = {
++    #if RCT_NEW_ARCH_ENABLED
++    #ifndef RCT_DYNAMIC_FRAMEWORKS
++
++
++    {"RNGestureHandlerButton", RNGestureHandlerButtonCls}, // 1
++
++    {"RNGestureHandlerRootView", RNGestureHandlerRootViewCls}, // 1
++
++#if !TARGET_OS_OSX
++
++    {"RNCSafeAreaProvider", RNCSafeAreaProviderCls}, // 3
++
++    {"RNCSafeAreaView", RNCSafeAreaViewCls}, // 3
++#endif
++
++#if !TARGET_OS_OSX
++
++    {"RNSFullWindowOverlay", RNSFullWindowOverlayCls}, // 4
++
++    {"RNSModalScreen", RNSModalScreenCls}, // 4
++
++    {"RNSScreenContainer", RNSScreenContainerCls}, // 4
++
++    {"RNSScreen", RNSScreenCls}, // 4
++
++    {"RNSScreenNavigationContainer", RNSScreenNavigationContainerCls}, // 4
++
++    {"RNSScreenStackHeaderConfig", RNSScreenStackHeaderConfigCls}, // 4
++
++    {"RNSScreenStackHeaderSubview", RNSScreenStackHeaderSubviewCls}, // 4
++
++    {"RNSScreenStack", RNSScreenStackCls}, // 4
++
++    {"RNSSearchBar", RNSSearchBarCls}, // 4
++#endif
++
++    #endif
++    #endif
++  };
++
++  auto p = sFabricComponentsClassMap.find(name);
++  if (p != sFabricComponentsClassMap.end()) {
++    auto classFunc = p->second;
++    return classFunc();
++  }
++  return nil;
++}
+diff --git a/node_modules/react-native/React/Fabric/RCTTouchableComponentViewProtocol.h b/node_modules/react-native/React/Fabric/RCTTouchableComponentViewProtocol.h
+index 162aa86..af4320c 100644
+--- a/node_modules/react-native/React/Fabric/RCTTouchableComponentViewProtocol.h
++++ b/node_modules/react-native/React/Fabric/RCTTouchableComponentViewProtocol.h
+@@ -8,6 +8,9 @@
+ #import <UIKit/UIKit.h>
+ #import <react/renderer/components/view/TouchEventEmitter.h>
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wduplicate-protocol"
+ @protocol RCTTouchableComponentViewProtocol <NSObject>
+ - (facebook::react::SharedTouchEventEmitter)touchEventEmitterAtPoint:(CGPoint)point;
+ @end
++#pragma clang diagnostic pop
+diff --git a/node_modules/react-native/React/Inspector/RCTCxxInspectorWebSocketAdapter.mm b/node_modules/react-native/React/Inspector/RCTCxxInspectorWebSocketAdapter.mm
+index ad4d1f6..67379f3 100644
+--- a/node_modules/react-native/React/Inspector/RCTCxxInspectorWebSocketAdapter.mm
++++ b/node_modules/react-native/React/Inspector/RCTCxxInspectorWebSocketAdapter.mm
+@@ -50,7 +50,10 @@ - (void)send:(std::string_view)message
+   dispatch_async(dispatch_get_main_queue(), ^{
+     RCTCxxInspectorWebSocketAdapter *strongSelf = weakSelf;
+     if (strongSelf) {
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+       [strongSelf->_webSocket send:messageStr];
++#pragma clang diagnostic pop
+     }
+   });
+ }
+diff --git a/node_modules/react-native/React/Views/RCTModalHostView.m b/node_modules/react-native/React/Views/RCTModalHostView.m
+index dfde4ae..1b7d1c0 100644
+--- a/node_modules/react-native/React/Views/RCTModalHostView.m
++++ b/node_modules/react-native/React/Views/RCTModalHostView.m
+@@ -76,7 +76,10 @@ - (void)notifyForOrientationChange
+     return;
+   }
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+   UIInterfaceOrientation currentOrientation = [RCTSharedApplication() statusBarOrientation];
++#pragma clang diagnostic pop
+   if (currentOrientation == _lastKnownOrientation) {
+     return;
+   }
+diff --git a/node_modules/react-native/React/Views/RCTModalHostViewController.m b/node_modules/react-native/React/Views/RCTModalHostViewController.m
+index 50075ff..cd6dd46 100644
+--- a/node_modules/react-native/React/Views/RCTModalHostViewController.m
++++ b/node_modules/react-native/React/Views/RCTModalHostViewController.m
+@@ -53,8 +53,11 @@ - (BOOL)prefersStatusBarHidden
+ #if RCT_DEV
+ - (UIInterfaceOrientationMask)supportedInterfaceOrientations
+ {
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+   UIInterfaceOrientationMask appSupportedOrientationsMask =
+       [RCTSharedApplication() supportedInterfaceOrientationsForWindow:[RCTSharedApplication() keyWindow]];
++#pragma clang diagnostic pop
+   if (!(_supportedInterfaceOrientations & appSupportedOrientationsMask)) {
+     RCTLogError(
+         @"Modal was presented with 0x%x orientations mask but the application only supports 0x%x."
+diff --git a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
+index 1aead51..d79a323 100644
+--- a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
++++ b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
+@@ -1034,7 +1034,10 @@ -(type)getter                                           \
+ RCT_SET_AND_PRESERVE_OFFSET(setShowsHorizontalScrollIndicator, showsHorizontalScrollIndicator, BOOL)
+ RCT_SET_AND_PRESERVE_OFFSET(setShowsVerticalScrollIndicator, showsVerticalScrollIndicator, BOOL)
+ RCT_SET_AND_PRESERVE_OFFSET(setZoomScale, zoomScale, CGFloat);
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+ RCT_SET_AND_PRESERVE_OFFSET(setScrollIndicatorInsets, scrollIndicatorInsets, UIEdgeInsets);
++#pragma clang diagnostic pop
+ 
+ - (void)setAutomaticallyAdjustsScrollIndicatorInsets:(BOOL)automaticallyAdjusts API_AVAILABLE(ios(13.0))
+ {
+diff --git a/node_modules/react-native/ReactCommon/jsinspector-modern/ExecutionContext.cpp b/node_modules/react-native/ReactCommon/jsinspector-modern/ExecutionContext.cpp
+index a298816..054f40a 100644
+--- a/node_modules/react-native/ReactCommon/jsinspector-modern/ExecutionContext.cpp
++++ b/node_modules/react-native/ReactCommon/jsinspector-modern/ExecutionContext.cpp
+@@ -37,7 +37,10 @@ bool ExecutionContextSelector::matches(
+ 
+   // Prevent the compiler from thinking always_false_v is unused when the
+   // visitor is (correctly) exhaustive.
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wunreachable-code"
+   (void)always_false_v<void>;
++#pragma clang diagnostic pop
+ }
+ 
+ ExecutionContextSelector ExecutionContextSelector::byId(int32_t id) {
+diff --git a/node_modules/react-native/ReactCommon/jsinspector-modern/FallbackRuntimeAgentDelegate.h b/node_modules/react-native/ReactCommon/jsinspector-modern/FallbackRuntimeAgentDelegate.h
+index 56e3e89..ba46a77 100644
+--- a/node_modules/react-native/ReactCommon/jsinspector-modern/FallbackRuntimeAgentDelegate.h
++++ b/node_modules/react-native/ReactCommon/jsinspector-modern/FallbackRuntimeAgentDelegate.h
+@@ -51,11 +51,11 @@ class FallbackRuntimeAgentDelegate : public RuntimeAgentDelegate {
+   void sendFallbackRuntimeWarning();
+ 
+   /**
+-   * Send a simple Log.entryAdded notification with the given
+-   * \param text. You must ensure that the frontend has enabled Log
+-   * notifications (using Log.enable) prior to calling this function. In Chrome
+-   * DevTools, the message will appear in the Console tab along with regular
+-   * console messages.
++   * Send a simple Log.entryAdded notification with the given text.
++   * You must ensure that the frontend has enabled Log notifications
++   * (using Log.enable) prior to calling this function. In Chrome DevTools,
++   * the message will appear in the Console tab along with regular console messages.
++   * \param text The warning message text to send.
+    */
+   void sendWarningLogEntry(std::string_view text);
+ 
+diff --git a/node_modules/react-native/ReactCommon/jsinspector-modern/PageAgent.h b/node_modules/react-native/ReactCommon/jsinspector-modern/PageAgent.h
+index 30f540a..c82b99f 100644
+--- a/node_modules/react-native/ReactCommon/jsinspector-modern/PageAgent.h
++++ b/node_modules/react-native/ReactCommon/jsinspector-modern/PageAgent.h
+@@ -64,13 +64,14 @@ class PageAgent final {
+ 
+  private:
+   /**
+-   * Send a simple Log.entryAdded notification with the given
+-   * \param text. You must ensure that the frontend has enabled Log
++   * Send a simple Log.entryAdded notification with the given text.
++   * You must ensure that the frontend has enabled Log
+    * notifications (using Log.enable) prior to calling this function. In Chrome
+    * DevTools, the message will appear in the Console tab along with regular
+    * console messages. The difference between Log.entryAdded and
+    * Runtime.consoleAPICalled is that the latter requires an execution context
+    * ID, which does not exist at the Page level.
++   * \param text The message text to log
+    */
+   void sendInfoLogEntry(std::string_view text);
+ 
+diff --git a/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios/ReactCommon/RCTTurboModule.mm b/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios/ReactCommon/RCTTurboModule.mm
+index 6f6a6b8..9083103 100644
+--- a/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios/ReactCommon/RCTTurboModule.mm
++++ b/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios/ReactCommon/RCTTurboModule.mm
+@@ -57,7 +57,10 @@ static int32_t getUniqueId()
+ 
+ static jsi::String convertNSStringToJSIString(jsi::Runtime &runtime, NSString *value)
+ {
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wgnu-conditional-omitted-operand"
+   return jsi::String::createFromUtf8(runtime, [value UTF8String] ?: "");
++#pragma clang diagnostic pop
+ }
+ 
+ static jsi::Object convertNSDictionaryToJSIObject(jsi::Runtime &runtime, NSDictionary *value)
+@@ -118,8 +121,11 @@ static int32_t getUniqueId()
+   NSMutableArray *result = [NSMutableArray new];
+   for (size_t i = 0; i < size; i++) {
+     // Insert kCFNull when it's `undefined` value to preserve the indices.
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wgnu-conditional-omitted-operand"
+     [result
+         addObject:convertJSIValueToObjCObject(runtime, value.getValueAtIndex(runtime, i), jsInvoker) ?: (id)kCFNull];
++#pragma clang diagnostic pop
+   }
+   return [result copy];
+ }
+diff --git a/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios/ReactCommon/RCTTurboModuleManager.mm b/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios/ReactCommon/RCTTurboModuleManager.mm
+index 9a34ab1..86ec724 100644
+--- a/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios/ReactCommon/RCTTurboModuleManager.mm
++++ b/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios/ReactCommon/RCTTurboModuleManager.mm
+@@ -237,7 +237,10 @@ - (instancetype)initWithBridge:(RCTBridge *)bridge
+       NSMutableDictionary<NSString *, id<RCTBridgeModule>> *legacyInitializedModules = [NSMutableDictionary new];
+ 
+       if ([_delegate respondsToSelector:@selector(extraModulesForBridge:)]) {
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+         for (id<RCTBridgeModule> module in [_delegate extraModulesForBridge:nil]) {
++#pragma clang diagnostic pop
+           if (!isTurboModuleInstance(module)) {
+             [legacyInitializedModules setObject:module forKey:RCTBridgeModuleNameForClass([module class])];
+           }
+@@ -786,10 +789,13 @@ - (BOOL)_shouldCreateObjCModule:(Class)moduleClass
+    * TODO(T41180176): Investigate whether we can delete this after TM
+    * rollout.
+    */
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wgnu-conditional-omitted-operand"
+   [[NSNotificationCenter defaultCenter]
+       postNotificationName:RCTDidInitializeModuleNotification
+                     object:_bridge
+                   userInfo:@{@"module" : module, @"bridge" : RCTNullIfNil([_bridge parentBridge])}];
++#pragma clang diagnostic pop
+ 
+   TurboModulePerfLogger::moduleCreateSetUpEnd(moduleName, moduleId);
+ 
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ComponentDescriptors.cpp b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ComponentDescriptors.cpp
+new file mode 100644
+index 0000000..2fdd870
+--- /dev/null
++++ b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ComponentDescriptors.cpp
+@@ -0,0 +1,29 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateComponentDescriptorCpp.js
++ */
++
++#include <react/renderer/components/rncore/ComponentDescriptors.h>
++#include <react/renderer/core/ConcreteComponentDescriptor.h>
++#include <react/renderer/componentregistry/ComponentDescriptorProviderRegistry.h>
++
++namespace facebook::react {
++
++void rncore_registerComponentDescriptorsFromCodegen(
++  std::shared_ptr<const ComponentDescriptorProviderRegistry> registry) {
++registry->add(concreteComponentDescriptorProvider<ActivityIndicatorViewComponentDescriptor>());
++registry->add(concreteComponentDescriptorProvider<AndroidDrawerLayoutComponentDescriptor>());
++registry->add(concreteComponentDescriptorProvider<AndroidHorizontalScrollContentViewComponentDescriptor>());
++registry->add(concreteComponentDescriptorProvider<AndroidSwipeRefreshLayoutComponentDescriptor>());
++registry->add(concreteComponentDescriptorProvider<DebuggingOverlayComponentDescriptor>());
++registry->add(concreteComponentDescriptorProvider<PullToRefreshViewComponentDescriptor>());
++registry->add(concreteComponentDescriptorProvider<SwitchComponentDescriptor>());
++registry->add(concreteComponentDescriptorProvider<UnimplementedNativeViewComponentDescriptor>());
++}
++
++} // namespace facebook::react
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ComponentDescriptors.h b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ComponentDescriptors.h
+new file mode 100644
+index 0000000..d20605d
+--- /dev/null
++++ b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ComponentDescriptors.h
+@@ -0,0 +1,31 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateComponentDescriptorH.js
++ */
++
++#pragma once
++
++#include <react/renderer/components/rncore/ShadowNodes.h>
++#include <react/renderer/core/ConcreteComponentDescriptor.h>
++#include <react/renderer/componentregistry/ComponentDescriptorProviderRegistry.h>
++
++namespace facebook::react {
++
++using ActivityIndicatorViewComponentDescriptor = ConcreteComponentDescriptor<ActivityIndicatorViewShadowNode>;
++using AndroidDrawerLayoutComponentDescriptor = ConcreteComponentDescriptor<AndroidDrawerLayoutShadowNode>;
++using AndroidHorizontalScrollContentViewComponentDescriptor = ConcreteComponentDescriptor<AndroidHorizontalScrollContentViewShadowNode>;
++using AndroidSwipeRefreshLayoutComponentDescriptor = ConcreteComponentDescriptor<AndroidSwipeRefreshLayoutShadowNode>;
++using DebuggingOverlayComponentDescriptor = ConcreteComponentDescriptor<DebuggingOverlayShadowNode>;
++using PullToRefreshViewComponentDescriptor = ConcreteComponentDescriptor<PullToRefreshViewShadowNode>;
++using SwitchComponentDescriptor = ConcreteComponentDescriptor<SwitchShadowNode>;
++using UnimplementedNativeViewComponentDescriptor = ConcreteComponentDescriptor<UnimplementedNativeViewShadowNode>;
++
++void rncore_registerComponentDescriptorsFromCodegen(
++  std::shared_ptr<const ComponentDescriptorProviderRegistry> registry);
++
++} // namespace facebook::react
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/components/rncore/EventEmitters.cpp b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/EventEmitters.cpp
+new file mode 100644
+index 0000000..c983c53
+--- /dev/null
++++ b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/EventEmitters.cpp
+@@ -0,0 +1,132 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateEventEmitterCpp.js
++ */
++
++#include <react/renderer/components/rncore/EventEmitters.h>
++
++
++namespace facebook::react {
++
++
++void AndroidDrawerLayoutEventEmitter::onDrawerSlide(OnDrawerSlide $event) const {
++  dispatchEvent("drawerSlide", [$event=std::move($event)](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    $payload.setProperty(runtime, "offset", $event.offset);
++    return $payload;
++  });
++}
++
++
++void AndroidDrawerLayoutEventEmitter::onDrawerStateChanged(OnDrawerStateChanged $event) const {
++  dispatchEvent("drawerStateChanged", [$event=std::move($event)](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    $payload.setProperty(runtime, "drawerState", $event.drawerState);
++    return $payload;
++  });
++}
++
++
++void AndroidDrawerLayoutEventEmitter::onDrawerOpen(OnDrawerOpen $event) const {
++  dispatchEvent("drawerOpen", [](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    
++    return $payload;
++  });
++}
++
++
++void AndroidDrawerLayoutEventEmitter::onDrawerClose(OnDrawerClose $event) const {
++  dispatchEvent("drawerClose", [](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    
++    return $payload;
++  });
++}
++
++
++
++void AndroidSwipeRefreshLayoutEventEmitter::onRefresh(OnRefresh $event) const {
++  dispatchEvent("refresh", [](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    
++    return $payload;
++  });
++}
++
++
++void AndroidSwitchEventEmitter::onChange(OnChange $event) const {
++  dispatchEvent("change", [$event=std::move($event)](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    $payload.setProperty(runtime, "value", $event.value);
++$payload.setProperty(runtime, "target", $event.target);
++    return $payload;
++  });
++}
++
++
++
++
++void PullToRefreshViewEventEmitter::onRefresh(OnRefresh $event) const {
++  dispatchEvent("refresh", [](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    
++    return $payload;
++  });
++}
++
++
++
++void ModalHostViewEventEmitter::onRequestClose(OnRequestClose $event) const {
++  dispatchEvent("requestClose", [](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    
++    return $payload;
++  });
++}
++
++
++void ModalHostViewEventEmitter::onShow(OnShow $event) const {
++  dispatchEvent("show", [](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    
++    return $payload;
++  });
++}
++
++
++void ModalHostViewEventEmitter::onDismiss(OnDismiss $event) const {
++  dispatchEvent("dismiss", [](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    
++    return $payload;
++  });
++}
++
++
++void ModalHostViewEventEmitter::onOrientationChange(OnOrientationChange $event) const {
++  dispatchEvent("orientationChange", [$event=std::move($event)](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    $payload.setProperty(runtime, "orientation", toString($event.orientation));
++    return $payload;
++  });
++}
++
++
++
++void SwitchEventEmitter::onChange(OnChange $event) const {
++  dispatchEvent("change", [$event=std::move($event)](jsi::Runtime &runtime) {
++    auto $payload = jsi::Object(runtime);
++    $payload.setProperty(runtime, "value", $event.value);
++$payload.setProperty(runtime, "target", $event.target);
++    return $payload;
++  });
++}
++
++
++} // namespace facebook::react
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/components/rncore/EventEmitters.h b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/EventEmitters.h
+new file mode 100644
+index 0000000..0c3bce4
+--- /dev/null
++++ b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/EventEmitters.h
+@@ -0,0 +1,169 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateEventEmitterH.js
++ */
++#pragma once
++
++#include <react/renderer/components/view/ViewEventEmitter.h>
++
++
++namespace facebook::react {
++class ActivityIndicatorViewEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  
++  
++};
++class AndroidDrawerLayoutEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  struct OnDrawerSlide {
++      Float offset;
++    };
++
++  struct OnDrawerStateChanged {
++      int drawerState;
++    };
++
++  struct OnDrawerOpen {
++      
++    };
++
++  struct OnDrawerClose {
++      
++    };
++  void onDrawerSlide(OnDrawerSlide value) const;
++
++  void onDrawerStateChanged(OnDrawerStateChanged value) const;
++
++  void onDrawerOpen(OnDrawerOpen value) const;
++
++  void onDrawerClose(OnDrawerClose value) const;
++};
++class AndroidHorizontalScrollContentViewEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  
++  
++};
++class AndroidSwipeRefreshLayoutEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  struct OnRefresh {
++      
++    };
++  void onRefresh(OnRefresh value) const;
++};
++class AndroidSwitchEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  struct OnChange {
++      bool value;
++    int target;
++    };
++  void onChange(OnChange value) const;
++};
++class DebuggingOverlayEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  
++  
++};
++class AndroidProgressBarEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  
++  
++};
++class PullToRefreshViewEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  struct OnRefresh {
++      
++    };
++  void onRefresh(OnRefresh value) const;
++};
++class InputAccessoryEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  
++  
++};
++class ModalHostViewEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  struct OnRequestClose {
++      
++    };
++
++  struct OnShow {
++      
++    };
++
++  struct OnDismiss {
++      
++    };
++
++  enum class OnOrientationChangeOrientation {
++    Portrait,
++    Landscape
++  };
++
++  static char const *toString(const OnOrientationChangeOrientation value) {
++    switch (value) {
++      case OnOrientationChangeOrientation::Portrait: return "portrait";
++      case OnOrientationChangeOrientation::Landscape: return "landscape";
++    }
++  }
++
++  struct OnOrientationChange {
++      OnOrientationChangeOrientation orientation;
++    };
++  void onRequestClose(OnRequestClose value) const;
++
++  void onShow(OnShow value) const;
++
++  void onDismiss(OnDismiss value) const;
++
++  void onOrientationChange(OnOrientationChange value) const;
++};
++class SafeAreaViewEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  
++  
++};
++class SwitchEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  struct OnChange {
++      bool value;
++    int target;
++    };
++  void onChange(OnChange value) const;
++};
++class UnimplementedNativeViewEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  
++  
++};
++} // namespace facebook::react
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/components/rncore/Props.cpp b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/Props.cpp
+new file mode 100644
+index 0000000..c8a0efd
+--- /dev/null
++++ b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/Props.cpp
+@@ -0,0 +1,155 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GeneratePropsCpp.js
++ */
++
++#include <react/renderer/components/rncore/Props.h>
++#include <react/renderer/core/PropsParserContext.h>
++#include <react/renderer/core/propsConversions.h>
++
++namespace facebook::react {
++
++ActivityIndicatorViewProps::ActivityIndicatorViewProps(
++    const PropsParserContext &context,
++    const ActivityIndicatorViewProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    hidesWhenStopped(convertRawProp(context, rawProps, "hidesWhenStopped", sourceProps.hidesWhenStopped, {true})),
++    animating(convertRawProp(context, rawProps, "animating", sourceProps.animating, {true})),
++    color(convertRawProp(context, rawProps, "color", sourceProps.color, {})),
++    size(convertRawProp(context, rawProps, "size", sourceProps.size, {ActivityIndicatorViewSize::Small}))
++      {}
++AndroidDrawerLayoutProps::AndroidDrawerLayoutProps(
++    const PropsParserContext &context,
++    const AndroidDrawerLayoutProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    keyboardDismissMode(convertRawProp(context, rawProps, "keyboardDismissMode", sourceProps.keyboardDismissMode, {AndroidDrawerLayoutKeyboardDismissMode::None})),
++    drawerBackgroundColor(convertRawProp(context, rawProps, "drawerBackgroundColor", sourceProps.drawerBackgroundColor, {})),
++    drawerPosition(convertRawProp(context, rawProps, "drawerPosition", sourceProps.drawerPosition, {AndroidDrawerLayoutDrawerPosition::Left})),
++    drawerWidth(convertRawProp(context, rawProps, "drawerWidth", sourceProps.drawerWidth, {})),
++    drawerLockMode(convertRawProp(context, rawProps, "drawerLockMode", sourceProps.drawerLockMode, {AndroidDrawerLayoutDrawerLockMode::Unlocked})),
++    statusBarBackgroundColor(convertRawProp(context, rawProps, "statusBarBackgroundColor", sourceProps.statusBarBackgroundColor, {}))
++      {}
++AndroidHorizontalScrollContentViewProps::AndroidHorizontalScrollContentViewProps(
++    const PropsParserContext &context,
++    const AndroidHorizontalScrollContentViewProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    removeClippedSubviews(convertRawProp(context, rawProps, "removeClippedSubviews", sourceProps.removeClippedSubviews, {false}))
++      {}
++AndroidSwipeRefreshLayoutProps::AndroidSwipeRefreshLayoutProps(
++    const PropsParserContext &context,
++    const AndroidSwipeRefreshLayoutProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    enabled(convertRawProp(context, rawProps, "enabled", sourceProps.enabled, {true})),
++    colors(convertRawProp(context, rawProps, "colors", sourceProps.colors, {})),
++    progressBackgroundColor(convertRawProp(context, rawProps, "progressBackgroundColor", sourceProps.progressBackgroundColor, {})),
++    size(convertRawProp(context, rawProps, "size", sourceProps.size, {AndroidSwipeRefreshLayoutSize::Default})),
++    progressViewOffset(convertRawProp(context, rawProps, "progressViewOffset", sourceProps.progressViewOffset, {0.0})),
++    refreshing(convertRawProp(context, rawProps, "refreshing", sourceProps.refreshing, {false}))
++      {}
++AndroidSwitchProps::AndroidSwitchProps(
++    const PropsParserContext &context,
++    const AndroidSwitchProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    disabled(convertRawProp(context, rawProps, "disabled", sourceProps.disabled, {false})),
++    enabled(convertRawProp(context, rawProps, "enabled", sourceProps.enabled, {true})),
++    thumbColor(convertRawProp(context, rawProps, "thumbColor", sourceProps.thumbColor, {})),
++    trackColorForFalse(convertRawProp(context, rawProps, "trackColorForFalse", sourceProps.trackColorForFalse, {})),
++    trackColorForTrue(convertRawProp(context, rawProps, "trackColorForTrue", sourceProps.trackColorForTrue, {})),
++    value(convertRawProp(context, rawProps, "value", sourceProps.value, {false})),
++    on(convertRawProp(context, rawProps, "on", sourceProps.on, {false})),
++    thumbTintColor(convertRawProp(context, rawProps, "thumbTintColor", sourceProps.thumbTintColor, {})),
++    trackTintColor(convertRawProp(context, rawProps, "trackTintColor", sourceProps.trackTintColor, {}))
++      {}
++DebuggingOverlayProps::DebuggingOverlayProps(
++    const PropsParserContext &context,
++    const DebuggingOverlayProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps)
++
++    
++      {}
++AndroidProgressBarProps::AndroidProgressBarProps(
++    const PropsParserContext &context,
++    const AndroidProgressBarProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    styleAttr(convertRawProp(context, rawProps, "styleAttr", sourceProps.styleAttr, {})),
++    typeAttr(convertRawProp(context, rawProps, "typeAttr", sourceProps.typeAttr, {})),
++    indeterminate(convertRawProp(context, rawProps, "indeterminate", sourceProps.indeterminate, {false})),
++    progress(convertRawProp(context, rawProps, "progress", sourceProps.progress, {0.0})),
++    animating(convertRawProp(context, rawProps, "animating", sourceProps.animating, {true})),
++    color(convertRawProp(context, rawProps, "color", sourceProps.color, {})),
++    testID(convertRawProp(context, rawProps, "testID", sourceProps.testID, {""}))
++      {}
++PullToRefreshViewProps::PullToRefreshViewProps(
++    const PropsParserContext &context,
++    const PullToRefreshViewProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    tintColor(convertRawProp(context, rawProps, "tintColor", sourceProps.tintColor, {})),
++    titleColor(convertRawProp(context, rawProps, "titleColor", sourceProps.titleColor, {})),
++    title(convertRawProp(context, rawProps, "title", sourceProps.title, {})),
++    progressViewOffset(convertRawProp(context, rawProps, "progressViewOffset", sourceProps.progressViewOffset, {0.0})),
++    refreshing(convertRawProp(context, rawProps, "refreshing", sourceProps.refreshing, {false}))
++      {}
++InputAccessoryProps::InputAccessoryProps(
++    const PropsParserContext &context,
++    const InputAccessoryProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    backgroundColor(convertRawProp(context, rawProps, "backgroundColor", sourceProps.backgroundColor, {}))
++      {}
++ModalHostViewProps::ModalHostViewProps(
++    const PropsParserContext &context,
++    const ModalHostViewProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    animationType(convertRawProp(context, rawProps, "animationType", sourceProps.animationType, {ModalHostViewAnimationType::None})),
++    presentationStyle(convertRawProp(context, rawProps, "presentationStyle", sourceProps.presentationStyle, {ModalHostViewPresentationStyle::FullScreen})),
++    transparent(convertRawProp(context, rawProps, "transparent", sourceProps.transparent, {false})),
++    statusBarTranslucent(convertRawProp(context, rawProps, "statusBarTranslucent", sourceProps.statusBarTranslucent, {false})),
++    hardwareAccelerated(convertRawProp(context, rawProps, "hardwareAccelerated", sourceProps.hardwareAccelerated, {false})),
++    visible(convertRawProp(context, rawProps, "visible", sourceProps.visible, {false})),
++    animated(convertRawProp(context, rawProps, "animated", sourceProps.animated, {false})),
++    supportedOrientations(convertRawProp(context, rawProps, "supportedOrientations", sourceProps.supportedOrientations, {static_cast<ModalHostViewSupportedOrientationsMask>(ModalHostViewSupportedOrientations::Portrait)})),
++    identifier(convertRawProp(context, rawProps, "identifier", sourceProps.identifier, {0}))
++      {}
++SafeAreaViewProps::SafeAreaViewProps(
++    const PropsParserContext &context,
++    const SafeAreaViewProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps)
++
++    
++      {}
++SwitchProps::SwitchProps(
++    const PropsParserContext &context,
++    const SwitchProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    disabled(convertRawProp(context, rawProps, "disabled", sourceProps.disabled, {false})),
++    value(convertRawProp(context, rawProps, "value", sourceProps.value, {false})),
++    tintColor(convertRawProp(context, rawProps, "tintColor", sourceProps.tintColor, {})),
++    onTintColor(convertRawProp(context, rawProps, "onTintColor", sourceProps.onTintColor, {})),
++    thumbTintColor(convertRawProp(context, rawProps, "thumbTintColor", sourceProps.thumbTintColor, {})),
++    thumbColor(convertRawProp(context, rawProps, "thumbColor", sourceProps.thumbColor, {})),
++    trackColorForFalse(convertRawProp(context, rawProps, "trackColorForFalse", sourceProps.trackColorForFalse, {})),
++    trackColorForTrue(convertRawProp(context, rawProps, "trackColorForTrue", sourceProps.trackColorForTrue, {}))
++      {}
++UnimplementedNativeViewProps::UnimplementedNativeViewProps(
++    const PropsParserContext &context,
++    const UnimplementedNativeViewProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    name(convertRawProp(context, rawProps, "name", sourceProps.name, {""}))
++      {}
++
++} // namespace facebook::react
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/components/rncore/Props.h b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/Props.h
+new file mode 100644
+index 0000000..044c1e9
+--- /dev/null
++++ b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/Props.h
+@@ -0,0 +1,392 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GeneratePropsH.js
++ */
++#pragma once
++
++#include <cinttypes>
++#include <react/renderer/components/view/ViewProps.h>
++#include <react/renderer/core/PropsParserContext.h>
++#include <react/renderer/graphics/Color.h>
++#include <vector>
++
++namespace facebook::react {
++
++enum class ActivityIndicatorViewSize { Small, Large };
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, ActivityIndicatorViewSize &result) {
++  auto string = (std::string)value;
++  if (string == "small") { result = ActivityIndicatorViewSize::Small; return; }
++  if (string == "large") { result = ActivityIndicatorViewSize::Large; return; }
++  abort();
++}
++
++static inline std::string toString(const ActivityIndicatorViewSize &value) {
++  switch (value) {
++    case ActivityIndicatorViewSize::Small: return "small";
++    case ActivityIndicatorViewSize::Large: return "large";
++  }
++}
++
++class ActivityIndicatorViewProps final : public ViewProps {
++ public:
++  ActivityIndicatorViewProps() = default;
++  ActivityIndicatorViewProps(const PropsParserContext& context, const ActivityIndicatorViewProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  bool hidesWhenStopped{true};
++  bool animating{true};
++  SharedColor color{};
++  ActivityIndicatorViewSize size{ActivityIndicatorViewSize::Small};
++};
++
++enum class AndroidDrawerLayoutKeyboardDismissMode { None, OnDrag };
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, AndroidDrawerLayoutKeyboardDismissMode &result) {
++  auto string = (std::string)value;
++  if (string == "none") { result = AndroidDrawerLayoutKeyboardDismissMode::None; return; }
++  if (string == "on-drag") { result = AndroidDrawerLayoutKeyboardDismissMode::OnDrag; return; }
++  abort();
++}
++
++static inline std::string toString(const AndroidDrawerLayoutKeyboardDismissMode &value) {
++  switch (value) {
++    case AndroidDrawerLayoutKeyboardDismissMode::None: return "none";
++    case AndroidDrawerLayoutKeyboardDismissMode::OnDrag: return "on-drag";
++  }
++}
++enum class AndroidDrawerLayoutDrawerPosition { Left, Right };
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, AndroidDrawerLayoutDrawerPosition &result) {
++  auto string = (std::string)value;
++  if (string == "left") { result = AndroidDrawerLayoutDrawerPosition::Left; return; }
++  if (string == "right") { result = AndroidDrawerLayoutDrawerPosition::Right; return; }
++  abort();
++}
++
++static inline std::string toString(const AndroidDrawerLayoutDrawerPosition &value) {
++  switch (value) {
++    case AndroidDrawerLayoutDrawerPosition::Left: return "left";
++    case AndroidDrawerLayoutDrawerPosition::Right: return "right";
++  }
++}
++enum class AndroidDrawerLayoutDrawerLockMode { Unlocked, LockedClosed, LockedOpen };
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, AndroidDrawerLayoutDrawerLockMode &result) {
++  auto string = (std::string)value;
++  if (string == "unlocked") { result = AndroidDrawerLayoutDrawerLockMode::Unlocked; return; }
++  if (string == "locked-closed") { result = AndroidDrawerLayoutDrawerLockMode::LockedClosed; return; }
++  if (string == "locked-open") { result = AndroidDrawerLayoutDrawerLockMode::LockedOpen; return; }
++  abort();
++}
++
++static inline std::string toString(const AndroidDrawerLayoutDrawerLockMode &value) {
++  switch (value) {
++    case AndroidDrawerLayoutDrawerLockMode::Unlocked: return "unlocked";
++    case AndroidDrawerLayoutDrawerLockMode::LockedClosed: return "locked-closed";
++    case AndroidDrawerLayoutDrawerLockMode::LockedOpen: return "locked-open";
++  }
++}
++
++class AndroidDrawerLayoutProps final : public ViewProps {
++ public:
++  AndroidDrawerLayoutProps() = default;
++  AndroidDrawerLayoutProps(const PropsParserContext& context, const AndroidDrawerLayoutProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  AndroidDrawerLayoutKeyboardDismissMode keyboardDismissMode{AndroidDrawerLayoutKeyboardDismissMode::None};
++  SharedColor drawerBackgroundColor{};
++  AndroidDrawerLayoutDrawerPosition drawerPosition{AndroidDrawerLayoutDrawerPosition::Left};
++  Float drawerWidth{};
++  AndroidDrawerLayoutDrawerLockMode drawerLockMode{AndroidDrawerLayoutDrawerLockMode::Unlocked};
++  SharedColor statusBarBackgroundColor{};
++};
++
++class AndroidHorizontalScrollContentViewProps final : public ViewProps {
++ public:
++  AndroidHorizontalScrollContentViewProps() = default;
++  AndroidHorizontalScrollContentViewProps(const PropsParserContext& context, const AndroidHorizontalScrollContentViewProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  bool removeClippedSubviews{false};
++};
++
++enum class AndroidSwipeRefreshLayoutSize { Default, Large };
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, AndroidSwipeRefreshLayoutSize &result) {
++  auto string = (std::string)value;
++  if (string == "default") { result = AndroidSwipeRefreshLayoutSize::Default; return; }
++  if (string == "large") { result = AndroidSwipeRefreshLayoutSize::Large; return; }
++  abort();
++}
++
++static inline std::string toString(const AndroidSwipeRefreshLayoutSize &value) {
++  switch (value) {
++    case AndroidSwipeRefreshLayoutSize::Default: return "default";
++    case AndroidSwipeRefreshLayoutSize::Large: return "large";
++  }
++}
++
++class AndroidSwipeRefreshLayoutProps final : public ViewProps {
++ public:
++  AndroidSwipeRefreshLayoutProps() = default;
++  AndroidSwipeRefreshLayoutProps(const PropsParserContext& context, const AndroidSwipeRefreshLayoutProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  bool enabled{true};
++  std::vector<SharedColor> colors{};
++  SharedColor progressBackgroundColor{};
++  AndroidSwipeRefreshLayoutSize size{AndroidSwipeRefreshLayoutSize::Default};
++  Float progressViewOffset{0.0};
++  bool refreshing{false};
++};
++
++class AndroidSwitchProps final : public ViewProps {
++ public:
++  AndroidSwitchProps() = default;
++  AndroidSwitchProps(const PropsParserContext& context, const AndroidSwitchProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  bool disabled{false};
++  bool enabled{true};
++  SharedColor thumbColor{};
++  SharedColor trackColorForFalse{};
++  SharedColor trackColorForTrue{};
++  bool value{false};
++  bool on{false};
++  SharedColor thumbTintColor{};
++  SharedColor trackTintColor{};
++};
++
++class DebuggingOverlayProps final : public ViewProps {
++ public:
++  DebuggingOverlayProps() = default;
++  DebuggingOverlayProps(const PropsParserContext& context, const DebuggingOverlayProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  
++};
++
++class AndroidProgressBarProps final : public ViewProps {
++ public:
++  AndroidProgressBarProps() = default;
++  AndroidProgressBarProps(const PropsParserContext& context, const AndroidProgressBarProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  std::string styleAttr{};
++  std::string typeAttr{};
++  bool indeterminate{false};
++  double progress{0.0};
++  bool animating{true};
++  SharedColor color{};
++  std::string testID{""};
++};
++
++class PullToRefreshViewProps final : public ViewProps {
++ public:
++  PullToRefreshViewProps() = default;
++  PullToRefreshViewProps(const PropsParserContext& context, const PullToRefreshViewProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  SharedColor tintColor{};
++  SharedColor titleColor{};
++  std::string title{};
++  Float progressViewOffset{0.0};
++  bool refreshing{false};
++};
++
++class InputAccessoryProps final : public ViewProps {
++ public:
++  InputAccessoryProps() = default;
++  InputAccessoryProps(const PropsParserContext& context, const InputAccessoryProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  SharedColor backgroundColor{};
++};
++
++enum class ModalHostViewAnimationType { None, Slide, Fade };
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, ModalHostViewAnimationType &result) {
++  auto string = (std::string)value;
++  if (string == "none") { result = ModalHostViewAnimationType::None; return; }
++  if (string == "slide") { result = ModalHostViewAnimationType::Slide; return; }
++  if (string == "fade") { result = ModalHostViewAnimationType::Fade; return; }
++  abort();
++}
++
++static inline std::string toString(const ModalHostViewAnimationType &value) {
++  switch (value) {
++    case ModalHostViewAnimationType::None: return "none";
++    case ModalHostViewAnimationType::Slide: return "slide";
++    case ModalHostViewAnimationType::Fade: return "fade";
++  }
++}
++enum class ModalHostViewPresentationStyle { FullScreen, PageSheet, FormSheet, OverFullScreen };
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, ModalHostViewPresentationStyle &result) {
++  auto string = (std::string)value;
++  if (string == "fullScreen") { result = ModalHostViewPresentationStyle::FullScreen; return; }
++  if (string == "pageSheet") { result = ModalHostViewPresentationStyle::PageSheet; return; }
++  if (string == "formSheet") { result = ModalHostViewPresentationStyle::FormSheet; return; }
++  if (string == "overFullScreen") { result = ModalHostViewPresentationStyle::OverFullScreen; return; }
++  abort();
++}
++
++static inline std::string toString(const ModalHostViewPresentationStyle &value) {
++  switch (value) {
++    case ModalHostViewPresentationStyle::FullScreen: return "fullScreen";
++    case ModalHostViewPresentationStyle::PageSheet: return "pageSheet";
++    case ModalHostViewPresentationStyle::FormSheet: return "formSheet";
++    case ModalHostViewPresentationStyle::OverFullScreen: return "overFullScreen";
++  }
++}
++using ModalHostViewSupportedOrientationsMask = uint32_t;
++
++enum class ModalHostViewSupportedOrientations: ModalHostViewSupportedOrientationsMask {
++  Portrait = 1 << 0,
++  PortraitUpsideDown = 1 << 1,
++  Landscape = 1 << 2,
++  LandscapeLeft = 1 << 3,
++  LandscapeRight = 1 << 4
++};
++
++constexpr bool operator&(
++  ModalHostViewSupportedOrientationsMask const lhs,
++  enum ModalHostViewSupportedOrientations const rhs) {
++  return lhs & static_cast<ModalHostViewSupportedOrientationsMask>(rhs);
++}
++
++constexpr ModalHostViewSupportedOrientationsMask operator|(
++  ModalHostViewSupportedOrientationsMask const lhs,
++  enum ModalHostViewSupportedOrientations const rhs) {
++  return lhs | static_cast<ModalHostViewSupportedOrientationsMask>(rhs);
++}
++
++constexpr void operator|=(
++  ModalHostViewSupportedOrientationsMask &lhs,
++  enum ModalHostViewSupportedOrientations const rhs) {
++  lhs = lhs | static_cast<ModalHostViewSupportedOrientationsMask>(rhs);
++}
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, ModalHostViewSupportedOrientationsMask &result) {
++  auto items = std::vector<std::string>{value};
++  for (const auto &item : items) {
++    if (item == "portrait") {
++      result |= ModalHostViewSupportedOrientations::Portrait;
++      continue;
++    }
++    if (item == "portrait-upside-down") {
++      result |= ModalHostViewSupportedOrientations::PortraitUpsideDown;
++      continue;
++    }
++    if (item == "landscape") {
++      result |= ModalHostViewSupportedOrientations::Landscape;
++      continue;
++    }
++    if (item == "landscape-left") {
++      result |= ModalHostViewSupportedOrientations::LandscapeLeft;
++      continue;
++    }
++    if (item == "landscape-right") {
++      result |= ModalHostViewSupportedOrientations::LandscapeRight;
++      continue;
++    }
++    abort();
++  }
++}
++
++static inline std::string toString(const ModalHostViewSupportedOrientationsMask &value) {
++    auto result = std::string{};
++    auto separator = std::string{", "};
++
++    if (value & ModalHostViewSupportedOrientations::Portrait) {
++      result += "portrait" + separator;
++    }
++    if (value & ModalHostViewSupportedOrientations::PortraitUpsideDown) {
++      result += "portrait-upside-down" + separator;
++    }
++    if (value & ModalHostViewSupportedOrientations::Landscape) {
++      result += "landscape" + separator;
++    }
++    if (value & ModalHostViewSupportedOrientations::LandscapeLeft) {
++      result += "landscape-left" + separator;
++    }
++    if (value & ModalHostViewSupportedOrientations::LandscapeRight) {
++      result += "landscape-right" + separator;
++    }
++    if (!result.empty()) {
++      result.erase(result.length() - separator.length());
++    }
++    return result;
++}
++
++class ModalHostViewProps final : public ViewProps {
++ public:
++  ModalHostViewProps() = default;
++  ModalHostViewProps(const PropsParserContext& context, const ModalHostViewProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  ModalHostViewAnimationType animationType{ModalHostViewAnimationType::None};
++  ModalHostViewPresentationStyle presentationStyle{ModalHostViewPresentationStyle::FullScreen};
++  bool transparent{false};
++  bool statusBarTranslucent{false};
++  bool hardwareAccelerated{false};
++  bool visible{false};
++  bool animated{false};
++  ModalHostViewSupportedOrientationsMask supportedOrientations{static_cast<ModalHostViewSupportedOrientationsMask>(ModalHostViewSupportedOrientations::Portrait)};
++  int identifier{0};
++};
++
++class SafeAreaViewProps final : public ViewProps {
++ public:
++  SafeAreaViewProps() = default;
++  SafeAreaViewProps(const PropsParserContext& context, const SafeAreaViewProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  
++};
++
++class SwitchProps final : public ViewProps {
++ public:
++  SwitchProps() = default;
++  SwitchProps(const PropsParserContext& context, const SwitchProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  bool disabled{false};
++  bool value{false};
++  SharedColor tintColor{};
++  SharedColor onTintColor{};
++  SharedColor thumbTintColor{};
++  SharedColor thumbColor{};
++  SharedColor trackColorForFalse{};
++  SharedColor trackColorForTrue{};
++};
++
++class UnimplementedNativeViewProps final : public ViewProps {
++ public:
++  UnimplementedNativeViewProps() = default;
++  UnimplementedNativeViewProps(const PropsParserContext& context, const UnimplementedNativeViewProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  std::string name{""};
++};
++
++} // namespace facebook::react
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/components/rncore/RCTComponentViewHelpers.h b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/RCTComponentViewHelpers.h
+new file mode 100644
+index 0000000..8139124
+--- /dev/null
++++ b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/RCTComponentViewHelpers.h
+@@ -0,0 +1,293 @@
++/**
++* This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++*
++* Do not edit this file as changes may cause incorrect behavior and will be lost
++* once the code is regenerated.
++*
++* @generated by codegen project: GenerateComponentHObjCpp.js
++*/
++
++#import <Foundation/Foundation.h>
++#import <React/RCTDefines.h>
++#import <React/RCTLog.h>
++
++NS_ASSUME_NONNULL_BEGIN
++
++@protocol RCTActivityIndicatorViewViewProtocol <NSObject>
++
++@end
++
++@protocol RCTAndroidDrawerLayoutViewProtocol <NSObject>
++- (void)openDrawer;
++- (void)closeDrawer;
++@end
++
++RCT_EXTERN inline void RCTAndroidDrawerLayoutHandleCommand(
++  id<RCTAndroidDrawerLayoutViewProtocol> componentView,
++  NSString const *commandName,
++  NSArray const *args)
++{
++  if ([commandName isEqualToString:@"openDrawer"]) {
++#if RCT_DEBUG
++  if ([args count] != 0) {
++    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"AndroidDrawerLayout", commandName, (int)[args count], 0);
++    return;
++  }
++#endif
++
++  
++
++  [componentView openDrawer];
++  return;
++}
++
++if ([commandName isEqualToString:@"closeDrawer"]) {
++#if RCT_DEBUG
++  if ([args count] != 0) {
++    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"AndroidDrawerLayout", commandName, (int)[args count], 0);
++    return;
++  }
++#endif
++
++  
++
++  [componentView closeDrawer];
++  return;
++}
++
++#if RCT_DEBUG
++  RCTLogError(@"%@ received command %@, which is not a supported command.", @"AndroidDrawerLayout", commandName);
++#endif
++}
++
++@protocol RCTAndroidHorizontalScrollContentViewViewProtocol <NSObject>
++
++@end
++
++@protocol RCTAndroidSwipeRefreshLayoutViewProtocol <NSObject>
++- (void)setNativeRefreshing:(BOOL)value;
++@end
++
++RCT_EXTERN inline void RCTAndroidSwipeRefreshLayoutHandleCommand(
++  id<RCTAndroidSwipeRefreshLayoutViewProtocol> componentView,
++  NSString const *commandName,
++  NSArray const *args)
++{
++  if ([commandName isEqualToString:@"setNativeRefreshing"]) {
++#if RCT_DEBUG
++  if ([args count] != 1) {
++    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"AndroidSwipeRefreshLayout", commandName, (int)[args count], 1);
++    return;
++  }
++#endif
++
++  NSObject *arg0 = args[0];
++#if RCT_DEBUG
++  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"boolean", @"AndroidSwipeRefreshLayout", commandName, @"1st")) {
++    return;
++  }
++#endif
++  BOOL value = [(NSNumber *)arg0 boolValue];
++
++  [componentView setNativeRefreshing:value];
++  return;
++}
++
++#if RCT_DEBUG
++  RCTLogError(@"%@ received command %@, which is not a supported command.", @"AndroidSwipeRefreshLayout", commandName);
++#endif
++}
++
++@protocol RCTAndroidSwitchViewProtocol <NSObject>
++- (void)setNativeValue:(BOOL)value;
++@end
++
++RCT_EXTERN inline void RCTAndroidSwitchHandleCommand(
++  id<RCTAndroidSwitchViewProtocol> componentView,
++  NSString const *commandName,
++  NSArray const *args)
++{
++  if ([commandName isEqualToString:@"setNativeValue"]) {
++#if RCT_DEBUG
++  if ([args count] != 1) {
++    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"AndroidSwitch", commandName, (int)[args count], 1);
++    return;
++  }
++#endif
++
++  NSObject *arg0 = args[0];
++#if RCT_DEBUG
++  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"boolean", @"AndroidSwitch", commandName, @"1st")) {
++    return;
++  }
++#endif
++  BOOL value = [(NSNumber *)arg0 boolValue];
++
++  [componentView setNativeValue:value];
++  return;
++}
++
++#if RCT_DEBUG
++  RCTLogError(@"%@ received command %@, which is not a supported command.", @"AndroidSwitch", commandName);
++#endif
++}
++
++@protocol RCTDebuggingOverlayViewProtocol <NSObject>
++- (void)highlightTraceUpdates:(const NSArray *)updates;
++- (void)highlightElements:(const NSArray *)elements;
++- (void)clearElementsHighlights;
++@end
++
++RCT_EXTERN inline void RCTDebuggingOverlayHandleCommand(
++  id<RCTDebuggingOverlayViewProtocol> componentView,
++  NSString const *commandName,
++  NSArray const *args)
++{
++  if ([commandName isEqualToString:@"highlightTraceUpdates"]) {
++#if RCT_DEBUG
++  if ([args count] != 1) {
++    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"DebuggingOverlay", commandName, (int)[args count], 1);
++    return;
++  }
++#endif
++
++  NSObject *arg0 = args[0];
++#if RCT_DEBUG
++  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSArray class], @"array", @"DebuggingOverlay", commandName, @"1st")) {
++    return;
++  }
++#endif
++  const NSArray * updates = (NSArray *)arg0;
++
++  [componentView highlightTraceUpdates:updates];
++  return;
++}
++
++if ([commandName isEqualToString:@"highlightElements"]) {
++#if RCT_DEBUG
++  if ([args count] != 1) {
++    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"DebuggingOverlay", commandName, (int)[args count], 1);
++    return;
++  }
++#endif
++
++  NSObject *arg0 = args[0];
++#if RCT_DEBUG
++  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSArray class], @"array", @"DebuggingOverlay", commandName, @"1st")) {
++    return;
++  }
++#endif
++  const NSArray * elements = (NSArray *)arg0;
++
++  [componentView highlightElements:elements];
++  return;
++}
++
++if ([commandName isEqualToString:@"clearElementsHighlights"]) {
++#if RCT_DEBUG
++  if ([args count] != 0) {
++    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"DebuggingOverlay", commandName, (int)[args count], 0);
++    return;
++  }
++#endif
++
++  
++
++  [componentView clearElementsHighlights];
++  return;
++}
++
++#if RCT_DEBUG
++  RCTLogError(@"%@ received command %@, which is not a supported command.", @"DebuggingOverlay", commandName);
++#endif
++}
++
++@protocol RCTAndroidProgressBarViewProtocol <NSObject>
++
++@end
++
++@protocol RCTPullToRefreshViewViewProtocol <NSObject>
++- (void)setNativeRefreshing:(BOOL)refreshing;
++@end
++
++RCT_EXTERN inline void RCTPullToRefreshViewHandleCommand(
++  id<RCTPullToRefreshViewViewProtocol> componentView,
++  NSString const *commandName,
++  NSArray const *args)
++{
++  if ([commandName isEqualToString:@"setNativeRefreshing"]) {
++#if RCT_DEBUG
++  if ([args count] != 1) {
++    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"PullToRefreshView", commandName, (int)[args count], 1);
++    return;
++  }
++#endif
++
++  NSObject *arg0 = args[0];
++#if RCT_DEBUG
++  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"boolean", @"PullToRefreshView", commandName, @"1st")) {
++    return;
++  }
++#endif
++  BOOL refreshing = [(NSNumber *)arg0 boolValue];
++
++  [componentView setNativeRefreshing:refreshing];
++  return;
++}
++
++#if RCT_DEBUG
++  RCTLogError(@"%@ received command %@, which is not a supported command.", @"PullToRefreshView", commandName);
++#endif
++}
++
++@protocol RCTInputAccessoryViewProtocol <NSObject>
++
++@end
++
++@protocol RCTModalHostViewViewProtocol <NSObject>
++
++@end
++
++@protocol RCTSafeAreaViewViewProtocol <NSObject>
++
++@end
++
++@protocol RCTSwitchViewProtocol <NSObject>
++- (void)setValue:(BOOL)value;
++@end
++
++RCT_EXTERN inline void RCTSwitchHandleCommand(
++  id<RCTSwitchViewProtocol> componentView,
++  NSString const *commandName,
++  NSArray const *args)
++{
++  if ([commandName isEqualToString:@"setValue"]) {
++#if RCT_DEBUG
++  if ([args count] != 1) {
++    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"Switch", commandName, (int)[args count], 1);
++    return;
++  }
++#endif
++
++  NSObject *arg0 = args[0];
++#if RCT_DEBUG
++  if (!RCTValidateTypeOfViewCommandArgument(arg0, [NSNumber class], @"boolean", @"Switch", commandName, @"1st")) {
++    return;
++  }
++#endif
++  BOOL value = [(NSNumber *)arg0 boolValue];
++
++  [componentView setValue:value];
++  return;
++}
++
++#if RCT_DEBUG
++  RCTLogError(@"%@ received command %@, which is not a supported command.", @"Switch", commandName);
++#endif
++}
++
++@protocol RCTUnimplementedNativeViewViewProtocol <NSObject>
++
++@end
++
++NS_ASSUME_NONNULL_END
+\ No newline at end of file
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ShadowNodes.cpp b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ShadowNodes.cpp
+new file mode 100644
+index 0000000..429785b
+--- /dev/null
++++ b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ShadowNodes.cpp
+@@ -0,0 +1,24 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateShadowNodeCpp.js
++ */
++
++#include <react/renderer/components/rncore/ShadowNodes.h>
++
++namespace facebook::react {
++
++extern const char ActivityIndicatorViewComponentName[] = "ActivityIndicatorView";
++extern const char AndroidDrawerLayoutComponentName[] = "AndroidDrawerLayout";
++extern const char AndroidHorizontalScrollContentViewComponentName[] = "AndroidHorizontalScrollContentView";
++extern const char AndroidSwipeRefreshLayoutComponentName[] = "AndroidSwipeRefreshLayout";
++extern const char DebuggingOverlayComponentName[] = "DebuggingOverlay";
++extern const char PullToRefreshViewComponentName[] = "PullToRefreshView";
++extern const char SwitchComponentName[] = "Switch";
++extern const char UnimplementedNativeViewComponentName[] = "UnimplementedNativeView";
++
++} // namespace facebook::react
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ShadowNodes.h b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ShadowNodes.h
+new file mode 100644
+index 0000000..3427808
+--- /dev/null
++++ b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/ShadowNodes.h
+@@ -0,0 +1,109 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateShadowNodeH.js
++ */
++
++#pragma once
++
++#include <react/renderer/components/rncore/EventEmitters.h>
++#include <react/renderer/components/rncore/Props.h>
++#include <react/renderer/components/rncore/States.h>
++#include <react/renderer/components/view/ConcreteViewShadowNode.h>
++#include <jsi/jsi.h>
++
++namespace facebook::react {
++
++JSI_EXPORT extern const char ActivityIndicatorViewComponentName[];
++
++/*
++ * `ShadowNode` for <ActivityIndicatorView> component.
++ */
++using ActivityIndicatorViewShadowNode = ConcreteViewShadowNode<
++    ActivityIndicatorViewComponentName,
++    ActivityIndicatorViewProps,
++    ActivityIndicatorViewEventEmitter,
++    ActivityIndicatorViewState>;
++
++JSI_EXPORT extern const char AndroidDrawerLayoutComponentName[];
++
++/*
++ * `ShadowNode` for <AndroidDrawerLayout> component.
++ */
++using AndroidDrawerLayoutShadowNode = ConcreteViewShadowNode<
++    AndroidDrawerLayoutComponentName,
++    AndroidDrawerLayoutProps,
++    AndroidDrawerLayoutEventEmitter,
++    AndroidDrawerLayoutState>;
++
++JSI_EXPORT extern const char AndroidHorizontalScrollContentViewComponentName[];
++
++/*
++ * `ShadowNode` for <AndroidHorizontalScrollContentView> component.
++ */
++using AndroidHorizontalScrollContentViewShadowNode = ConcreteViewShadowNode<
++    AndroidHorizontalScrollContentViewComponentName,
++    AndroidHorizontalScrollContentViewProps,
++    AndroidHorizontalScrollContentViewEventEmitter,
++    AndroidHorizontalScrollContentViewState>;
++
++JSI_EXPORT extern const char AndroidSwipeRefreshLayoutComponentName[];
++
++/*
++ * `ShadowNode` for <AndroidSwipeRefreshLayout> component.
++ */
++using AndroidSwipeRefreshLayoutShadowNode = ConcreteViewShadowNode<
++    AndroidSwipeRefreshLayoutComponentName,
++    AndroidSwipeRefreshLayoutProps,
++    AndroidSwipeRefreshLayoutEventEmitter,
++    AndroidSwipeRefreshLayoutState>;
++
++JSI_EXPORT extern const char DebuggingOverlayComponentName[];
++
++/*
++ * `ShadowNode` for <DebuggingOverlay> component.
++ */
++using DebuggingOverlayShadowNode = ConcreteViewShadowNode<
++    DebuggingOverlayComponentName,
++    DebuggingOverlayProps,
++    DebuggingOverlayEventEmitter,
++    DebuggingOverlayState>;
++
++JSI_EXPORT extern const char PullToRefreshViewComponentName[];
++
++/*
++ * `ShadowNode` for <PullToRefreshView> component.
++ */
++using PullToRefreshViewShadowNode = ConcreteViewShadowNode<
++    PullToRefreshViewComponentName,
++    PullToRefreshViewProps,
++    PullToRefreshViewEventEmitter,
++    PullToRefreshViewState>;
++
++JSI_EXPORT extern const char SwitchComponentName[];
++
++/*
++ * `ShadowNode` for <Switch> component.
++ */
++using SwitchShadowNode = ConcreteViewShadowNode<
++    SwitchComponentName,
++    SwitchProps,
++    SwitchEventEmitter,
++    SwitchState>;
++
++JSI_EXPORT extern const char UnimplementedNativeViewComponentName[];
++
++/*
++ * `ShadowNode` for <UnimplementedNativeView> component.
++ */
++using UnimplementedNativeViewShadowNode = ConcreteViewShadowNode<
++    UnimplementedNativeViewComponentName,
++    UnimplementedNativeViewProps,
++    UnimplementedNativeViewEventEmitter,
++    UnimplementedNativeViewState>;
++
++} // namespace facebook::react
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/components/rncore/States.cpp b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/States.cpp
+new file mode 100644
+index 0000000..9762c3c
+--- /dev/null
++++ b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/States.cpp
+@@ -0,0 +1,16 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateStateCpp.js
++ */
++#include <react/renderer/components/rncore/States.h>
++
++namespace facebook::react {
++
++
++
++} // namespace facebook::react
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/components/rncore/States.h b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/States.h
+new file mode 100644
+index 0000000..55114f1
+--- /dev/null
++++ b/node_modules/react-native/ReactCommon/react/renderer/components/rncore/States.h
+@@ -0,0 +1,139 @@
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateStateH.js
++ */
++#pragma once
++
++#ifdef ANDROID
++#include <folly/dynamic.h>
++#include <react/renderer/mapbuffer/MapBuffer.h>
++#include <react/renderer/mapbuffer/MapBufferBuilder.h>
++#endif
++
++namespace facebook::react {
++
++class ActivityIndicatorViewState {
++public:
++  ActivityIndicatorViewState() = default;
++
++#ifdef ANDROID
++  ActivityIndicatorViewState(ActivityIndicatorViewState const &previousState, folly::dynamic data){};
++  folly::dynamic getDynamic() const {
++    return {};
++  };
++  MapBuffer getMapBuffer() const {
++    return MapBufferBuilder::EMPTY();
++  };
++#endif
++};
++
++class AndroidDrawerLayoutState {
++public:
++  AndroidDrawerLayoutState() = default;
++
++#ifdef ANDROID
++  AndroidDrawerLayoutState(AndroidDrawerLayoutState const &previousState, folly::dynamic data){};
++  folly::dynamic getDynamic() const {
++    return {};
++  };
++  MapBuffer getMapBuffer() const {
++    return MapBufferBuilder::EMPTY();
++  };
++#endif
++};
++
++class AndroidHorizontalScrollContentViewState {
++public:
++  AndroidHorizontalScrollContentViewState() = default;
++
++#ifdef ANDROID
++  AndroidHorizontalScrollContentViewState(AndroidHorizontalScrollContentViewState const &previousState, folly::dynamic data){};
++  folly::dynamic getDynamic() const {
++    return {};
++  };
++  MapBuffer getMapBuffer() const {
++    return MapBufferBuilder::EMPTY();
++  };
++#endif
++};
++
++class AndroidSwipeRefreshLayoutState {
++public:
++  AndroidSwipeRefreshLayoutState() = default;
++
++#ifdef ANDROID
++  AndroidSwipeRefreshLayoutState(AndroidSwipeRefreshLayoutState const &previousState, folly::dynamic data){};
++  folly::dynamic getDynamic() const {
++    return {};
++  };
++  MapBuffer getMapBuffer() const {
++    return MapBufferBuilder::EMPTY();
++  };
++#endif
++};
++
++class DebuggingOverlayState {
++public:
++  DebuggingOverlayState() = default;
++
++#ifdef ANDROID
++  DebuggingOverlayState(DebuggingOverlayState const &previousState, folly::dynamic data){};
++  folly::dynamic getDynamic() const {
++    return {};
++  };
++  MapBuffer getMapBuffer() const {
++    return MapBufferBuilder::EMPTY();
++  };
++#endif
++};
++
++class PullToRefreshViewState {
++public:
++  PullToRefreshViewState() = default;
++
++#ifdef ANDROID
++  PullToRefreshViewState(PullToRefreshViewState const &previousState, folly::dynamic data){};
++  folly::dynamic getDynamic() const {
++    return {};
++  };
++  MapBuffer getMapBuffer() const {
++    return MapBufferBuilder::EMPTY();
++  };
++#endif
++};
++
++class SwitchState {
++public:
++  SwitchState() = default;
++
++#ifdef ANDROID
++  SwitchState(SwitchState const &previousState, folly::dynamic data){};
++  folly::dynamic getDynamic() const {
++    return {};
++  };
++  MapBuffer getMapBuffer() const {
++    return MapBufferBuilder::EMPTY();
++  };
++#endif
++};
++
++class UnimplementedNativeViewState {
++public:
++  UnimplementedNativeViewState() = default;
++
++#ifdef ANDROID
++  UnimplementedNativeViewState(UnimplementedNativeViewState const &previousState, folly::dynamic data){};
++  folly::dynamic getDynamic() const {
++    return {};
++  };
++  MapBuffer getMapBuffer() const {
++    return MapBufferBuilder::EMPTY();
++  };
++#endif
++};
++
++} // namespace facebook::react
+\ No newline at end of file
+diff --git a/node_modules/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTHost.mm b/node_modules/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTHost.mm
+index cddebbe..76a1f57 100644
+--- a/node_modules/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTHost.mm
++++ b/node_modules/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTHost.mm
+@@ -45,6 +45,8 @@ void onReload(const PageReloadRequest &request) override
+ @interface RCTHost () <RCTReloadListener, RCTInstanceDelegate>
+ @end
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
+ @implementation RCTHost {
+   RCTInstance *_instance;
+ 
+@@ -410,3 +412,4 @@ - (void)_setBundleURL:(NSURL *)bundleURL
+ }
+ 
+ @end
++#pragma clang diagnostic pop
+diff --git a/node_modules/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTInstance.mm b/node_modules/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTInstance.mm
+index 029525a..eb84874 100644
+--- a/node_modules/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTInstance.mm
++++ b/node_modules/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTInstance.mm
+@@ -143,8 +143,11 @@ - (instancetype)initWithDelegate:(id<RCTInstanceDelegate>)delegate
+ - (void)callFunctionOnJSModule:(NSString *)moduleName method:(NSString *)method args:(NSArray *)args
+ {
+   if (_valid) {
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wgnu-conditional-omitted-operand"
+     _reactInstance->callFunctionOnModule(
+         [moduleName UTF8String], [method UTF8String], convertIdToFollyDynamic(args ?: @[]));
++#pragma clang diagnostic pop
+   }
+ }
+ 

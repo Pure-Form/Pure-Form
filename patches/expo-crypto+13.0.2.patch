@@ -1,0 +1,71 @@
+diff --git a/node_modules/expo-crypto/ios/CryptoModule.swift b/node_modules/expo-crypto/ios/CryptoModule.swift
+index 81cd26f..3b20d06 100644
+--- a/node_modules/expo-crypto/ios/CryptoModule.swift
++++ b/node_modules/expo-crypto/ios/CryptoModule.swift
+@@ -35,6 +35,7 @@ private func getRandomBase64String(length: Int) throws -> String {
+   return Data(bytes).base64EncodedString()
+ }
+ 
++@available(iOS, deprecated: 13.0, message: "Uses legacy crypto functions")
+ private func digestString(algorithm: DigestAlgorithm, str: String, options: DigestOptions) throws -> String {
+   guard let data = str.data(using: .utf8) else {
+     throw LossyConversionException()
+@@ -68,19 +69,20 @@ private func getRandomValues(array: TypedArray) throws -> TypedArray {
+   return array
+ }
+ 
++@available(iOS, deprecated: 13.0, message: "Uses legacy crypto functions")
+ private func digest(algorithm: DigestAlgorithm, output: TypedArray, data: TypedArray) {
+-  let length = Int(algorithm.digestLength)
++  let _ = Int(algorithm.digestLength)
+   let outputPtr = output.rawPointer.assumingMemoryBound(to: UInt8.self)
+-  algorithm.digest(data.rawPointer, UInt32(data.byteLength), outputPtr)
++  _ = algorithm.digest(data.rawPointer, UInt32(data.byteLength), outputPtr)
+ }
+ 
+-private class LossyConversionException: Exception {
++private final class LossyConversionException: Exception, @unchecked Sendable {
+   override var reason: String {
+     "Unable to convert given string without losing some information"
+   }
+ }
+ 
+-private class FailedGeneratingRandomBytesException: GenericException<OSStatus> {
++private final class FailedGeneratingRandomBytesException: GenericException<OSStatus>, @unchecked Sendable {
+   override var reason: String {
+     "Generating random bytes has failed with OSStatus code: \(param)"
+   }
+diff --git a/node_modules/expo-crypto/ios/DigestAlgorithm.swift b/node_modules/expo-crypto/ios/DigestAlgorithm.swift
+index 679fda2..b3f7740 100644
+--- a/node_modules/expo-crypto/ios/DigestAlgorithm.swift
++++ b/node_modules/expo-crypto/ios/DigestAlgorithm.swift
+@@ -9,7 +9,7 @@ typealias DigestFunction = (
+   _ md: UnsafeMutablePointer<UInt8>?
+ ) -> UnsafeMutablePointer<UInt8>?
+ 
+-internal enum DigestAlgorithm: String, EnumArgument {
++internal enum DigestAlgorithm: String, Enumerable {
+   case md2 = "MD2"
+   case md4 = "MD4"
+   case md5 = "MD5"
+@@ -40,6 +40,7 @@ internal enum DigestAlgorithm: String, EnumArgument {
+     }
+   }
+ 
++  @available(iOS, deprecated: 13.0, message: "MD2/MD4/MD5 are cryptographically broken")
+   var digest: DigestFunction {
+     switch self {
+     case .md2:
+diff --git a/node_modules/expo-crypto/ios/DigestOptions.swift b/node_modules/expo-crypto/ios/DigestOptions.swift
+index 8eb6f30..d99f85d 100644
+--- a/node_modules/expo-crypto/ios/DigestOptions.swift
++++ b/node_modules/expo-crypto/ios/DigestOptions.swift
+@@ -6,7 +6,7 @@ internal struct DigestOptions: Record {
+   @Field
+   var encoding: Encoding = .hex
+ 
+-  internal enum Encoding: String, EnumArgument {
++  internal enum Encoding: String, Enumerable {
+     case hex = "hex"
+     case base64 = "base64"
+   }

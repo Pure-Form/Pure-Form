@@ -31,3 +31,406 @@ index ae0a811..386f773 100644
        }
        return false
      } catch (e: PackageManager.NameNotFoundException) {
+diff --git a/node_modules/expo-modules-core/ios/Api/Builders/ViewDefinitionBuilder.swift b/node_modules/expo-modules-core/ios/Api/Builders/ViewDefinitionBuilder.swift
+index 7c75942..a5c5dac 100644
+--- a/node_modules/expo-modules-core/ios/Api/Builders/ViewDefinitionBuilder.swift
++++ b/node_modules/expo-modules-core/ios/Api/Builders/ViewDefinitionBuilder.swift
+@@ -45,7 +45,7 @@ public struct ViewDefinitionBuilder<ViewType: UIView> {
+   ) -> AnyViewDefinitionElement where ElementType.ViewType == ViewType {
+     // Enforce async functions to run on the main queue
+     if var function = element as? AnyAsyncFunctionDefinition {
+-      function.runOnQueue(.main)
++      _ = function.runOnQueue(.main)
+       function.takesOwner = true
+     }
+     return element
+diff --git a/node_modules/expo-modules-core/ios/AppDelegates/ExpoAppDelegate.swift b/node_modules/expo-modules-core/ios/AppDelegates/ExpoAppDelegate.swift
+index b16422a..e71c06e 100644
+--- a/node_modules/expo-modules-core/ios/AppDelegates/ExpoAppDelegate.swift
++++ b/node_modules/expo-modules-core/ios/AppDelegates/ExpoAppDelegate.swift
+@@ -271,7 +271,11 @@ open class ExpoAppDelegate: UIResponder, UIApplicationDelegate {
+       completionHandler(.noData)
+     } else {
+       subs.forEach { subscriber in
+-        subscriber.application?(application, performFetchWithCompletionHandler: handler)
++        if #available(iOS 13.0, *) {
++          // This method is deprecated in iOS 13.0+
++        } else {
++          subscriber.application?(application, performFetchWithCompletionHandler: handler)
++        }
+       }
+     }
+   }
+diff --git a/node_modules/expo-modules-core/ios/Core/Conversions.swift b/node_modules/expo-modules-core/ios/Core/Conversions.swift
+index a45fcbc..14c3b70 100644
+--- a/node_modules/expo-modules-core/ios/Core/Conversions.swift
++++ b/node_modules/expo-modules-core/ios/Core/Conversions.swift
+@@ -164,17 +164,17 @@ internal final class Conversions {
+     }
+     if let appContext {
+       if let value = value as? JavaScriptObjectBuilder {
+-        return try? value.build(appContext: appContext)
++        return (try? value.build(appContext: appContext)) as Any
+       }
+ 
+       // If the returned value is a native shared object, create its JS representation and add the pair to the registry of shared objects.
+       if let value = value as? SharedObject, let dynamicType = asDynamicSharedObjectType(dynamicType) {
+         guard let object = try? appContext.newObject(nativeClassId: dynamicType.typeIdentifier) else {
+           log.warn("Unable to create a JS object for \(dynamicType.description)")
+-          return Optional<Any>.none
++          return Optional<Any>.none as Any
+         }
+         appContext.sharedObjectRegistry.add(native: value, javaScript: object)
+-        return object
++        return object as Any
+       }
+     }
+     return value as Any
+diff --git a/node_modules/expo-modules-core/ios/Core/DynamicTypes/AnyDynamicType.swift b/node_modules/expo-modules-core/ios/Core/DynamicTypes/AnyDynamicType.swift
+index b1123ae..b3300a6 100644
+--- a/node_modules/expo-modules-core/ios/Core/DynamicTypes/AnyDynamicType.swift
++++ b/node_modules/expo-modules-core/ios/Core/DynamicTypes/AnyDynamicType.swift
+@@ -31,11 +31,11 @@ public protocol AnyDynamicType: CustomStringConvertible {
+ 
+ extension AnyDynamicType {
+   func cast(jsValue: JavaScriptValue, appContext: AppContext) throws -> Any {
+-    return jsValue.getRaw()
++    return jsValue.getRaw() as Any
+   }
+ 
+   func cast<ValueType>(_ value: ValueType, appContext: AppContext) throws -> Any {
+-    return value
++    return value as Any
+   }
+ }
+ 
+diff --git a/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicDataType.swift b/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicDataType.swift
+index 2f8345c..ea9b26e 100644
+--- a/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicDataType.swift
++++ b/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicDataType.swift
+@@ -9,7 +9,7 @@ internal struct DynamicDataType: AnyDynamicType {
+   }
+ 
+   func equals(_ type: AnyDynamicType) -> Bool {
+-    return type is Data.Type
++    return type is DynamicDataType
+   }
+ 
+   /**
+diff --git a/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicRawType.swift b/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicRawType.swift
+index 76b75db..713e502 100644
+--- a/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicRawType.swift
++++ b/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicRawType.swift
+@@ -7,7 +7,7 @@
+ internal struct DynamicRawType<InnerType>: AnyDynamicType {
+   let innerType: InnerType.Type
+ 
+-  func wraps<InnerType>(_ type: InnerType.Type) -> Bool {
++  func wraps<WrappedType>(_ type: WrappedType.Type) -> Bool {
+     return type == innerType
+   }
+ 
+diff --git a/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicType.swift b/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicType.swift
+index a3769bf..c4897fd 100644
+--- a/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicType.swift
++++ b/node_modules/expo-modules-core/ios/Core/DynamicTypes/DynamicType.swift
+@@ -35,7 +35,7 @@ private func DynamicType<T>(_ type: T.Type) -> AnyDynamicType {
+   if let TypedArrayType = T.self as? AnyTypedArray.Type {
+     return DynamicTypedArrayType(innerType: TypedArrayType)
+   }
+-  if let DataType = T.self as? Data.Type {
++  if let _ = T.self as? Data.Type {
+     return DynamicDataType()
+   }
+   if let JavaScriptValueType = T.self as? any AnyJavaScriptValue.Type {
+diff --git a/node_modules/expo-modules-core/ios/Core/Events/EventDispatcher.swift b/node_modules/expo-modules-core/ios/Core/Events/EventDispatcher.swift
+index 9ba5b3d..91b52cd 100644
+--- a/node_modules/expo-modules-core/ios/Core/Events/EventDispatcher.swift
++++ b/node_modules/expo-modules-core/ios/Core/Events/EventDispatcher.swift
+@@ -63,7 +63,7 @@ internal func installEventDispatcher<ViewType>(forEvent eventName: String, onVie
+     return isEventDispatcherWithName($0, eventName)
+   }
+ 
+-  if var eventDispatcher = child?.value as? EventDispatcher {
++  if let eventDispatcher = child?.value as? EventDispatcher {
+     eventDispatcher.handler = handler
+   } else if let view = view as? UIView, view.responds(to: Selector(eventName)) {
+     // This is to handle events in legacy views written in Objective-C.
+diff --git a/node_modules/expo-modules-core/ios/Core/Events/LegacyEventEmitterCompat.swift b/node_modules/expo-modules-core/ios/Core/Events/LegacyEventEmitterCompat.swift
+index c2cdb66..c6bd8ee 100644
+--- a/node_modules/expo-modules-core/ios/Core/Events/LegacyEventEmitterCompat.swift
++++ b/node_modules/expo-modules-core/ios/Core/Events/LegacyEventEmitterCompat.swift
+@@ -11,7 +11,7 @@ public final class LegacyEventEmitterCompat: EXEventEmitterService {
+   // swiftlint:disable:next implicitly_unwrapped_optional
+   public func sendEvent(withName name: String!, body: Any!) {
+     guard let appContext, let runtime = try? appContext.runtime else {
+-      log.warn("Unable to send an event '\(name)' because the runtime is not available")
++      log.warn("Unable to send an event '\(String(describing: name))' because the runtime is not available")
+       return
+     }
+ 
+@@ -24,7 +24,7 @@ public final class LegacyEventEmitterCompat: EXEventEmitterService {
+     runtime.schedule {
+       for holder in moduleHoldersWithEvent {
+         if let jsObject = holder.javaScriptObject {
+-          JSIUtils.emitEvent(name, to: jsObject, withArguments: [body], in: runtime)
++          JSIUtils.emitEvent(name, to: jsObject, withArguments: [body as Any], in: runtime)
+         }
+       }
+     }
+diff --git a/node_modules/expo-modules-core/ios/Core/JavaScriptFunction.swift b/node_modules/expo-modules-core/ios/Core/JavaScriptFunction.swift
+index 51bfab0..9c6184c 100644
+--- a/node_modules/expo-modules-core/ios/Core/JavaScriptFunction.swift
++++ b/node_modules/expo-modules-core/ios/Core/JavaScriptFunction.swift
+@@ -40,7 +40,7 @@ public final class JavaScriptFunction<ReturnType>: AnyArgument, AnyJavaScriptVal
+    */
+   private func call(withArguments arguments: [Any] = [], asConstructor: Bool = false, usingThis this: JavaScriptObject? = nil) throws -> ReturnType {
+     guard let appContext else {
+-      throw AppContextLostException()
++      throw Exceptions.AppContextLost()
+     }
+     let value = rawFunction.call(withArguments: arguments, thisObject: this, asConstructor: false)
+     let dynamicType = ~ReturnType.self
+diff --git a/node_modules/expo-modules-core/ios/Core/JavaScriptUtils.swift b/node_modules/expo-modules-core/ios/Core/JavaScriptUtils.swift
+index 04557fc..fb65c1d 100644
+--- a/node_modules/expo-modules-core/ios/Core/JavaScriptUtils.swift
++++ b/node_modules/expo-modules-core/ios/Core/JavaScriptUtils.swift
+@@ -95,7 +95,7 @@ internal func concat(
+   var result = arguments
+ 
+   if function.takesOwner {
+-    result = [owner] + arguments
++    result = [owner as Any] + arguments
+   }
+   if arguments.count < function.argumentsCount {
+     result += Array(repeating: Any?.none as Any, count: function.argumentsCount - arguments.count)
+diff --git a/node_modules/expo-modules-core/ios/Core/Objects/ObjectDefinition.swift b/node_modules/expo-modules-core/ios/Core/Objects/ObjectDefinition.swift
+index b51b831..644411d 100644
+--- a/node_modules/expo-modules-core/ios/Core/Objects/ObjectDefinition.swift
++++ b/node_modules/expo-modules-core/ios/Core/Objects/ObjectDefinition.swift
+@@ -68,7 +68,7 @@ public class ObjectDefinition: AnyDefinition, JavaScriptObjectBuilder {
+   }
+ 
+   public func decorate(object: JavaScriptObject, appContext: AppContext) throws {
+-    let runtime = try appContext.runtime
++    _ = try appContext.runtime
+ 
+     decorateWithConstants(object: object)
+     try decorateWithFunctions(object: object, appContext: appContext)
+diff --git a/node_modules/expo-modules-core/ios/Core/SharedObjects/SharedObject.swift b/node_modules/expo-modules-core/ios/Core/SharedObjects/SharedObject.swift
+index 993b56f..2511c6e 100644
+--- a/node_modules/expo-modules-core/ios/Core/SharedObjects/SharedObject.swift
++++ b/node_modules/expo-modules-core/ios/Core/SharedObjects/SharedObject.swift
+@@ -46,7 +46,7 @@ public extension SharedObject { // swiftlint:disable:this no_grouping_extension
+   /**
+    Schedules an event with the given name and arguments to be emitted to the associated JavaScript object.
+    */
+-  public func emit<each A: AnyArgument>(event: String, arguments: repeat each A) {
++  func emit<each A: AnyArgument>(event: String, arguments: repeat each A) {
+     guard let appContext, let runtime = try? appContext.runtime else {
+       log.warn("Trying to send event '\(event)' to \(type(of: self)), but the JS runtime has been lost")
+       return
+diff --git a/node_modules/expo-modules-core/ios/Core/Views/ViewModuleWrapper.swift b/node_modules/expo-modules-core/ios/Core/Views/ViewModuleWrapper.swift
+index 7c338de..d5cc861 100644
+--- a/node_modules/expo-modules-core/ios/Core/Views/ViewModuleWrapper.swift
++++ b/node_modules/expo-modules-core/ios/Core/Views/ViewModuleWrapper.swift
+@@ -87,7 +87,7 @@ public final class ViewModuleWrapper: RCTViewManager, DynamicModuleWrapperProtoc
+       fatalError(Exceptions.AppContextLost().reason)
+     }
+     guard let view = wrappedModuleHolder.definition.view?.createView(appContext: appContext) else {
+-      fatalError("Cannot create a view from module '\(self.name)'")
++      fatalError("Cannot create a view from module '\(String(describing: self.name))'")
+     }
+     return view
+   }
+@@ -112,7 +112,7 @@ public final class ViewModuleWrapper: RCTViewManager, DynamicModuleWrapperProtoc
+       // so there is no other way to pass it to the instances.
+       let wrappedModuleBlock: @convention(block) () -> ViewModuleWrapper = { module }
+       let wrappedModuleImp: IMP = imp_implementationWithBlock(wrappedModuleBlock)
+-      class_addMethod(wrapperClass, Selector("wrappedModule"), wrappedModuleImp, "@@:")
++      class_addMethod(wrapperClass, #selector(DynamicModuleWrapperProtocol.wrappedModule), wrappedModuleImp, "@@:")
+ 
+       return wrapperClass as? ViewModuleWrapper.Type
+     }
+diff --git a/node_modules/expo-modules-core/ios/EXLegacyExpoViewProtocol.h b/node_modules/expo-modules-core/ios/EXLegacyExpoViewProtocol.h
+index 00aacdb..23e9abf 100644
+--- a/node_modules/expo-modules-core/ios/EXLegacyExpoViewProtocol.h
++++ b/node_modules/expo-modules-core/ios/EXLegacyExpoViewProtocol.h
+@@ -8,6 +8,6 @@
+  */
+ @protocol EXLegacyExpoViewProtocol
+ 
+-- (instancetype)initWithModuleRegistry:(nullable EXModuleRegistry *)moduleRegistry;
++- (nonnull instancetype)initWithModuleRegistry:(nullable EXModuleRegistry *)moduleRegistry;
+ 
+ @end
+diff --git a/node_modules/expo-modules-core/ios/FileSystemUtilities/FileSystemLegacyUtilities.swift b/node_modules/expo-modules-core/ios/FileSystemUtilities/FileSystemLegacyUtilities.swift
+index 542a7ec..9c728f1 100644
+--- a/node_modules/expo-modules-core/ios/FileSystemUtilities/FileSystemLegacyUtilities.swift
++++ b/node_modules/expo-modules-core/ios/FileSystemUtilities/FileSystemLegacyUtilities.swift
+@@ -23,9 +23,9 @@ public class FileSystemLegacyUtilities: NSObject, EXInternalModule, EXFileSystem
+     self.isScoped = true
+ 
+     super.init()
+-    ensureDirExists(withPath: self.cachesDirectory)
+-    ensureDirExists(withPath: self.documentDirectory)
+-    ensureDirExists(withPath: self.applicationSupportDirectory)
++    _ = ensureDirExists(withPath: self.cachesDirectory)
++    _ = ensureDirExists(withPath: self.documentDirectory)
++    _ = ensureDirExists(withPath: self.applicationSupportDirectory)
+   }
+ 
+   required public override init() {
+@@ -40,9 +40,9 @@ public class FileSystemLegacyUtilities: NSObject, EXInternalModule, EXFileSystem
+     self.applicationSupportDirectory = applicationSupportDirectoryPaths[0]
+ 
+     super.init()
+-    ensureDirExists(withPath: self.cachesDirectory)
+-    ensureDirExists(withPath: self.documentDirectory)
+-    ensureDirExists(withPath: self.applicationSupportDirectory)
++    _ = ensureDirExists(withPath: self.cachesDirectory)
++    _ = ensureDirExists(withPath: self.documentDirectory)
++    _ = ensureDirExists(withPath: self.applicationSupportDirectory)
+   }
+ 
+   public static func exportedInterfaces() -> [Protocol] {
+@@ -68,9 +68,9 @@ public class FileSystemLegacyUtilities: NSObject, EXInternalModule, EXFileSystem
+   }
+ 
+   @objc
+-  public func generatePath(inDirectory directory: String, withExtension ext: String) -> String {
+-    let fileName = "\(UUID().uuidString)\(ext)"
+-    ensureDirExists(withPath: directory)
++  public func generatePath(inDirectory directory: String, withExtension ext: String?) -> String {
++    let fileName = "\(UUID().uuidString)\(ext ?? "")"
++    _ = ensureDirExists(withPath: directory)
+     return (directory as NSString).appendingPathComponent(fileName)
+   }
+ 
+diff --git a/node_modules/expo-modules-core/ios/Interfaces/FileSystem/EXFileSystemInterface.h b/node_modules/expo-modules-core/ios/Interfaces/FileSystem/EXFileSystemInterface.h
+index fca4649..722819e 100644
+--- a/node_modules/expo-modules-core/ios/Interfaces/FileSystem/EXFileSystemInterface.h
++++ b/node_modules/expo-modules-core/ios/Interfaces/FileSystem/EXFileSystemInterface.h
+@@ -11,13 +11,13 @@ typedef NS_OPTIONS(unsigned int, EXFileSystemPermissionFlags) {
+ // TODO: Maybe get rid of this interface in favor of EXFileSystemManager and private utilities classes
+ @protocol EXFileSystemInterface
+ 
+-@property (nonatomic, readonly) NSString *documentDirectory;
+-@property (nonatomic, readonly) NSString *cachesDirectory;
+-@property (nonatomic, readonly) NSString *applicationSupportDirectory;
++@property (nonatomic, readonly, nonnull) NSString *documentDirectory;
++@property (nonatomic, readonly, nonnull) NSString *cachesDirectory;
++@property (nonatomic, readonly, nonnull) NSString *applicationSupportDirectory;
+ 
+ // TODO: Move permissionsForURI to EXFileSystemManagerInterface
+-- (EXFileSystemPermissionFlags)permissionsForURI:(NSURL *)uri;
+-- (nonnull NSString *)generatePathInDirectory:(NSString *)directory withExtension:(NSString *)extension;
+-- (BOOL)ensureDirExistsWithPath:(NSString *)path;
++- (EXFileSystemPermissionFlags)permissionsForURI:(nonnull NSURL *)uri;
++- (nonnull NSString *)generatePathInDirectory:(nonnull NSString *)directory withExtension:(nullable NSString *)extension;
++- (BOOL)ensureDirExistsWithPath:(nonnull NSString *)path;
+ 
+ @end
+diff --git a/node_modules/expo-modules-core/ios/JSI/EXJSIInstaller.h b/node_modules/expo-modules-core/ios/JSI/EXJSIInstaller.h
+index 8d2dbc8..3dd46c9 100644
+--- a/node_modules/expo-modules-core/ios/JSI/EXJSIInstaller.h
++++ b/node_modules/expo-modules-core/ios/JSI/EXJSIInstaller.h
+@@ -36,7 +36,7 @@ extern NSString * _Nonnull const EXGlobalCoreObjectPropertyName;
+ /**
+  Installs the base class for shared objects, i.e. `global.expo.SharedObject`.
+  */
+-+ (void)installSharedObjectClass:(nonnull EXRuntime *)runtime releaser:(void(^)(long))releaser;
+++ (void)installSharedObjectClass:(nonnull EXRuntime *)runtime releaser:(nonnull void(^)(long))releaser;
+ 
+ /**
+  Installs the EventEmitter class in the given runtime as `global.expo.EventEmitter`.
+diff --git a/node_modules/expo-modules-core/ios/JSI/EXJSIUtils.h b/node_modules/expo-modules-core/ios/JSI/EXJSIUtils.h
+index cb876b0..ed5bed2 100644
+--- a/node_modules/expo-modules-core/ios/JSI/EXJSIUtils.h
++++ b/node_modules/expo-modules-core/ios/JSI/EXJSIUtils.h
+@@ -16,9 +16,9 @@ namespace expo {
+ 
+ #pragma mark - Promises
+ 
+-using PromiseInvocationBlock = void (^)(RCTPromiseResolveBlock resolveWrapper, RCTPromiseRejectBlock rejectWrapper);
++using PromiseInvocationBlock = void (^ _Nonnull)(RCTPromiseResolveBlock _Nonnull resolveWrapper, RCTPromiseRejectBlock _Nonnull rejectWrapper);
+ 
+-void callPromiseSetupWithBlock(jsi::Runtime &runtime, std::shared_ptr<react::CallInvoker> jsInvoker, std::shared_ptr<react::Promise> promise, PromiseInvocationBlock setupBlock);
++void callPromiseSetupWithBlock(jsi::Runtime &runtime, std::shared_ptr<react::CallInvoker> jsInvoker, std::shared_ptr<react::Promise> promise, PromiseInvocationBlock _Nonnull setupBlock);
+ 
+ #pragma mark - Weak objects
+ 
+diff --git a/node_modules/expo-modules-core/ios/JSI/JavaScriptRuntime.swift b/node_modules/expo-modules-core/ios/JSI/JavaScriptRuntime.swift
+index d2103f1..5e25758 100644
+--- a/node_modules/expo-modules-core/ios/JSI/JavaScriptRuntime.swift
++++ b/node_modules/expo-modules-core/ios/JSI/JavaScriptRuntime.swift
+@@ -64,7 +64,7 @@ public extension JavaScriptRuntime {
+   /**
+    Schedules a block to be executed with granted synchronized access to the JS runtime.
+    */
+-  public func schedule(priority: SchedulerPriority = .normal, _ closure: @escaping () -> Void) {
++  func schedule(priority: SchedulerPriority = .normal, _ closure: @escaping () -> Void) {
+     __schedule(closure, priority: priority.rawValue)
+   }
+ }
+diff --git a/node_modules/expo-modules-core/ios/Legacy/NativeModulesProxy/EXNativeModulesProxy.h b/node_modules/expo-modules-core/ios/Legacy/NativeModulesProxy/EXNativeModulesProxy.h
+index 38be20f..5a4ec50 100644
+--- a/node_modules/expo-modules-core/ios/Legacy/NativeModulesProxy/EXNativeModulesProxy.h
++++ b/node_modules/expo-modules-core/ios/Legacy/NativeModulesProxy/EXNativeModulesProxy.h
+@@ -10,11 +10,11 @@
+ NS_SWIFT_NAME(ModulesProxyConfig)
+ @interface EXModulesProxyConfig : NSObject
+ 
+-- (instancetype)initWithConstants:(nonnull NSDictionary *)constants
++- (nonnull instancetype)initWithConstants:(nonnull NSDictionary *)constants
+                       methodNames:(nonnull NSDictionary *)methodNames
+                      viewManagers:(nonnull NSDictionary *)viewManagerMetadata;
+ 
+-- (void)addEntriesFromConfig:(nonnull const EXModulesProxyConfig *)config;
++- (void)addEntriesFromConfig:(nonnull EXModulesProxyConfig *)config;
+ - (nonnull NSDictionary<NSString *, id> *)toDictionary;
+ 
+ @end
+@@ -26,12 +26,12 @@ NS_SWIFT_NAME(ModulesProxyConfig)
+ NS_SWIFT_NAME(LegacyNativeModulesProxy)
+ @interface EXNativeModulesProxy : NSObject <RCTBridgeModule>
+ 
+-@property (nonatomic, strong, readonly) EXModulesProxyConfig *nativeModulesConfig;
++@property (nonatomic, strong, readonly, nonnull) EXModulesProxyConfig *nativeModulesConfig;
+ 
+ - (nonnull instancetype)init;
+ - (nonnull instancetype)initWithModuleRegistry:(nullable EXModuleRegistry *)moduleRegistry;
+ - (nonnull instancetype)initWithCustomModuleRegistry:(nonnull EXModuleRegistry *)moduleRegistry;
+ 
+-- (void)callMethod:(NSString *)moduleName methodNameOrKey:(id)methodNameOrKey arguments:(NSArray *)arguments resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject;
++- (void)callMethod:(nonnull NSString *)moduleName methodNameOrKey:(nonnull id)methodNameOrKey arguments:(nonnull NSArray *)arguments resolver:(nonnull RCTPromiseResolveBlock)resolve rejecter:(nonnull RCTPromiseRejectBlock)reject;
+ 
+ @end
+diff --git a/node_modules/expo-modules-core/ios/Legacy/NativeModulesProxy/EXNativeModulesProxy.mm b/node_modules/expo-modules-core/ios/Legacy/NativeModulesProxy/EXNativeModulesProxy.mm
+index 13d6f39..94f15d1 100644
+--- a/node_modules/expo-modules-core/ios/Legacy/NativeModulesProxy/EXNativeModulesProxy.mm
++++ b/node_modules/expo-modules-core/ios/Legacy/NativeModulesProxy/EXNativeModulesProxy.mm
+@@ -44,9 +44,9 @@ - (instancetype)initWithConstants:(nonnull NSDictionary *)constants
+                      viewManagers:(nonnull NSDictionary *)viewManagerMetadata
+ {
+   if (self = [super init]) {
+-    _exportedConstants = constants;
+-    _methodNames = methodNames;
+-    _viewManagerMetadata = viewManagerMetadata;
++    _exportedConstants = [constants mutableCopy];
++    _methodNames = [methodNames mutableCopy];
++    _viewManagerMetadata = [viewManagerMetadata mutableCopy];
+   }
+   return self;
+ }
+@@ -108,7 +108,10 @@ @implementation EXNativeModulesProxy {
+ - (instancetype)initWithModuleRegistry:(nullable EXModuleRegistry *)moduleRegistry
+ {
+   if (self = [super init]) {
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+     _exModuleRegistry = moduleRegistry != nil ? moduleRegistry : [[EXModuleRegistryProvider new] moduleRegistry];
++#pragma clang diagnostic pop
+     _exportedMethodsKeys = [NSMutableDictionary dictionary];
+     _exportedMethodsReverseKeys = [NSMutableDictionary dictionary];
+     _ownsModuleRegistry = moduleRegistry == nil;

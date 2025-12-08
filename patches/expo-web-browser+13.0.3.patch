@@ -1,0 +1,57 @@
+diff --git a/node_modules/expo-web-browser/ios/WebAuthSession.swift b/node_modules/expo-web-browser/ios/WebAuthSession.swift
+index dedcf0c..8ae0023 100644
+--- a/node_modules/expo-web-browser/ios/WebAuthSession.swift
++++ b/node_modules/expo-web-browser/ios/WebAuthSession.swift
+@@ -5,7 +5,11 @@ import AuthenticationServices
+ 
+ private class PresentationContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
+   func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+-    return UIApplication.shared.keyWindow ?? ASPresentationAnchor()
++    if #available(iOS 13.0, *) {
++      return UIApplication.shared.windows.first { $0.isKeyWindow } ?? ASPresentationAnchor()
++    } else {
++      return UIApplication.shared.keyWindow ?? ASPresentationAnchor()
++    }
+   }
+ }
+ 
+diff --git a/node_modules/expo-web-browser/ios/WebBrowserOptions.swift b/node_modules/expo-web-browser/ios/WebBrowserOptions.swift
+index 97af872..bf7e65f 100644
+--- a/node_modules/expo-web-browser/ios/WebBrowserOptions.swift
++++ b/node_modules/expo-web-browser/ios/WebBrowserOptions.swift
+@@ -29,7 +29,7 @@ struct AuthSessionOptions: Record {
+   var preferEphemeralSession: Bool = false
+ }
+ 
+-enum DismissButtonStyle: String, EnumArgument {
++enum DismissButtonStyle: String, Enumerable {
+   case done
+   case close
+   case cancel
+@@ -46,7 +46,7 @@ enum DismissButtonStyle: String, EnumArgument {
+   }
+ }
+ 
+-internal enum PresentationStyle: String, EnumArgument {
++internal enum PresentationStyle: String, Enumerable {
+   case fullScreen
+   case pageSheet
+   case formSheet
+diff --git a/node_modules/expo-web-browser/ios/WebBrowserSession.swift b/node_modules/expo-web-browser/ios/WebBrowserSession.swift
+index d4b882f..70201b3 100644
+--- a/node_modules/expo-web-browser/ios/WebBrowserSession.swift
++++ b/node_modules/expo-web-browser/ios/WebBrowserSession.swift
+@@ -28,7 +28,12 @@ internal class WebBrowserSession: NSObject, SFSafariViewControllerDelegate, UIAd
+   }
+ 
+   func open() {
+-    var currentViewController = UIApplication.shared.keyWindow?.rootViewController
++    var currentViewController: UIViewController?
++    if #available(iOS 13.0, *) {
++      currentViewController = UIApplication.shared.windows.first { $0.isKeyWindow }?.rootViewController
++    } else {
++      currentViewController = UIApplication.shared.keyWindow?.rootViewController
++    }
+     while currentViewController?.presentedViewController != nil {
+       currentViewController = currentViewController?.presentedViewController
+     }

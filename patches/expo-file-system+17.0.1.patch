@@ -1,0 +1,157 @@
+diff --git a/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionCancelableUploadTaskDelegate.h b/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionCancelableUploadTaskDelegate.h
+index c9ea573..d5197f2 100644
+--- a/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionCancelableUploadTaskDelegate.h
++++ b/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionCancelableUploadTaskDelegate.h
+@@ -3,14 +3,18 @@
+ #import <ExpoFileSystem/EXSessionUploadTaskDelegate.h>
+ #import <ExpoFileSystem/EXTaskHandlersManager.h>
+ 
++NS_ASSUME_NONNULL_BEGIN
++
+ typedef void (^EXUploadDelegateOnSendCallback)(NSURLSessionUploadTask *task, int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend);
+ 
+ @interface EXSessionCancelableUploadTaskDelegate : EXSessionUploadTaskDelegate
+ 
+-- (nonnull instancetype)initWithResolve:(EXPromiseResolveBlock)resolve
+-                                 reject:(EXPromiseRejectBlock)reject
+-                         onSendCallback:(EXUploadDelegateOnSendCallback)onSendCallback
+-                       resumableManager:(EXTaskHandlersManager *)manager
+-                                   uuid:(NSString *)uuid;
++- (instancetype)initWithResolve:(EXPromiseResolveBlock)resolve
++                         reject:(EXPromiseRejectBlock)reject
++                 onSendCallback:(EXUploadDelegateOnSendCallback)onSendCallback
++               resumableManager:(EXTaskHandlersManager *)manager
++                           uuid:(NSString *)uuid;
+ 
+ @end
++
++NS_ASSUME_NONNULL_END
+diff --git a/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionDownloadTaskDelegate.h b/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionDownloadTaskDelegate.h
+index add56c8..9ead438 100644
+--- a/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionDownloadTaskDelegate.h
++++ b/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionDownloadTaskDelegate.h
+@@ -2,12 +2,16 @@
+ 
+ #import <ExpoFileSystem/EXSessionTaskDelegate.h>
+ 
++NS_ASSUME_NONNULL_BEGIN
++
+ @interface EXSessionDownloadTaskDelegate : EXSessionTaskDelegate
+ 
+-- (nonnull instancetype)initWithResolve:(EXPromiseResolveBlock)resolve
+-                                 reject:(EXPromiseRejectBlock)reject
+-                               localUrl:(NSURL *)localUrl
+-                     shouldCalculateMd5:(BOOL)shouldCalculateMd5;
++- (instancetype)initWithResolve:(EXPromiseResolveBlock)resolve
++                         reject:(EXPromiseRejectBlock)reject
++                       localUrl:(NSURL *)localUrl
++             shouldCalculateMd5:(BOOL)shouldCalculateMd5;
+ 
+ @end
+ 
++NS_ASSUME_NONNULL_END
++
+diff --git a/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionResumableDownloadTaskDelegate.h b/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionResumableDownloadTaskDelegate.h
+index da7bf56..d6178e7 100644
+--- a/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionResumableDownloadTaskDelegate.h
++++ b/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionResumableDownloadTaskDelegate.h
+@@ -3,16 +3,20 @@
+ #import <ExpoFileSystem/EXSessionDownloadTaskDelegate.h>
+ #import <ExpoFileSystem/EXTaskHandlersManager.h>
+ 
++NS_ASSUME_NONNULL_BEGIN
++
+ typedef void (^EXDownloadDelegateOnWriteCallback)(NSURLSessionDownloadTask *task, int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite);
+ 
+ @interface EXSessionResumableDownloadTaskDelegate : EXSessionDownloadTaskDelegate
+ 
+-- (nonnull instancetype)initWithResolve:(EXPromiseResolveBlock)resolve
+-                                 reject:(EXPromiseRejectBlock)reject
+-                               localUrl:(NSURL *)localUrl
+-                     shouldCalculateMd5:(BOOL)shouldCalculateMd5
+-                        onWriteCallback:(EXDownloadDelegateOnWriteCallback)onWriteCallback
+-                       resumableManager:(EXTaskHandlersManager *)manager
+-                                   uuid:(NSString *)uuid;
++- (instancetype)initWithResolve:(EXPromiseResolveBlock)resolve
++                         reject:(EXPromiseRejectBlock)reject
++                       localUrl:(NSURL *)localUrl
++             shouldCalculateMd5:(BOOL)shouldCalculateMd5
++                onWriteCallback:(EXDownloadDelegateOnWriteCallback)onWriteCallback
++               resumableManager:(EXTaskHandlersManager *)manager
++                           uuid:(NSString *)uuid;
+ 
+ @end
++
++NS_ASSUME_NONNULL_END
+diff --git a/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionTaskDelegate.h b/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionTaskDelegate.h
+index 61daeda..76d7e8d 100644
+--- a/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionTaskDelegate.h
++++ b/node_modules/expo-file-system/ios/EXSessionTasks/EXSessionTaskDelegate.h
+@@ -3,17 +3,19 @@
+ #import <Foundation/Foundation.h>
+ #import <ExpoModulesCore/EXDefines.h>
+ 
++NS_ASSUME_NONNULL_BEGIN
++
+ @interface EXSessionTaskDelegate : NSObject
+ 
+ @property (nonatomic, strong, readonly) EXPromiseResolveBlock resolve;
+ @property (nonatomic, strong, readonly) EXPromiseRejectBlock reject;
+ 
+-- (nonnull instancetype)initWithResolve:(EXPromiseResolveBlock)resolve
+-                                 reject:(EXPromiseRejectBlock)reject;
++- (instancetype)initWithResolve:(EXPromiseResolveBlock)resolve
++                         reject:(EXPromiseRejectBlock)reject;
+ 
+ - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location;
+ 
+-- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error;
++- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(nullable NSError *)error;
+ 
+ - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
+                                            didWriteData:(int64_t)bytesWritten
+@@ -30,3 +32,5 @@
+ - (NSDictionary *)parseServerResponse:(NSURLResponse *)response;
+ 
+ @end
++
++NS_ASSUME_NONNULL_END
+diff --git a/node_modules/expo-file-system/ios/FileSystemHelpers.swift b/node_modules/expo-file-system/ios/FileSystemHelpers.swift
+index 456d530..9f76174 100644
+--- a/node_modules/expo-file-system/ios/FileSystemHelpers.swift
++++ b/node_modules/expo-file-system/ios/FileSystemHelpers.swift
+@@ -89,7 +89,7 @@ internal func copyPHAsset(fromUrl: URL, toUrl: URL, with resourceManager: PHAsse
+     let firstResource = PHAssetResource.assetResources(for: asset).first
+     if let firstResource {
+       resourceManager.writeData(for: firstResource, toFile: toUrl, options: nil) { error in
+-        if let error {
++        if error != nil {
+           promise.reject(FailedToCopyAssetException(fromUrl.absoluteString))
+         }
+         promise.resolve()
+diff --git a/node_modules/expo-file-system/ios/FileSystemModule.swift b/node_modules/expo-file-system/ios/FileSystemModule.swift
+index 3519c67..0acd858 100644
+--- a/node_modules/expo-file-system/ios/FileSystemModule.swift
++++ b/node_modules/expo-file-system/ios/FileSystemModule.swift
+@@ -206,7 +206,7 @@ public final class FileSystemModule: Module {
+       try ensurePathPermission(appContext, path: localUrl.path, flag: .write)
+ 
+       let session = options.sessionType == .background ? backgroundSession : foregroundSession
+-      let resumeData = resumeDataString != nil ? Data(base64Encoded: resumeDataString ?? "") : nil
++      let _ = resumeDataString != nil ? Data(base64Encoded: resumeDataString ?? "") : nil
+       let onWrite: EXDownloadDelegateOnWriteCallback = { [weak self] _, _, totalBytesWritten, totalBytesExpectedToWrite in
+         self?.sendEvent(EVENT_DOWNLOAD_PROGRESS, [
+           "uuid": uuid,
+diff --git a/node_modules/expo-file-system/ios/NetworkingHelpers.swift b/node_modules/expo-file-system/ios/NetworkingHelpers.swift
+index a889bb1..a2198c3 100644
+--- a/node_modules/expo-file-system/ios/NetworkingHelpers.swift
++++ b/node_modules/expo-file-system/ios/NetworkingHelpers.swift
+@@ -63,7 +63,7 @@ func createLocalUrl(from sourceUrl: URL) throws -> URL {
+ 
+ func createMultipartBody(boundary: String, sourceUrl: URL, options: UploadOptions) -> Data? {
+   let fieldName = options.fieldName ?? sourceUrl.lastPathComponent
+-  var mimeType = options.mimeType ?? findMimeType(forAttachment: sourceUrl)
++  let mimeType = options.mimeType ?? findMimeType(forAttachment: sourceUrl)
+   guard let data = try? Data(contentsOf: sourceUrl) else {
+     return nil
+   }

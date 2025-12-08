@@ -1,0 +1,27 @@
+diff --git a/node_modules/@react-native-async-storage/async-storage/ios/RNCAsyncStorage.h b/node_modules/@react-native-async-storage/async-storage/ios/RNCAsyncStorage.h
+index 38e5178..403804c 100644
+--- a/node_modules/@react-native-async-storage/async-storage/ios/RNCAsyncStorage.h
++++ b/node_modules/@react-native-async-storage/async-storage/ios/RNCAsyncStorage.h
+@@ -48,15 +48,19 @@
+ // For clearing data when the bridge may not exist, e.g. when logging out.
+ + (void)clearAllData;
+ 
++NS_ASSUME_NONNULL_BEGIN
++
+ // Grab data from the cache. ResponseBlock result array will have an error at position 0, and an
+ // array of arrays at position 1.
+-- (void)multiGet:(NSArray<NSString *> *)keys callback:(RCTResponseSenderBlock)callback;
++- (void)multiGet:(NSArray<NSString *> *)keys callback:(RCTResponseSenderBlock _Nonnull)callback;
+ 
+ // Add multiple key value pairs to the cache.
+ - (void)multiSet:(NSArray<NSArray<NSString *> *> *)kvPairs
+-        callback:(RCTResponseSenderBlock)callback;
++        callback:(RCTResponseSenderBlock _Nonnull)callback;
+ 
+ // Interface for natively fetching all the keys from the storage data.
+-- (void)getAllKeys:(RCTResponseSenderBlock)callback;
++- (void)getAllKeys:(RCTResponseSenderBlock _Nonnull)callback;
++
++NS_ASSUME_NONNULL_END
+ 
+ @end

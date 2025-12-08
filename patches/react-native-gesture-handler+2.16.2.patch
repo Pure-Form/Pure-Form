@@ -1,0 +1,75 @@
+diff --git a/node_modules/react-native-gesture-handler/apple/Handlers/RNPanHandler.m b/node_modules/react-native-gesture-handler/apple/Handlers/RNPanHandler.m
+index 8fbfd11..06393d0 100644
+--- a/node_modules/react-native-gesture-handler/apple/Handlers/RNPanHandler.m
++++ b/node_modules/react-native-gesture-handler/apple/Handlers/RNPanHandler.m
+@@ -80,12 +80,15 @@ - (void)setMinimumNumberOfTouches:(NSUInteger)minimumNumberOfTouches
+ }
+ #endif
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wmismatched-return-types"
+ - (void)activateAfterLongPress
+ {
+   self.state = UIGestureRecognizerStateBegan;
+   // Send event in ACTIVE state because UIGestureRecognizerStateBegan is mapped to RNGestureHandlerStateBegan
+   [_gestureHandler handleGesture:self inState:RNGestureHandlerStateActive];
+ }
++#pragma clang diagnostic pop
+ 
+ - (void)interactionsBegan:(NSSet *)touches withEvent:(UIEvent *)event
+ {
+diff --git a/node_modules/react-native-gesture-handler/apple/RNGestureHandlerManager.mm b/node_modules/react-native-gesture-handler/apple/RNGestureHandlerManager.mm
+index 7983c49..294fc59 100644
+--- a/node_modules/react-native-gesture-handler/apple/RNGestureHandlerManager.mm
++++ b/node_modules/react-native-gesture-handler/apple/RNGestureHandlerManager.mm
+@@ -41,7 +41,7 @@
+   RCTDefaultLogFunction(     \
+       RCTLogLevelInfo, RCTLogSourceNative, @(__FILE__), @(__LINE__), [NSString stringWithFormat:__VA_ARGS__])
+ 
+-constexpr int NEW_ARCH_NUMBER_OF_ATTACH_RETRIES = 25;
++[[maybe_unused]] constexpr int NEW_ARCH_NUMBER_OF_ATTACH_RETRIES = 25;
+ 
+ @interface RNGestureHandlerManager () <RNGestureHandlerEventEmitter, RNRootViewGestureRecognizerDelegate>
+ 
+@@ -115,7 +115,9 @@ - (void)createGestureHandler:(NSString *)handlerName tag:(NSNumber *)handlerTag
+       @"RotationGestureHandler" : [RNRotationGestureHandler class],
+       @"ForceTouchGestureHandler" : [RNForceTouchHandler class],
+       @"ManualGestureHandler" : [RNManualGestureHandler class],
++#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130400
+       @"HoverGestureHandler" : [RNHoverGestureHandler class],
++#endif
+     };
+   });
+ 
+@@ -422,7 +424,10 @@ - (void)sendEventForDeviceEvent:(RNGestureHandlerStateChange *)event
+ {
+   // Delivers the event to JS as a device event.
+   NSMutableDictionary *body = [[event arguments] objectAtIndex:2];
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+   [_eventDispatcher sendDeviceEventWithName:@"onGestureHandlerStateChange" body:body];
++#pragma clang diagnostic pop
+ }
+ 
+ @end
+diff --git a/node_modules/react-native-gesture-handler/apple/RNGestureHandlerModule.mm b/node_modules/react-native-gesture-handler/apple/RNGestureHandlerModule.mm
+index d36fcf4..a2ad711 100644
+--- a/node_modules/react-native-gesture-handler/apple/RNGestureHandlerModule.mm
++++ b/node_modules/react-native-gesture-handler/apple/RNGestureHandlerModule.mm
+@@ -64,6 +64,8 @@ + (BOOL)requiresMainQueueSetup
+   return YES;
+ }
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
+ - (void)invalidate
+ {
+   RNGestureHandlerManager *handlerManager = _manager;
+@@ -77,6 +79,7 @@ - (void)invalidate
+   [self.bridge.uiManager.observerCoordinator removeObserver:self];
+ #endif // RCT_NEW_ARCH_ENABLED
+ }
++#pragma clang diagnostic pop
+ 
+ - (dispatch_queue_t)methodQueue
+ {

@@ -1,0 +1,22 @@
+diff --git a/node_modules/expo-localization/ios/LocalizationModule.swift b/node_modules/expo-localization/ios/LocalizationModule.swift
+index 17c9cb7..a7314c2 100644
+--- a/node_modules/expo-localization/ios/LocalizationModule.swift
++++ b/node_modules/expo-localization/ios/LocalizationModule.swift
+@@ -123,6 +123,8 @@ public class LocalizationModule: Module {
+       return "roc"
+     case .iso8601:
+       return "iso8601"
++    @unknown default:
++      return "gregory"
+     }
+   }
+ 
+@@ -203,7 +205,7 @@ public class LocalizationModule: Module {
+   }
+ 
+   static func getCalendars() -> [[String: Any?]] {
+-    var calendar = Locale.current.calendar
++    let calendar = Locale.current.calendar
+     return [
+       [
+         "calendar": getUnicodeCalendarIdentifier(calendar: calendar),

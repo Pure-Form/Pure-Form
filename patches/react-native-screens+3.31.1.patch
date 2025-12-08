@@ -1,0 +1,171 @@
+diff --git a/node_modules/react-native-screens/ios/RNSScreen.mm b/node_modules/react-native-screens/ios/RNSScreen.mm
+index ac6479f..990b704 100644
+--- a/node_modules/react-native-screens/ios/RNSScreen.mm
++++ b/node_modules/react-native-screens/ios/RNSScreen.mm
+@@ -279,10 +279,13 @@ - (void)setHomeIndicatorHidden:(BOOL)homeIndicatorHidden
+ }
+ #endif
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
+ - (UIView *)reactSuperview
+ {
+   return _reactSuperview;
+ }
++#pragma clang diagnostic pop
+ 
+ - (void)addSubview:(UIView *)view
+ {
+@@ -1042,7 +1045,10 @@ - (BOOL)hasNestedStack
+ - (CGSize)getStatusBarHeightIsModal:(BOOL)isModal
+ {
+ #if !TARGET_OS_TV && !TARGET_OS_VISION
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+   CGSize fallbackStatusBarSize = [[UIApplication sharedApplication] statusBarFrame].size;
++#pragma clang diagnostic pop
+ 
+ #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && defined(__IPHONE_13_0) && \
+     __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0
+diff --git a/node_modules/react-native-screens/ios/RNSScreenContainer.mm b/node_modules/react-native-screens/ios/RNSScreenContainer.mm
+index 09f5d4d..b155ca8 100644
+--- a/node_modules/react-native-screens/ios/RNSScreenContainer.mm
++++ b/node_modules/react-native-screens/ios/RNSScreenContainer.mm
+@@ -89,6 +89,8 @@ - (void)markChildUpdated
+   [self updateContainer];
+ }
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
+ - (void)insertReactSubview:(RNSScreenView *)subview atIndex:(NSInteger)atIndex
+ {
+   subview.reactSuperview = self;
+@@ -106,6 +108,7 @@ - (void)removeReactSubview:(RNSScreenView *)subview
+ {
+   return _reactSubviews;
+ }
++#pragma clang diagnostic pop
+ 
+ - (UIViewController *)reactViewController
+ {
+diff --git a/node_modules/react-native-screens/ios/RNSScreenStack.mm b/node_modules/react-native-screens/ios/RNSScreenStack.mm
+index b96bb9e..4733359 100644
+--- a/node_modules/react-native-screens/ios/RNSScreenStack.mm
++++ b/node_modules/react-native-screens/ios/RNSScreenStack.mm
+@@ -242,10 +242,13 @@ - (void)presentationControllerDidDismiss:(UIPresentationController *)presentatio
+   }
+ }
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
+ - (NSArray<UIView *> *)reactSubviews
+ {
+   return _reactSubviews;
+ }
++#pragma clang diagnostic pop
+ 
+ - (void)didMoveToWindow
+ {
+@@ -1033,6 +1036,8 @@ - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
+ 
+ #endif // !TARGET_OS_TV
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
+ - (void)insertReactSubview:(RNSScreenView *)subview atIndex:(NSInteger)atIndex
+ {
+   if (![subview isKindOfClass:[RNSScreenView class]]) {
+@@ -1048,6 +1053,7 @@ - (void)removeReactSubview:(RNSScreenView *)subview
+   subview.reactSuperview = nil;
+   [_reactSubviews removeObject:subview];
+ }
++#pragma clang diagnostic pop
+ 
+ - (void)didUpdateReactSubviews
+ {
+diff --git a/node_modules/react-native-screens/ios/RNSScreenStackHeaderConfig.mm b/node_modules/react-native-screens/ios/RNSScreenStackHeaderConfig.mm
+index f7ec746..ab5f28a 100644
+--- a/node_modules/react-native-screens/ios/RNSScreenStackHeaderConfig.mm
++++ b/node_modules/react-native-screens/ios/RNSScreenStackHeaderConfig.mm
+@@ -90,6 +90,8 @@ - (void)initProps
+   _backTitleVisible = YES;
+ }
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
+ - (UIView *)reactSuperview
+ {
+   return _screenView;
+@@ -99,6 +101,7 @@ - (UIView *)reactSuperview
+ {
+   return _reactSubviews;
+ }
++#pragma clang diagnostic pop
+ 
+ - (void)removeFromSuperview
+ {
+@@ -535,7 +538,9 @@ + (void)updateViewController:(UIViewController *)vc
+     // When backBarButtonItem's title is null, back menu will use value
+     // of backButtonTitle
+     [backBarButtonItem setTitle:nil];
+-    prevItem.backButtonTitle = resolvedBackTitle;
++    if (@available(iOS 11.0, *)) {
++      prevItem.backButtonTitle = resolvedBackTitle;
++    }
+   }
+   prevItem.backBarButtonItem = backBarButtonItem;
+ 
+@@ -682,6 +687,8 @@ + (void)updateViewController:(UIViewController *)vc
+   }
+ }
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
+ - (void)insertReactSubview:(RNSScreenStackHeaderSubview *)subview atIndex:(NSInteger)atIndex
+ {
+   [_reactSubviews insertObject:subview atIndex:atIndex];
+@@ -692,6 +699,7 @@ - (void)removeReactSubview:(RNSScreenStackHeaderSubview *)subview
+ {
+   [_reactSubviews removeObject:subview];
+ }
++#pragma clang diagnostic pop
+ 
+ - (void)didUpdateReactSubviews
+ {
+diff --git a/node_modules/react-native-screens/ios/RNSScreenWindowTraits.mm b/node_modules/react-native-screens/ios/RNSScreenWindowTraits.mm
+index 4af4d4a..da2cd11 100644
+--- a/node_modules/react-native-screens/ios/RNSScreenWindowTraits.mm
++++ b/node_modules/react-native-screens/ios/RNSScreenWindowTraits.mm
+@@ -33,7 +33,9 @@ + (void)updateStatusBarAppearance
+ + (void)updateHomeIndicatorAutoHidden
+ {
+ #if !TARGET_OS_TV
+-  [RCTKeyWindow().rootViewController setNeedsUpdateOfHomeIndicatorAutoHidden];
++  if (@available(iOS 11.0, *)) {
++    [RCTKeyWindow().rootViewController setNeedsUpdateOfHomeIndicatorAutoHidden];
++  }
+ #endif
+ }
+ 
+@@ -165,7 +167,10 @@ + (void)enforceDesiredDeviceOrientation
+ 
+         // `attemptRotationToDeviceOrientation` is deprecated for modern OS versions
+         // so we need to use `setNeedsUpdateOfSupportedInterfaceOrientations`
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+         UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
++#pragma clang diagnostic pop
+         while (topController.presentedViewController) {
+           topController = topController.presentedViewController;
+         }
+@@ -205,7 +210,10 @@ + (UIInterfaceOrientation)interfaceOrientation
+   } else
+ #endif
+   {
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+     return UIApplication.sharedApplication.statusBarOrientation;
++#pragma clang diagnostic pop
+   }
+ }
+ #endif

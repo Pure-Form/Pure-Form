@@ -79,9 +79,19 @@ target 'PureLife' do
             config.build_settings['OTHER_LDFLAGS'] = flags.split.uniq.join(' ')
           end
         end
-        # Fix deployment target to minimum supported version (12.0)
-        if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 12.0
-          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+        # Fix deployment target to minimum supported version (13.4) - force all pods
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.4'
+        # Suppress documentation warnings from frameworks
+        config.build_settings['WARNING_CFLAGS'] ||= '$(inherited)'
+        config.build_settings['WARNING_CFLAGS'] = "#{config.build_settings['WARNING_CFLAGS']} -Wno-documentation"
+        # Suppress script phase notes
+        config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
+        config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'YES'
+        
+        # Suppress Swift deprecation warnings for ExpoCrypto (uses legacy CommonCrypto)
+        if target.name == 'ExpoCrypto'
+          config.build_settings['OTHER_SWIFT_FLAGS'] ||= '$(inherited)'
+          config.build_settings['OTHER_SWIFT_FLAGS'] = "#{config.build_settings['OTHER_SWIFT_FLAGS']} -suppress-warnings"
         end
       end
     end
@@ -89,20 +99,63 @@ target 'PureLife' do
     # Update to recommended Xcode settings
     installer.pods_project.build_configurations.each do |config|
       config.build_settings['DEAD_CODE_STRIPPING'] = 'YES'
+      # Suppress documentation warnings from prebuilt frameworks
+      config.build_settings['WARNING_CFLAGS'] ||= ['$(inherited)', '-Wno-documentation']
+      # Suppress all compiler warnings
+      config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'YES'
+      config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
     end
 
-    # Fix script phase warnings for missing outputs
+    # Add explicit outputs to script phases and make them create a stamp file so
+    # Xcode dependency analysis doesn't emit "will be run during every build" notes.
+    # For each PBXShellScriptBuildPhase, add an output path under DerivedFiles and
+    # append a short echo command to the script to touch that file.
     installer.pods_project.targets.each do |target|
       target.build_phases.each do |phase|
-        if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase) && phase.name
-          if phase.name.include?("Create Symlinks to Header Folders") ||
-             phase.name.include?("Generate app.config for prebuilt Constants.manifest") ||
-             phase.name.include?("[Hermes] Replace Hermes")
-            phase.always_out_of_date = "1"
+        if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
+          safe_name = phase.name ? phase.name.gsub(/[^0-9A-Za-z_\-]/, '_') : "unnamed_phase"
+          stamp_path = "${DERIVED_FILE_DIR}/pods_#{target.name}_#{safe_name}.stamp"
+          # Only add the output if not already present
+          phase.output_paths ||= []
+          unless phase.output_paths.include?(stamp_path)
+            phase.output_paths << stamp_path
+          end
+          # Ensure the script will create the stamp file when run.
+          append_cmd = "\necho \"stamp\" > \"#{stamp_path}\" || true\n"
+          unless phase.shell_script && phase.shell_script.include?(stamp_path)
+            phase.shell_script = (phase.shell_script.to_s || "") + append_cmd
           end
         end
       end
     end
+
+    # Also apply the same changes to aggregate targets / main user project targets
+    if installer.respond_to?(:aggregate_targets)
+      installer.aggregate_targets.each do |aggregate_target|
+        if aggregate_target.user_project && aggregate_target.user_project.targets
+          aggregate_target.user_project.targets.each do |target|
+            target.build_phases.each do |phase|
+              if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
+                safe_name = phase.name ? phase.name.gsub(/[^0-9A-Za-z_\-]/, '_') : "unnamed_phase"
+                stamp_path = "${DERIVED_FILE_DIR}/proj_#{target.name}_#{safe_name}.stamp"
+                phase.output_paths ||= []
+                unless phase.output_paths.include?(stamp_path)
+                  phase.output_paths << stamp_path
+                end
+                append_cmd = "\necho \"stamp\" > \"#{stamp_path}\" || true\n"
+                unless phase.shell_script && phase.shell_script.include?(stamp_path)
+                  phase.shell_script = (phase.shell_script.to_s || "") + append_cmd
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    # Apply custom patches to Pods
+    puts "Applying custom Pods patches..."
+    system("bash #{File.join(__dir__, '../scripts/patch-pods.sh')} #{installer.pods_project.path.parent}")
   end
 
   post_integrate do |installer|
