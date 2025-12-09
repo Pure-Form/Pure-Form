@@ -24,7 +24,6 @@
 - (NSURL *)bundleURL
 {
 #if DEBUG
-  // Use RCTBundleURLProvider which automatically finds Metro (supports both local and tunnel)
   return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@".expo/.virtual-metro-entry"];
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
