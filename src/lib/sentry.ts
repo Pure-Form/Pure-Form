@@ -25,10 +25,7 @@ export const initSentry = () => {
     // App info
     dist: Constants.expoConfig?.version,
     release: `${Constants.expoConfig?.slug}@${Constants.expoConfig?.version}`,
-    // Integrations
-    integrations: [
-      Sentry.reactNavigationIntegration(),
-    ],
+    // Note: Navigation integration removed for Sentry v5.x compatibility
     // beforeSend to filter out sensitive data
     beforeSend(event) {
       // Remove sensitive data from breadcrumbs
