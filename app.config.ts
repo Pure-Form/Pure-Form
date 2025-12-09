@@ -52,14 +52,6 @@ const config: ExpoConfig = {
       },
     ],
     "expo-font",
-    [
-      "expo-notifications",
-      {
-        icon: "./assets/icon.png",
-        color: "#00B6FF",
-        sounds: [],
-      },
-    ],
   ],
     extra: {
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? "",
