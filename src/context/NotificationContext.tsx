@@ -1,4 +1,5 @@
-import * as Notifications from "expo-notifications";
+// expo-notifications removed - not supported by Personal Apple Developer accounts
+// This file is kept for future use when upgrading to paid Apple Developer account
 import { Platform } from "react-native";
 import React, {
   createContext,
@@ -21,79 +22,22 @@ const NotificationContext = createContext<NotificationContextType | undefined>(
   undefined,
 );
 
-// Configure how notifications are handled when app is foregrounded
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
-
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
 
-  useEffect(() => {
-    checkPermission();
-  }, []);
-
+  // Notifications disabled - Personal Apple Developer accounts don't support Push Notifications
   const checkPermission = async () => {
-    try {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      setHasPermission(existingStatus === "granted");
-
-      if (existingStatus === "granted") {
-        await registerForPushNotifications();
-      }
-    } catch (error) {
-      console.error("NotificationError:", "NotificationContext.checkPermission");
-    }
+    console.log("Notifications disabled - Personal Apple Developer account limitation");
   };
 
   const requestPermission = async (): Promise<boolean> => {
-    try {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-
-      if (finalStatus !== "granted") {
-        setHasPermission(false);
-        return false;
-      }
-
-      setHasPermission(true);
-      await registerForPushNotifications();
-      return true;
-    } catch (error) {
-      console.error("NotificationError:", "NotificationContext.requestPermission");
-      return false;
-    }
+    console.log("Notifications disabled - Personal Apple Developer account limitation");
+    return false;
   };
 
   const registerForPushNotifications = async () => {
-    try {
-      if (Platform.OS === "android") {
-        await Notifications.setNotificationChannelAsync("default", {
-          name: "default",
-          importance: Notifications.AndroidImportance.MAX,
-          vibrationPattern: [0, 250, 250, 250],
-          lightColor: "#00B6FF",
-        });
-      }
-
-      const token = (await Notifications.getExpoPushTokenAsync()).data;
-      setExpoPushToken(token);
-      console.log("Expo Push Token:", token);
-    } catch (error) {
-      console.error("NotificationError:", "NotificationContext.registerForPushNotifications");
-    }
+    console.log("Notifications disabled - Personal Apple Developer account limitation");
   };
 
   const scheduleWorkoutReminder = async (
@@ -101,64 +45,16 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     hour: number,
     minute: number,
   ): Promise<string | null> => {
-    try {
-      if (!hasPermission) {
-        const granted = await requestPermission();
-        if (!granted) return null;
-      }
-
-      // Map day to weekday number (1 = Monday, 7 = Sunday)
-      const dayMap: Record<string, number> = {
-        MON: 1,
-        TUE: 2,
-        WED: 3,
-        THU: 4,
-        FRI: 5,
-        SAT: 6,
-        SUN: 7,
-      };
-
-      const weekday = dayMap[day] || 1;
-
-      const identifier = await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "🏋️ Workout Time!",
-          body: `Time for your ${day} workout. Let's crush it!`,
-          sound: true,
-          priority: Notifications.AndroidNotificationPriority.HIGH,
-          data: { day, type: "workout" },
-        },
-        trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
-          weekday,
-          hour,
-          minute,
-          repeats: true,
-        },
-      });
-
-      console.log(`Scheduled workout reminder for ${day} at ${hour}:${minute}`);
-      return identifier;
-    } catch (error) {
-      console.error("NotificationError:", "NotificationContext.scheduleWorkoutReminder");
-      return null;
-    }
+    console.log("Notifications disabled - Personal Apple Developer account limitation");
+    return null;
   };
 
   const cancelNotification = async (identifier: string) => {
-    try {
-      await Notifications.cancelScheduledNotificationAsync(identifier);
-    } catch (error) {
-      console.error("NotificationError:", "NotificationContext.cancelNotification");
-    }
+    console.log("Notifications disabled - Personal Apple Developer account limitation");
   };
 
   const cancelAllNotifications = async () => {
-    try {
-      await Notifications.cancelAllScheduledNotificationsAsync();
-    } catch (error) {
-      console.error("NotificationError:", "NotificationContext.cancelAllNotifications");
-    }
+    console.log("Notifications disabled - Personal Apple Developer account limitation");
   };
 
   return (
