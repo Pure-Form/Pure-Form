@@ -9,7 +9,9 @@ type FocusCardProps = {
   item: FocusItem;
 };
 
-const iconMap: Record<FocusItem["icon"], keyof typeof Ionicons.glyphMap> = {
+type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
+
+const iconMap: Record<FocusItem["icon"], IoniconsName> = {
   barbell: "barbell-outline",
   nutrition: "nutrition-outline",
   calendar: "calendar-outline",

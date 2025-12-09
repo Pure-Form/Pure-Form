@@ -40,9 +40,10 @@ const DashboardTabs = () => {
         },
         tabBarShowLabel: false,
         tabBarIcon: ({ color, size }: { color: string; size: number }) => {
+          type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
           const iconMap: Record<
             keyof DashboardTabParamList,
-            keyof typeof Ionicons.glyphMap
+            IoniconsName
           > = {
             Dashboard: "speedometer-outline",
             Planner: "barbell-outline",

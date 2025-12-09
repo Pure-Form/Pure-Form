@@ -1,62 +1,42 @@
-import Sentry from "@/lib/sentry";
+// Sentry removed - Personal Apple Developer account limitation
+// Error logging now only uses console
 
 /**
- * Log an error to Sentry
+ * Log an error to console (Sentry disabled)
  * @param error Error object or string
  * @param context Additional context for debugging
  */
 export const logError = (error: Error | string, context?: Record<string, any>) => {
-  if (typeof error === "string") {
-    Sentry.captureMessage(error, {
-      level: "error",
-      contexts: context ? { additional: context } : undefined,
-    });
-  } else {
-    Sentry.captureException(error, {
-      contexts: context ? { additional: context } : undefined,
-    });
-  }
-
-  // Also log to console in development
+  // Log to console only
   if (__DEV__) {
     console.error("[Error]", error, context);
   }
 };
 
 /**
- * Log a warning to Sentry
+ * Log a warning to console (Sentry disabled)
  * @param message Warning message
  * @param context Additional context
  */
 export const logWarning = (message: string, context?: Record<string, any>) => {
-  Sentry.captureMessage(message, {
-    level: "warning",
-    contexts: context ? { additional: context } : undefined,
-  });
-
   if (__DEV__) {
     console.warn("[Warning]", message, context);
   }
 };
 
 /**
- * Log an info message to Sentry
+ * Log an info message to console (Sentry disabled)
  * @param message Info message
  * @param context Additional context
  */
 export const logInfo = (message: string, context?: Record<string, any>) => {
-  Sentry.captureMessage(message, {
-    level: "info",
-    contexts: context ? { additional: context } : undefined,
-  });
-
   if (__DEV__) {
     console.log("[Info]", message, context);
   }
 };
 
 /**
- * Add breadcrumb for tracking user actions
+ * Add breadcrumb for tracking user actions (disabled - Sentry removed)
  * @param message Breadcrumb message
  * @param category Category (e.g., 'navigation', 'user-action', 'network')
  * @param data Additional data
@@ -66,16 +46,14 @@ export const addBreadcrumb = (
   category: string = "user-action",
   data?: Record<string, any>,
 ) => {
-  Sentry.addBreadcrumb({
-    message,
-    category,
-    level: "info",
-    data,
-  });
+  // Breadcrumbs disabled - Sentry removed
+  if (__DEV__) {
+    console.log("[Breadcrumb]", category, message, data);
+  }
 };
 
 /**
- * Set user context for better error tracking
+ * Set user context (disabled - Sentry removed)
  * @param userId User ID
  * @param email User email
  * @param additionalData Additional user data
@@ -85,33 +63,34 @@ export const setUserContext = (
   email?: string,
   additionalData?: Record<string, any>,
 ) => {
-  if (userId) {
-    Sentry.setUser({
-      id: userId,
-      email,
-      ...additionalData,
-    });
-  } else {
-    Sentry.setUser(null);
+  // User context disabled - Sentry removed
+  if (__DEV__) {
+    console.log("[User Context]", { userId, email, ...additionalData });
   }
 };
 
 /**
- * Set custom tag for filtering errors in Sentry
+ * Set custom tag (disabled - Sentry removed)
  * @param key Tag key
  * @param value Tag value
  */
 export const setTag = (key: string, value: string) => {
-  Sentry.setTag(key, value);
+  // Tags disabled - Sentry removed
+  if (__DEV__) {
+    console.log("[Tag]", key, value);
+  }
 };
 
 /**
- * Set custom context for errors
+ * Set custom context (disabled - Sentry removed)
  * @param name Context name
  * @param data Context data
  */
 export const setContext = (name: string, data: Record<string, any>) => {
-  Sentry.setContext(name, data);
+  // Context disabled - Sentry removed
+  if (__DEV__) {
+    console.log("[Context]", name, data);
+  }
 };
 
 /**

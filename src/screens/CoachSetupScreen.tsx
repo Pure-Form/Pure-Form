@@ -40,11 +40,13 @@ type FormState = {
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
 
+type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
+
 type Option<TValue> = {
   label: string;
   value: TValue;
   subtitle?: string;
-  icon?: keyof typeof Ionicons.glyphMap;
+  icon?: IoniconsName;
 };
 
 const OptionPill = <TValue,>({

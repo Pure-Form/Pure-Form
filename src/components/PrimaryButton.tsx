@@ -8,7 +8,7 @@ type PrimaryButtonProps = {
   onPress: () => void;
   disabled?: boolean;
   loading?: boolean;
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "tertiary";
 };
 
 const PrimaryButton = ({
@@ -21,9 +21,15 @@ const PrimaryButton = ({
   const { theme } = useTheme();
 
   const backgroundColor =
-    variant === "primary" ? theme.colors.accent : theme.colors.accentSoft;
+    variant === "primary" 
+      ? theme.colors.accent 
+      : variant === "secondary"
+      ? theme.colors.accentSoft
+      : "transparent";
   const textColor =
-    variant === "primary" ? theme.colors.background : theme.colors.accent;
+    variant === "primary" 
+      ? theme.colors.background 
+      : theme.colors.accent;
 
   return (
     <Pressable

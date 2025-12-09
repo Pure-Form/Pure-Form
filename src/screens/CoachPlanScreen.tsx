@@ -31,10 +31,12 @@ const JS_WEEKDAY_TO_KEY: WeekdayKey[] = [
 
 type Props = NativeStackScreenProps<PlannerStackParamList, "CoachPlan">;
 
+type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
+
 type FocusDescriptor = {
   title: string;
   subtitle: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: IoniconsName;
 };
 
 const focusCopy: Record<BodyFocus, FocusDescriptor> = {
