@@ -52,12 +52,25 @@ const config: ExpoConfig = {
       },
     ],
     "expo-font",
+    "sentry-expo",
+    [
+      "expo-notifications",
+      {
+        icon: "./assets/icon.png",
+        color: "#00B6FF",
+        sounds: [],
+      },
+    ],
   ],
     extra: {
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? "",
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "",
     supabasePasswordRedirect:
       process.env.EXPO_PUBLIC_SUPABASE_PASSWORD_REDIRECT ?? "",
+    sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN ?? "",
+    privacyPolicyUrl: "https://pure-form.github.io/Pure-Form/privacy-policy.html",
+    termsOfServiceUrl: "https://pure-form.github.io/Pure-Form/terms-of-service.html",
+    supportEmail: "ahmetsametyuzlu@gmail.com",
     eas: {
       projectId: "601cfd90-5fe3-4c18-9edc-9f28146c3b64",
     },
