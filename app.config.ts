@@ -20,7 +20,7 @@ const config: ExpoConfig = {
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "com.purelife.app",
+    bundleIdentifier: "com.mericmac.purelife",
     buildNumber: "1",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
@@ -31,7 +31,7 @@ const config: ExpoConfig = {
       foregroundImage: "./assets/adaptive-icon.png",
       backgroundColor: "#020205",
     },
-    package: "com.purelife.app",
+    package: "com.mericmac.purelife",
     versionCode: 2,
   },
   web: {
