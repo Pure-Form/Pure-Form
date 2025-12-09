@@ -24,8 +24,8 @@
 - (NSURL *)bundleURL
 {
 #if DEBUG
-  // Force Metro URL to Mac's IP address with correct Expo path
-  return [NSURL URLWithString:@"http://192.168.1.29:8081/.expo/.virtual-metro-entry.bundle?platform=ios&dev=true&lazy=true&minify=false&app=com.pureform.app&modulesOnly=false&runModule=true"];
+  // Use RCTBundleURLProvider which automatically finds Metro (supports both local and tunnel)
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@".expo/.virtual-metro-entry"];
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
