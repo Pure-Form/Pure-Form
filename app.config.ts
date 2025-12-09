@@ -52,7 +52,6 @@ const config: ExpoConfig = {
       },
     ],
     "expo-font",
-    "sentry-expo",
     [
       "expo-notifications",
       {
@@ -67,7 +66,6 @@ const config: ExpoConfig = {
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "",
     supabasePasswordRedirect:
       process.env.EXPO_PUBLIC_SUPABASE_PASSWORD_REDIRECT ?? "",
-    sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN ?? "",
     privacyPolicyUrl: "https://pure-form.github.io/Pure-Form/privacy-policy.html",
     termsOfServiceUrl: "https://pure-form.github.io/Pure-Form/terms-of-service.html",
     supportEmail: "ahmetsametyuzlu@gmail.com",
