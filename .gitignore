@@ -2,3 +2,27 @@ FoodData_Central_csv_*/
 scripts/output/
 node_modules
 .env
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Expo
+.expo/
+.expo-shared/
+
+# Temporary files
+*.log
+*.tmp
+.temp/

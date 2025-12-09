@@ -14,6 +14,7 @@ import { useTheme } from "@/context/ThemeContext";
 import DashboardTabs from "@/navigation/DashboardTabs";
 import LoginScreen from "@/screens/LoginScreen";
 import OnboardingScreen from "@/screens/OnboardingScreen";
+import ProfileEditScreen from "@/screens/ProfileEditScreen";
 import RegisterScreen from "@/screens/RegisterScreen";
 import ResetPasswordScreen from "@/screens/ResetPasswordScreen";
 
@@ -23,6 +24,7 @@ export type RootStackParamList = {
   Register: undefined;
   App: undefined;
   PasswordReset: undefined;
+  ProfileEdit: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -89,7 +91,10 @@ const AppNavigator = () => {
     >
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          <Stack.Screen name="App" component={DashboardTabs} />
+          <>
+            <Stack.Screen name="App" component={DashboardTabs} />
+            <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
+          </>
         ) : (
           <>
             <Stack.Screen name="Onboarding" component={OnboardingScreen} />

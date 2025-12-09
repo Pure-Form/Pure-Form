@@ -1,16 +1,27 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "@/context/ThemeContext";
+import { useWorkoutLog } from "@/context/WorkoutLogContext";
 import { getPlannerItems, type PlannerItem } from "@/services/mockData";
 
 const PlannerScreen = () => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const data = getPlannerItems();
+  const { isWorkoutCompleted, completeWorkout, uncompleteWorkout } = useWorkoutLog();
+
+  const handleToggleWorkout = async (item: PlannerItem) => {
+    const isCompleted = isWorkoutCompleted(item.day);
+    if (isCompleted) {
+      await uncompleteWorkout(item.day);
+    } else {
+      await completeWorkout(item.day, item.focus);
+    }
+  };
 
   return (
     <SafeAreaView
@@ -36,13 +47,18 @@ const PlannerScreen = () => {
               medium: "#FFC542",
               high: "#FF575F",
             };
+            const isCompleted = isWorkoutCompleted(item.day);
+
             return (
-              <View
+              <Pressable
+                onPress={() => handleToggleWorkout(item)}
                 style={[
                   styles.row,
                   {
-                    borderColor: theme.colors.border,
-                    backgroundColor: theme.colors.surface,
+                    borderColor: isCompleted ? theme.colors.accent : theme.colors.border,
+                    backgroundColor: isCompleted
+                      ? `${theme.colors.accent}15`
+                      : theme.colors.surface,
                   },
                 ]}
               >
@@ -68,22 +84,34 @@ const PlannerScreen = () => {
                     {item.duration} min
                   </Text>
                 </View>
-                <View
-                  style={[
-                    styles.intensityBadge,
-                    { borderColor: intensityColors[item.intensity] },
-                  ]}
-                >
-                  <Text
+                <View style={styles.rightSection}>
+                  <View
                     style={[
-                      styles.intensityText,
-                      { color: intensityColors[item.intensity] },
+                      styles.intensityBadge,
+                      { borderColor: intensityColors[item.intensity] },
                     ]}
                   >
-                    {t("planner.intensity")} {item.intensity.toUpperCase()}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.intensityText,
+                        { color: intensityColors[item.intensity] },
+                      ]}
+                    >
+                      {item.intensity.toUpperCase()}
+                    </Text>
+                  </View>
+                  <Pressable
+                    onPress={() => handleToggleWorkout(item)}
+                    hitSlop={8}
+                  >
+                    <Ionicons
+                      name={isCompleted ? "checkmark-circle" : "ellipse-outline"}
+                      size={28}
+                      color={isCompleted ? theme.colors.accent : theme.colors.subText}
+                    />
+                  </Pressable>
                 </View>
-              </View>
+              </Pressable>
             );
           }}
         />
@@ -144,6 +172,11 @@ const styles = StyleSheet.create({
   duration: {
     fontSize: 13,
   },
+  rightSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
   intensityBadge: {
     borderWidth: 1,
     borderRadius: 14,
@@ -151,7 +184,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   intensityText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
     textTransform: "uppercase",
   },

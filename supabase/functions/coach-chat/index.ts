@@ -1,17 +1,9 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
-const GEMINI_API_VERSION = "v1beta";
-const GEMINI_MODELS = (() => {
-  const models = (Deno.env.get("GEMINI_MODELS")
-    ?? "models/gemini-1.5-flash-latest")
-    .split(",")
-    .map((model) => model.trim())
-    .filter((model) => model.length > 0);
-  return models.length > 0 ? models : ["models/gemini-pro"];
-})();
-const buildGeminiUrl = (model: string) =>
-  `https://generativelanguage.googleapis.com/${GEMINI_API_VERSION}/${model}:generateContent`;
+// Hugging Face Inference API
+const HF_API_URL = "https://api-inference.huggingface.co/models/";
+const DEFAULT_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"; // Güçlü ve hızlı model
 
 interface CoachChatRequest {
   question: string;
@@ -36,55 +28,44 @@ ${profileSnippet}
 Question: ${question}`;
 };
 
-const createGeminiPayload = (prompt: string) => ({
-  contents: [
-    {
-      role: "user",
-      parts: [{ text: prompt }],
+const callHuggingFace = async (apiKey: string, prompt: string): Promise<string> => {
+  const model = Deno.env.get("HF_MODEL") || DEFAULT_MODEL;
+  const url = `${HF_API_URL}${model}`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
     },
-  ],
-  generationConfig: {
-    temperature: 0.4,
-    topP: 0.9,
-  },
-});
-
-const callGemini = async (apiKey: string, prompt: string): Promise<string> => {
-  const errors: string[] = [];
-
-  for (const model of GEMINI_MODELS) {
-    const response = await fetch(buildGeminiUrl(model), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
+    body: JSON.stringify({
+      inputs: prompt,
+      parameters: {
+        max_new_tokens: 512,
+        temperature: 0.7,
+        top_p: 0.9,
+        return_full_text: false,
       },
-      body: JSON.stringify(createGeminiPayload(prompt)),
-    });
+    }),
+  });
 
-    if (!response.ok) {
-      const message = await response.text();
-      errors.push(`Gemini error ${response.status} (${model}): ${message}`);
-      if (response.status !== 404) {
-        break;
-      }
-      continue;
-    }
-
-    const data = await response.json();
-    const text =
-      data?.candidates?.[0]?.content?.parts?.map((part: { text?: string }) => part?.text ?? "").join("") ??
-      "";
-
-    if (!text) {
-      errors.push(`Gemini returned empty response for ${model}`);
-      continue;
-    }
-
-    return text.trim();
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Hugging Face API error ${response.status}: ${error}`);
   }
 
-  throw new Error(errors.join(" | "));
+  const data = await response.json();
+  
+  // Farklı model response formatları için kontrol
+  if (Array.isArray(data) && data.length > 0) {
+    return data[0].generated_text || data[0].text || "";
+  }
+  
+  if (data.generated_text) {
+    return data.generated_text;
+  }
+
+  throw new Error("Unexpected response format from Hugging Face");
 };
 
 const corsHeaders = {
@@ -112,9 +93,9 @@ serve(async (req: Request): Promise<Response> => {
     });
   }
 
-  const apiKey = Deno.env.get("GEMINI_API_KEY");
+  const apiKey = Deno.env.get("HF_API_KEY");
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: "Missing GEMINI_API_KEY" }), {
+    return new Response(JSON.stringify({ error: "Missing HF_API_KEY" }), {
       status: 500,
       headers: {
         "Content-Type": "application/json",
@@ -148,7 +129,7 @@ serve(async (req: Request): Promise<Response> => {
 
   try {
     const prompt = buildPrompt(payload);
-    const answer = await callGemini(apiKey, prompt);
+    const answer = await callHuggingFace(apiKey, prompt);
     return new Response(JSON.stringify({ answer }), {
       status: 200,
       headers: {

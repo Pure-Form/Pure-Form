@@ -1,7 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import * as WebBrowser from "expo-web-browser";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,15 +16,22 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAuth } from "@/context/AuthContext";
+import { useNotifications } from "@/context/NotificationContext";
 import { useTheme } from "@/context/ThemeContext";
+import { RootStackParamList } from "@/navigation/AppNavigator";
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const SettingsScreen = () => {
   const { theme, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const { user, signOut } = useAuth();
+  const navigation = useNavigation<NavigationProp>();
+  const { hasPermission, requestPermission } = useNotifications();
   const [language, setLanguage] = useState(
     i18n.language.startsWith("tr") ? "tr" : "en",
   );
+  const [notificationsEnabled, setNotificationsEnabled] = useState(hasPermission);
 
   const handleLanguageChange = async (next: "en" | "tr") => {
     setLanguage(next);
@@ -32,7 +43,10 @@ const SettingsScreen = () => {
       style={[styles.safeArea, { backgroundColor: theme.colors.background }]}
     >
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.profileCard}>
+        <Pressable
+          style={styles.profileCard}
+          onPress={() => navigation.navigate("ProfileEdit")}
+        >
           <View
             style={[
               styles.avatar,
@@ -41,7 +55,7 @@ const SettingsScreen = () => {
           >
             <Ionicons name="person" size={28} color={theme.colors.accent} />
           </View>
-          <View>
+          <View style={styles.profileInfo}>
             <Text style={[styles.name, { color: theme.colors.text }]}>
               {user?.name ?? "Pure Athlete"}
             </Text>
@@ -49,7 +63,12 @@ const SettingsScreen = () => {
               {user?.email ?? "guest@pure.life"}
             </Text>
           </View>
-        </View>
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={theme.colors.subText}
+          />
+        </Pressable>
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: theme.colors.subText }]}>
@@ -72,6 +91,50 @@ const SettingsScreen = () => {
               onValueChange={toggleTheme}
               thumbColor={
                 theme.mode === "dark" ? theme.colors.accent : "#f4f3f4"
+              }
+              trackColor={{
+                false: theme.colors.border,
+                true: theme.colors.accentSoft,
+              }}
+            />
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.subText }]}>
+            {t("settings.notifications")}
+          </Text>
+          <View
+            style={[
+              styles.row,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
+            ]}
+          >
+            <View style={styles.rowLeft}>
+              <Ionicons
+                name="notifications-outline"
+                size={22}
+                color={theme.colors.text}
+              />
+              <Text style={[styles.rowText, { color: theme.colors.text }]}>
+                {t("settings.workoutReminders")}
+              </Text>
+            </View>
+            <Switch
+              value={notificationsEnabled}
+              onValueChange={async (value) => {
+                if (value) {
+                  const granted = await requestPermission();
+                  setNotificationsEnabled(granted);
+                } else {
+                  setNotificationsEnabled(false);
+                }
+              }}
+              thumbColor={
+                notificationsEnabled ? theme.colors.accent : "#f4f3f4"
               }
               trackColor={{
                 false: theme.colors.border,
@@ -130,6 +193,93 @@ const SettingsScreen = () => {
           </View>
         </View>
 
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.subText }]}>
+            {t("settings.legal") || "Legal"}
+          </Text>
+          <Pressable
+            onPress={() => {
+              Linking.openURL(
+                "https://raw.githubusercontent.com/Pure-Form/Pure-Form/main/assets/legal/privacy-policy.md",
+              ).catch((error) => {
+                console.warn("Failed to open privacy policy", error);
+              });
+            }}
+            style={[
+              styles.row,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
+            ]}
+          >
+            <Text style={[styles.rowText, { color: theme.colors.text }]}>
+              {t("settings.privacyPolicy") || "Privacy Policy"}
+            </Text>
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={theme.colors.subText}
+            />
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              Linking.openURL(
+                "https://raw.githubusercontent.com/Pure-Form/Pure-Form/main/assets/legal/terms-of-service.md",
+              ).catch((error) => {
+                console.warn("Failed to open terms", error);
+              });
+            }}
+            style={[
+              styles.row,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
+            ]}
+          >
+            <Text style={[styles.rowText, { color: theme.colors.text }]}>
+              {t("settings.termsOfService") || "Terms of Service"}
+            </Text>
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={theme.colors.subText}
+            />
+          </Pressable>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.subText }]}>
+            {t("settings.support") || "Support"}
+          </Text>
+          <Pressable
+            onPress={() => {
+              Linking.openURL("mailto:ahmetsametyuzlu@gmail.com").catch(
+                (error) => {
+                  console.warn("Failed to open email", error);
+                },
+              );
+            }}
+            style={[
+              styles.row,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
+            ]}
+          >
+            <Text style={[styles.rowText, { color: theme.colors.text }]}>
+              {t("settings.contactUs") || "Contact Us"}
+            </Text>
+            <Ionicons
+              name="mail-outline"
+              size={20}
+              color={theme.colors.subText}
+            />
+          </Pressable>
+        </View>
+
         <Pressable
           onPress={() => {
             signOut().catch((error) => {
@@ -152,7 +302,7 @@ const SettingsScreen = () => {
           <Text
             style={[styles.signOutText, { color: theme.colors.background }]}
           >
-            Sign out
+            {t("settings.signOut") || "Sign out"}
           </Text>
         </Pressable>
       </ScrollView>
@@ -181,6 +331,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  profileInfo: {
+    flex: 1,
+  },
   name: {
     fontSize: 18,
     fontWeight: "700",
@@ -202,6 +355,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  rowLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
   },
   rowText: {
     fontSize: 16,

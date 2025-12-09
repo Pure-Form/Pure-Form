@@ -9,6 +9,7 @@ import StatCard from "@/components/StatCard";
 import { useAuth } from "@/context/AuthContext";
 import { useCoach } from "@/context/CoachContext";
 import { useTheme } from "@/context/ThemeContext";
+import { useWorkoutLog } from "@/context/WorkoutLogContext";
 import { getDailySummary } from "@/services/mockData";
 import { WEEK_DAYS, type FocusItem, type WeekdayKey } from "@/types/coach";
 
@@ -42,11 +43,15 @@ const DashboardScreen = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { state } = useCoach();
+  const { completedWorkouts } = useWorkoutLog();
 
   const fallbackSummary = getDailySummary();
   const profile = state.profile;
   const summary = state.summary;
   const schedule = state.schedule;
+
+  // Calculate this week's completed workouts
+  const weeklyCompletedCount = Object.keys(completedWorkouts).length;
 
   const todayKey = JS_WEEKDAY_TO_KEY[new Date().getDay()];
   const todaySchedule = useMemo(
@@ -155,10 +160,8 @@ const DashboardScreen = () => {
           />
           <StatCard
             title={t("dashboard.workouts")}
-            value={(
-              profile?.workoutsPerWeek ?? fallbackSummary.workoutsCompleted
-            ).toString()}
-            unit="/week"
+            value={weeklyCompletedCount.toString()}
+            unit={`/${profile?.workoutsPerWeek ?? 5}`}
             icon={
               <Ionicons
                 name="barbell-outline"

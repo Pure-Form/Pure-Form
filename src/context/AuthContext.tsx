@@ -14,6 +14,7 @@ import * as WebBrowser from "expo-web-browser";
 import * as AuthSession from "expo-auth-session";
 
 import { supabase, supabasePasswordRedirect } from "@/lib/supabase";
+import { setUserContext, logError, addBreadcrumb } from "@/utils/errorLogging";
 
 // Expo SSO için hazırlık: Uygulamanın tarayıcı geri dönüşünü tanımasını sağlar
 WebBrowser.maybeCompleteAuthSession();
@@ -51,6 +52,7 @@ type Provider = "google" | "apple";
 type AuthContextValue = {
   user: AuthUser | null;
   loading: boolean;
+  setUser: (user: AuthUser | null) => void;
   signIn: (creds: Credentials) => Promise<AuthResult>;
   signOut: () => Promise<void>;
   register: (payload: RegistrationPayload) => Promise<AuthResult>;
@@ -87,9 +89,19 @@ type AuthProviderProps = {
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUserState] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [pendingPasswordReset, setPendingPasswordReset] = useState(false);
+
+  // Wrapper to update user and Sentry context
+  const setUser = useCallback((newUser: AuthUser | null) => {
+    setUserState(newUser);
+    setUserContext(
+      newUser?.id ?? null,
+      newUser?.email,
+      newUser ? { name: newUser.name, goal: newUser.goal } : undefined,
+    );
+  }, []);
 
   useEffect(() => {
     const restoreSession = async () => {
@@ -272,11 +284,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
 
       if (error) {
+        logError(error, { context: "signIn", email });
         return { ok: false, error: error.message };
       }
 
       if (data.user) {
         setUser(mapUserFromSupabase(data.user));
+        addBreadcrumb("User signed in", "auth", { email });
       }
 
       return { ok: true };
@@ -313,8 +327,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
           // 4. Başarılı Geri Dönüşü Yakalama ve Oturumu Doğrulama
           if (result.type === 'success' && result.url) {
-            // Supabase'in bu URL'den gelen oturum bilgisini işlemesini sağla
-            await supabase.auth.getSessionFromUrl({ url: result.url });
+            // Parse URL params and exchange for session
+            const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(result.url);
+            if (sessionError) {
+              throw sessionError;
+            }
             // onAuthStateChange dinleyicisi zaten user/session durumunu otomatik güncelleyecektir.
           }
         }
@@ -379,6 +396,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     () => ({
       user,
       loading,
+      setUser,
       signIn,
       signOut,
       register,
@@ -394,6 +412,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       pendingPasswordReset,
       register,
       requestPasswordReset,
+      setUser,
       signIn,
       signOut,
       user,

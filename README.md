@@ -10,9 +10,32 @@ AI destekli Pure Life mobil uygulaması; günlük kalori takibi, kişisel antren
 - **Kalıcı Durum**: AsyncStorage ile tema ve kullanıcı oturumu saklama.
 
 ## Kurulum
-1. Bağımlılıkları yükleyin: `npm install`
-2. Geliştirme sunucusunu başlatın: `npx expo start`
-3. Cihaz/Emülatör seçin veya Expo Go uygulamasını kullanarak QR kodunu okutun.
+
+### 1. Environment Setup
+```bash
+# Copy .env.example to .env
+cp .env.example .env
+
+# Edit .env and add your Supabase credentials
+# Get these from: https://supabase.com/dashboard/project/_/settings/api
+```
+
+**⚠️ IMPORTANT:** Never commit `.env` file to git. It's already in `.gitignore`.
+
+### 2. Install Dependencies
+```bash
+npm install
+```
+
+### 3. Start Development Server
+```bash
+npx expo start
+```
+
+### 4. Run on Device/Emulator
+- Scan QR code with Expo Go app, or
+- Press `i` for iOS simulator, or
+- Press `a` for Android emulator
 
 ## Uygulama ikonu (logo) yükleme
 
@@ -48,7 +71,48 @@ src/
   i18n/
 ```
 
-## Yapılacaklar
-- Gerçek API entegrasyonu ve veri modellerinin bağlanması.
-- Tasarımları marka yönergelerine göre güncelleme, özel illüstrasyonlar eklenmesi.
-- Bildirimler, Apple/Google oturum açma ve sağlık servisleriyle entegrasyon.
+## Error Monitoring (Sentry)
+
+Sentry is integrated for production error tracking and performance monitoring.
+
+### Setup Sentry (Optional):
+
+1. Create account at https://sentry.io
+2. Create new React Native project
+3. Copy DSN from project settings
+4. Add to `.env`:
+   ```bash
+   EXPO_PUBLIC_SENTRY_DSN=https://your-dsn@sentry.io/project-id
+   ```
+
+### Features:
+- ✅ Automatic error capture
+- ✅ User context tracking
+- ✅ Performance monitoring
+- ✅ Breadcrumb tracking
+- ✅ Release tracking
+
+**Note:** Sentry is disabled if DSN is not provided (development default).
+
+## Legal & Privacy
+
+- **Privacy Policy**: [assets/legal/privacy-policy.md](./assets/legal/privacy-policy.md)
+- **Terms of Service**: [assets/legal/terms-of-service.md](./assets/legal/terms-of-service.md)
+
+These documents are accessible in-app via Settings > Legal.
+
+## Security
+
+- Never commit `.env` file
+- `.env.example` contains placeholder values only
+- Rotate Supabase keys if accidentally exposed
+- Enable RLS (Row Level Security) in Supabase for all tables
+- Sentry filters sensitive data (passwords, tokens) automatically
+
+## Store Submission
+
+See [STORE_CHECKLIST.md](./STORE_CHECKLIST.md) for App Store and Play Store submission requirements.
+
+## iOS Build
+
+See [IOS_BUILD_SETUP.md](./IOS_BUILD_SETUP.md) for complete iOS build configuration and troubleshooting guide.
