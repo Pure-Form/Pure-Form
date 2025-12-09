@@ -11,11 +11,7 @@ import { NotificationProvider } from "@/context/NotificationContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { WorkoutLogProvider } from "@/context/WorkoutLogContext";
 import i18n from "@/i18n";
-import { initSentry } from "@/lib/sentry";
 import AppNavigator from "@/navigation/AppNavigator";
-
-// Initialize Sentry
-initSentry();
 
 const App = () => {
   return (
