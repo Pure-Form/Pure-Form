@@ -28,7 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>purelife</string>
-          <string>com.purelife.app</string>
+          <string>com.pureform.app</string>
         </array>
       </dict>
     </array>
