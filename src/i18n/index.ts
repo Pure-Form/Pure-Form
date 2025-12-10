@@ -115,7 +115,7 @@ const resources = {
         subtitle:
           "Browse macro-friendly foods, portion sizes, and quick tags to plan smarter meals.",
         searchLabel: "Search foods",
-        searchPlaceholder: "Try \"chicken\", \"kahvalti\", \"protein\"",
+        searchPlaceholder: 'Try "chicken", "kahvalti", "protein"',
         calories: "{{value}} kcal",
         portion: "Portion: {{value}}",
         portionGrams: "({{value}} g)",
@@ -261,7 +261,7 @@ const resources = {
         subtitle:
           "Kalorisi ve makro değerleri belirli yiyecekleri keşfederek planını oluştur.",
         searchLabel: "Yemek ara",
-        searchPlaceholder: "Örn. \"tavuk\", \"kahvalti\", \"protein\"",
+        searchPlaceholder: 'Örn. "tavuk", "kahvalti", "protein"',
         calories: "{{value}} kcal",
         portion: "Porsiyon: {{value}}",
         portionGrams: "({{value}} g)",

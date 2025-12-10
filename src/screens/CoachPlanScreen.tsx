@@ -425,10 +425,9 @@ const AiPlanSection = ({ aiPlan }: AiPlanSectionProps) => {
   const { theme } = useTheme();
   const summaryTr = aiPlan.summary?.tr ?? aiPlan.summary?.en ?? "";
   const summaryEn = aiPlan.summary?.en ?? aiPlan.summary?.tr ?? "";
-  const habitFocus =
-    aiPlan.habitFocus?.tr?.length
-      ? aiPlan.habitFocus.tr
-      : aiPlan.habitFocus?.en ?? [];
+  const habitFocus = aiPlan.habitFocus?.tr?.length
+    ? aiPlan.habitFocus.tr
+    : (aiPlan.habitFocus?.en ?? []);
 
   return (
     <View
@@ -488,7 +487,7 @@ const AiWeekCard = ({ week }: AiWeekCardProps) => {
   const tipsCopy = week.nutrition?.tips?.tr ?? week.nutrition?.tips?.en ?? "";
   const mealList = sampleMeals.length
     ? sampleMeals
-    : week.nutrition?.sampleMeals?.en ?? [];
+    : (week.nutrition?.sampleMeals?.en ?? []);
   const dailyCalories = week.nutrition?.dailyCalories ?? 0;
 
   return (
@@ -526,9 +525,7 @@ const AiWeekCard = ({ week }: AiWeekCardProps) => {
           },
         ]}
       >
-        <Text
-          style={[styles.aiNutritionHeading, { color: theme.colors.text }]}
-        >
+        <Text style={[styles.aiNutritionHeading, { color: theme.colors.text }]}>
           Beslenme
         </Text>
         <Text style={[styles.aiNutritionText, { color: theme.colors.subText }]}>
@@ -565,9 +562,7 @@ const AiWorkoutItem = ({ workout }: AiWorkoutItemProps) => {
   const detailCopy = workout.details?.tr ?? workout.details?.en ?? "";
 
   return (
-    <View
-      style={[styles.aiWorkoutItem, { borderColor: theme.colors.border }]}
-    >
+    <View style={[styles.aiWorkoutItem, { borderColor: theme.colors.border }]}>
       <View style={styles.aiWorkoutHeader}>
         <Text style={[styles.aiWorkoutDay, { color: theme.colors.text }]}>
           {dayLabel}
@@ -575,9 +570,7 @@ const AiWorkoutItem = ({ workout }: AiWorkoutItemProps) => {
         <View
           style={[styles.aiIntensityBadge, { borderColor: intensityColor }]}
         >
-          <Text
-            style={[styles.aiIntensityText, { color: intensityColor }]}
-          >
+          <Text style={[styles.aiIntensityText, { color: intensityColor }]}>
             {workout.intensity.toUpperCase()}
           </Text>
         </View>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
@@ -13,13 +14,8 @@ import { useTheme } from "@/context/ThemeContext";
 import { searchFoods } from "@/services/nutritionLibrary";
 import translationService from "@/services/translationService";
 import type { FoodItem } from "@/types/coach";
-import { useTranslation } from "react-i18next";
 
-const MACRO_KEYS: Array<"protein" | "carbs" | "fat"> = [
-  "protein",
-  "carbs",
-  "fat",
-];
+const MACRO_KEYS: ("protein" | "carbs" | "fat")[] = ["protein", "carbs", "fat"];
 
 const NutritionLibraryScreen = () => {
   const { theme } = useTheme();
@@ -42,9 +38,9 @@ const NutritionLibraryScreen = () => {
     setIsLoading(true);
     setErrorMessage(null);
     // preload translations for active locale so fallback data appears polished
-    translationService.loadTranslations(locale).catch((e) =>
-      console.warn("translation load failed", e),
-    );
+    translationService
+      .loadTranslations(locale)
+      .catch((e) => console.warn("translation load failed", e));
 
     const timer = setTimeout(async () => {
       try {

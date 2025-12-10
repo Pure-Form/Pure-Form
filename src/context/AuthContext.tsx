@@ -1,5 +1,7 @@
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
+import * as AuthSession from "expo-auth-session";
 import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
 import React, {
   ReactNode,
   createContext,
@@ -10,8 +12,6 @@ import React, {
   useState,
 } from "react";
 // YENİ IMPORTLAR: SSO akışını yönetmek için gerekli
-import * as WebBrowser from "expo-web-browser";
-import * as AuthSession from "expo-auth-session";
 
 import { supabase, supabasePasswordRedirect } from "@/lib/supabase";
 import { setUserContext, logError, addBreadcrumb } from "@/utils/errorLogging";
@@ -243,7 +243,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       unsubscribe();
       subscription.unsubscribe();
     };
-  }, []);
+  }, [setPendingPasswordReset, setUser]);
 
   const register = useCallback(
     async (payload: RegistrationPayload): Promise<AuthResult> => {
@@ -273,7 +273,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         requiresVerification: !data.session,
       };
     },
-    [],
+    [setUser],
   );
 
   const signIn = useCallback(
@@ -295,9 +295,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       return { ok: true };
     },
-    [],
+    [setUser],
   );
-  
+
   // YENİ FONKSİYON: SSO (Google/Apple) ile Oturum Açma Mantığı
   const signInWithProvider = useCallback(
     async (provider: Provider): Promise<AuthResult> => {
@@ -305,12 +305,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         // 1. Geri Dönüş URL'sini Oluşturma
         const redirectUrl = AuthSession.makeRedirectUri({
-          path: '/auth/callback',
+          path: "/auth/callback",
         });
-        
+
         // 2. Supabase'ten OAuth (SSO) Başlatma URL'sini Alma
         const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: provider,
+          provider,
           options: {
             redirectTo: redirectUrl,
             skipBrowserRedirect: true, // Expo'nun tarayıcıyı açmasını sağlar
@@ -323,30 +323,33 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
         if (data?.url) {
           // 3. Tarayıcı Penceresini Açma ve Akışı Yönetme
-          const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+          const result = await WebBrowser.openAuthSessionAsync(
+            data.url,
+            redirectUrl,
+          );
 
           // 4. Başarılı Geri Dönüşü Yakalama ve Oturumu Doğrulama
-          if (result.type === 'success' && result.url) {
+          if (result.type === "success" && result.url) {
             // Parse URL params and exchange for session
-            const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(result.url);
+            const { error: sessionError } =
+              await supabase.auth.exchangeCodeForSession(result.url);
             if (sessionError) {
               throw sessionError;
             }
             // onAuthStateChange dinleyicisi zaten user/session durumunu otomatik güncelleyecektir.
           }
         }
-        
+
         // Hata olmadıkça başarılı sayılır
         return { ok: true };
-
       } catch (e: any) {
         console.error(`SSO Giriş İşlemi Hata Verdi (${provider}):`, e.message);
-        return { ok: false, error: e.message || 'Bilinmeyen SSO hatası' };
+        return { ok: false, error: e.message || "Bilinmeyen SSO hatası" };
       } finally {
         setLoading(false);
       }
     },
-    [],
+    [setLoading],
   );
   // YENİ FONKSİYON BİTİŞİ
 
@@ -357,7 +360,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
     setUser(null);
     setPendingPasswordReset(false);
-  }, []);
+  }, [setPendingPasswordReset, setUser]);
 
   const requestPasswordReset = useCallback(
     async (email: string): Promise<AuthResult> => {
@@ -389,7 +392,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setPendingPasswordReset(false);
       return { ok: true };
     },
-    [],
+    [setPendingPasswordReset, setUser],
   );
 
   const value = useMemo(

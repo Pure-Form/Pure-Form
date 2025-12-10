@@ -12,7 +12,8 @@ const PlannerScreen = () => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const data = getPlannerItems();
-  const { isWorkoutCompleted, completeWorkout, uncompleteWorkout } = useWorkoutLog();
+  const { isWorkoutCompleted, completeWorkout, uncompleteWorkout } =
+    useWorkoutLog();
 
   const handleToggleWorkout = async (item: PlannerItem) => {
     const isCompleted = isWorkoutCompleted(item.day);
@@ -55,7 +56,9 @@ const PlannerScreen = () => {
                 style={[
                   styles.row,
                   {
-                    borderColor: isCompleted ? theme.colors.accent : theme.colors.border,
+                    borderColor: isCompleted
+                      ? theme.colors.accent
+                      : theme.colors.border,
                     backgroundColor: isCompleted
                       ? `${theme.colors.accent}15`
                       : theme.colors.surface,
@@ -105,9 +108,13 @@ const PlannerScreen = () => {
                     hitSlop={8}
                   >
                     <Ionicons
-                      name={isCompleted ? "checkmark-circle" : "ellipse-outline"}
+                      name={
+                        isCompleted ? "checkmark-circle" : "ellipse-outline"
+                      }
                       size={28}
-                      color={isCompleted ? theme.colors.accent : theme.colors.subText}
+                      color={
+                        isCompleted ? theme.colors.accent : theme.colors.subText
+                      }
                     />
                   </Pressable>
                 </View>

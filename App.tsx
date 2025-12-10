@@ -1,7 +1,7 @@
 //import 'react-native-url-polyfill/auto';
 //import 'react-native-url-polyfill/auto';
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
+import React from "react";
 import { I18nextProvider } from "react-i18next";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 

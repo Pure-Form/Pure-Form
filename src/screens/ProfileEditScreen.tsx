@@ -21,7 +21,10 @@ import { supabase } from "@/lib/supabase";
 import { RootStackParamList } from "@/navigation/AppNavigator";
 import { addBreadcrumb, logError } from "@/utils/errorLogging";
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, "ProfileEdit">;
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ProfileEdit"
+>;
 
 type Props = {
   navigation: NavigationProp;
@@ -152,11 +155,7 @@ const ProfileEditScreen = ({ navigation }: Props) => {
                 },
               ]}
             >
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color={theme.colors.text}
-              />
+              <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
             </Pressable>
             <Text style={[styles.title, { color: theme.colors.text }]}>
               {t("profile.editProfile") || "Edit Profile"}
@@ -265,12 +264,14 @@ const ProfileEditScreen = ({ navigation }: Props) => {
                   },
                 ]}
               >
-                <Text style={[styles.readOnlyText, { color: theme.colors.subText }]}>
+                <Text
+                  style={[styles.readOnlyText, { color: theme.colors.subText }]}
+                >
                   {user?.goal === "lose"
                     ? t("profile.goalLose") || "Lose Weight"
                     : user?.goal === "gain"
-                    ? t("profile.goalGain") || "Gain Muscle"
-                    : t("profile.goalMaintain") || "Maintain"}
+                      ? t("profile.goalGain") || "Gain Muscle"
+                      : t("profile.goalMaintain") || "Maintain"}
                 </Text>
                 <Ionicons
                   name="lock-closed-outline"
@@ -297,7 +298,12 @@ const ProfileEditScreen = ({ navigation }: Props) => {
             ]}
           >
             {loading ? (
-              <Text style={[styles.saveButtonText, { color: theme.colors.background }]}>
+              <Text
+                style={[
+                  styles.saveButtonText,
+                  { color: theme.colors.background },
+                ]}
+              >
                 {t("common.saving") || "Saving..."}
               </Text>
             ) : (
@@ -307,7 +313,12 @@ const ProfileEditScreen = ({ navigation }: Props) => {
                   size={20}
                   color={theme.colors.background}
                 />
-                <Text style={[styles.saveButtonText, { color: theme.colors.background }]}>
+                <Text
+                  style={[
+                    styles.saveButtonText,
+                    { color: theme.colors.background },
+                  ]}
+                >
                   {t("common.save") || "Save Changes"}
                 </Text>
               </>

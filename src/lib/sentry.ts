@@ -2,8 +2,10 @@ import * as Sentry from "@sentry/react-native";
 import Constants from "expo-constants";
 
 export const initSentry = () => {
-  const dsn = Constants.expoConfig?.extra?.sentryDsn ?? process.env.EXPO_PUBLIC_SENTRY_DSN;
-  
+  const dsn =
+    Constants.expoConfig?.extra?.sentryDsn ??
+    process.env.EXPO_PUBLIC_SENTRY_DSN;
+
   // Only initialize Sentry in production or if DSN is explicitly provided
   if (!dsn) {
     console.log("[Sentry] DSN not found, skipping initialization");
@@ -27,22 +29,33 @@ export const initSentry = () => {
     release: `${Constants.expoConfig?.slug}@${Constants.expoConfig?.version}`,
     // Note: Navigation integration removed for Sentry v5.x compatibility
     // beforeSend to filter out sensitive data
-    beforeSend(event) {
+    beforeSend(event: Sentry.Event): Sentry.Event | null {
       // Remove sensitive data from breadcrumbs
       if (event.breadcrumbs) {
-        event.breadcrumbs = event.breadcrumbs.map((breadcrumb) => {
-          if (breadcrumb.data) {
-            // Remove potential passwords, tokens, etc.
-            const { password, token, authorization, ...safeData } = breadcrumb.data;
-            return { ...breadcrumb, data: safeData };
-          }
-          return breadcrumb;
-        });
+        event.breadcrumbs = event.breadcrumbs.map(
+          (breadcrumb: Sentry.Breadcrumb) => {
+            if (breadcrumb.data) {
+              // Remove potential passwords, tokens, etc.
+              const {
+                password: _password,
+                token: _token,
+                authorization: _authorization,
+                ...safeData
+              } = breadcrumb.data;
+              return { ...breadcrumb, data: safeData };
+            }
+            return breadcrumb;
+          },
+        );
       }
 
       // Remove sensitive data from request headers
       if (event.request?.headers) {
-        const { authorization, Authorization, ...safeHeaders } = event.request.headers;
+        const {
+          authorization: _authorization,
+          Authorization: _Authorization,
+          ...safeHeaders
+        } = event.request.headers;
         event.request.headers = safeHeaders;
       }
 

@@ -53,13 +53,15 @@ const config: ExpoConfig = {
     ],
     "expo-font",
   ],
-    extra: {
+  extra: {
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? "",
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "",
     supabasePasswordRedirect:
       process.env.EXPO_PUBLIC_SUPABASE_PASSWORD_REDIRECT ?? "",
-    privacyPolicyUrl: "https://pure-form.github.io/Pure-Form/privacy-policy.html",
-    termsOfServiceUrl: "https://pure-form.github.io/Pure-Form/terms-of-service.html",
+    privacyPolicyUrl:
+      "https://pure-form.github.io/Pure-Form/privacy-policy.html",
+    termsOfServiceUrl:
+      "https://pure-form.github.io/Pure-Form/terms-of-service.html",
     supportEmail: "ahmetsametyuzlu@gmail.com",
     eas: {
       projectId: "601cfd90-5fe3-4c18-9edc-9f28146c3b64",

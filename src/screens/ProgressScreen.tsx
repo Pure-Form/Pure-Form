@@ -1,6 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Dimensions, FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -45,7 +52,7 @@ const ProgressScreen = () => {
     backgroundGradientTo: theme.colors.surface,
     decimalPlaces: 1,
     color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
-    labelColor: (opacity = 1) => theme.colors.subText,
+    labelColor: () => theme.colors.subText,
     style: {
       borderRadius: 16,
     },
@@ -125,9 +132,9 @@ const ProgressScreen = () => {
               bezier
               style={styles.chart}
               withInnerLines={false}
-              withOuterLines={true}
-              withVerticalLabels={true}
-              withHorizontalLabels={true}
+              withOuterLines
+              withVerticalLabels
+              withHorizontalLabels
               fromZero={false}
             />
           </View>
@@ -156,9 +163,9 @@ const ProgressScreen = () => {
               bezier
               style={styles.chart}
               withInnerLines={false}
-              withOuterLines={true}
-              withVerticalLabels={true}
-              withHorizontalLabels={true}
+              withOuterLines
+              withVerticalLabels
+              withHorizontalLabels
               fromZero={false}
             />
           </View>
@@ -186,7 +193,9 @@ const ProgressScreen = () => {
                   >
                     {item.label}
                   </Text>
-                  <Text style={[styles.listValue, { color: theme.colors.text }]}>
+                  <Text
+                    style={[styles.listValue, { color: theme.colors.text }]}
+                  >
                     {item.steps.toLocaleString()} steps
                   </Text>
                 </View>

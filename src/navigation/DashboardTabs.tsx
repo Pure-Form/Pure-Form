@@ -5,9 +5,9 @@ import { useTranslation } from "react-i18next";
 
 import { useTheme } from "@/context/ThemeContext";
 import PlannerNavigator from "@/navigation/PlannerNavigator";
+import CoachChatScreen from "@/screens/CoachChatScreen";
 import DashboardScreen from "@/screens/DashboardScreen";
 import NutritionLibraryScreen from "@/screens/NutritionLibraryScreen";
-import CoachChatScreen from "@/screens/CoachChatScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
 
 export type DashboardTabParamList = {
@@ -41,10 +41,7 @@ const DashboardTabs = () => {
         tabBarShowLabel: false,
         tabBarIcon: ({ color, size }: { color: string; size: number }) => {
           type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
-          const iconMap: Record<
-            keyof DashboardTabParamList,
-            IoniconsName
-          > = {
+          const iconMap: Record<keyof DashboardTabParamList, IoniconsName> = {
             Dashboard: "speedometer-outline",
             Planner: "barbell-outline",
             Nutrition: "restaurant-outline",
