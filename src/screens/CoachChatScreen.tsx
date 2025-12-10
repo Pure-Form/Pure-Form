@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
@@ -12,7 +13,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTranslation } from "react-i18next";
 
 import { useCoach } from "@/context/CoachContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -163,9 +163,7 @@ const CoachChatScreen = () => {
           </View>
         ) : null}
 
-        <View
-          style={[styles.inputRow, { borderColor: theme.colors.border }]}
-        >
+        <View style={[styles.inputRow, { borderColor: theme.colors.border }]}>
           <TextInput
             style={[styles.input, { color: theme.colors.text }]}
             placeholder={t("coachAI.placeholder")}
@@ -178,12 +176,15 @@ const CoachChatScreen = () => {
           <TouchableOpacity
             onPress={() => handleSend(input)}
             disabled={loading || !input.trim()}
-            style={[styles.sendButton,
-            {
-              backgroundColor: loading || !input.trim()
-                ? theme.colors.border
-                : theme.colors.accent,
-            }]}
+            style={[
+              styles.sendButton,
+              {
+                backgroundColor:
+                  loading || !input.trim()
+                    ? theme.colors.border
+                    : theme.colors.accent,
+              },
+            ]}
           >
             {loading ? (
               <ActivityIndicator size="small" color={theme.colors.background} />

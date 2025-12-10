@@ -424,14 +424,18 @@ const CoachSetupScreen = ({ navigation }: Props) => {
             label="Boy (cm)"
             keyboardType="numeric"
             value={form.heightCm}
-            onChangeText={(text: string) => handleNumericChange("heightCm", text)}
+            onChangeText={(text: string) =>
+              handleNumericChange("heightCm", text)
+            }
             error={errors.heightCm}
           />
           <FormTextInput
             label="Kilo (kg)"
             keyboardType="numeric"
             value={form.weightKg}
-            onChangeText={(text: string) => handleNumericChange("weightKg", text)}
+            onChangeText={(text: string) =>
+              handleNumericChange("weightKg", text)
+            }
             error={errors.weightKg}
           />
           <FormTextInput
@@ -439,7 +443,7 @@ const CoachSetupScreen = ({ navigation }: Props) => {
             keyboardType="numeric"
             value={form.targetWeightKg}
             onChangeText={(text: string) =>
-                    handleNumericChange("targetWeightKg", text)
+              handleNumericChange("targetWeightKg", text)
             }
             error={errors.targetWeightKg}
           />
@@ -549,7 +553,9 @@ const CoachSetupScreen = ({ navigation }: Props) => {
             label="Sakatlık / Dikkat Notu"
             placeholder="Bilek sakatlığı, bel hassasiyeti vb."
             value={form.injuries}
-            onChangeText={(text: string) => handleFreeTextChange("injuries", text)}
+            onChangeText={(text: string) =>
+              handleFreeTextChange("injuries", text)
+            }
             multiline
           />
         </View>

@@ -21,15 +21,13 @@ const PrimaryButton = ({
   const { theme } = useTheme();
 
   const backgroundColor =
-    variant === "primary" 
-      ? theme.colors.accent 
+    variant === "primary"
+      ? theme.colors.accent
       : variant === "secondary"
-      ? theme.colors.accentSoft
-      : "transparent";
+        ? theme.colors.accentSoft
+        : "transparent";
   const textColor =
-    variant === "primary" 
-      ? theme.colors.background 
-      : theme.colors.accent;
+    variant === "primary" ? theme.colors.background : theme.colors.accent;
 
   return (
     <Pressable
@@ -45,7 +43,11 @@ const PrimaryButton = ({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={textColor} />
+        <ActivityIndicator
+          color={textColor}
+          accessibilityRole="progressbar"
+          testID="primary-button-loader"
+        />
       ) : (
         <Text style={[styles.title, { color: textColor }]}>{title}</Text>
       )}

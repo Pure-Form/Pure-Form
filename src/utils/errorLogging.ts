@@ -6,7 +6,10 @@
  * @param error Error object or string
  * @param context Additional context for debugging
  */
-export const logError = (error: Error | string, context?: Record<string, any>) => {
+export const logError = (
+  error: Error | string,
+  context?: Record<string, any>,
+) => {
   // Log to console only
   if (__DEV__) {
     console.error("[Error]", error, context);
@@ -107,14 +110,11 @@ export const withErrorLogging = <T extends (...args: any[]) => Promise<any>>(
     try {
       return await fn(...args);
     } catch (error) {
-      logError(
-        error instanceof Error ? error : new Error(String(error)),
-        {
-          function: fn.name,
-          arguments: args,
-          customMessage: errorMessage,
-        },
-      );
+      logError(error instanceof Error ? error : new Error(String(error)), {
+        function: fn.name,
+        arguments: args,
+        customMessage: errorMessage,
+      });
       throw error;
     }
   }) as T;

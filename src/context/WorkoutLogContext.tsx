@@ -1,14 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
   type ReactNode,
 } from "react";
 
-import { supabase } from "@/lib/supabase";
 import { useAuth } from "./AuthContext";
+
+import { supabase } from "@/lib/supabase";
 
 export type WorkoutLog = {
   id: string;
@@ -29,7 +31,11 @@ export type ExerciseLog = {
 type WorkoutLogContextType = {
   completedWorkouts: Record<string, WorkoutLog>;
   isWorkoutCompleted: (day: string) => boolean;
-  completeWorkout: (day: string, focus: string, exercises?: ExerciseLog[]) => Promise<void>;
+  completeWorkout: (
+    day: string,
+    focus: string,
+    exercises?: ExerciseLog[],
+  ) => Promise<void>;
   uncompleteWorkout: (day: string) => Promise<void>;
   loading: boolean;
 };
@@ -42,17 +48,12 @@ const STORAGE_KEY = "@pure_life_workout_logs";
 
 export const WorkoutLogProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
-  const [completedWorkouts, setCompletedWorkouts] = useState<Record<string, WorkoutLog>>({});
+  const [completedWorkouts, setCompletedWorkouts] = useState<
+    Record<string, WorkoutLog>
+  >({});
   const [loading, setLoading] = useState(true);
 
-  // Load completed workouts from AsyncStorage and Supabase
-  useEffect(() => {
-    if (user) {
-      loadWorkoutLogs();
-    }
-  }, [user]);
-
-  const loadWorkoutLogs = async () => {
+  const loadWorkoutLogs = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -93,7 +94,14 @@ export const WorkoutLogProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  // Load completed workouts from AsyncStorage and Supabase
+  useEffect(() => {
+    if (user) {
+      loadWorkoutLogs();
+    }
+  }, [loadWorkoutLogs, user]);
 
   const isWorkoutCompleted = (day: string): boolean => {
     return !!completedWorkouts[day];

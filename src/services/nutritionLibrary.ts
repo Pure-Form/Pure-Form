@@ -323,9 +323,7 @@ const toSearchToken = (value: string) =>
     .replace(/ı/g, "i");
 
 const escapeLikePattern = (value: string) =>
-  value
-    .replace(/[%_]/g, (match) => `\\${match}`)
-    .replace(/'/g, "''");
+  value.replace(/[%_]/g, (match) => `\\${match}`).replace(/'/g, "''");
 
 const toTitleCase = (value: string) =>
   value
@@ -335,10 +333,7 @@ const toTitleCase = (value: string) =>
     .join(" ");
 
 const prettifyFoodName = (raw: string | null | undefined) => {
-  const cleaned = (raw ?? "")
-    .replace(/[_]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  const cleaned = (raw ?? "").replace(/[_]+/g, " ").replace(/\s+/g, " ").trim();
 
   if (!cleaned) {
     return "";
@@ -374,9 +369,9 @@ const supabaseRowToFoodItem = (row: SupabaseFoodRow): FoodItem => ({
   tags: toTags(row.tags).map((t) => t.toLowerCase()),
   imageUrl: row.image_url ?? undefined,
   dataSource: row.data_source
-    ? row.data_source.replace(/_/g, " ").replace(/\b\w/g, (char) =>
-        char.toUpperCase(),
-      )
+    ? row.data_source
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase())
     : undefined,
   dataSourceKey: row.data_source ?? undefined,
 });
@@ -392,9 +387,7 @@ const fallbackSearchFoods = (query: string) => {
   return FOOD_LIBRARY.filter(
     (item) =>
       toSearchToken(item.name).includes(searchToken) ||
-      item.tags.some((tag: string) =>
-        toSearchToken(tag).includes(searchToken),
-      ),
+      item.tags.some((tag: string) => toSearchToken(tag).includes(searchToken)),
   );
 };
 
@@ -443,10 +436,13 @@ export const searchFoods = async (
     return rows.map(supabaseRowToFoodItem);
   } catch (error: any) {
     // Timeout or network error - use local data
-    if (error?.name === 'AbortError' || error?.code === '57014') {
+    if (error?.name === "AbortError" || error?.code === "57014") {
       console.warn("Supabase timeout - using local data");
     } else {
-      console.warn("Supabase searchFoods unexpected error:", error?.message || error);
+      console.warn(
+        "Supabase searchFoods unexpected error:",
+        error?.message || error,
+      );
     }
     return fallbackSearchFoods(query);
   }

@@ -25,7 +25,10 @@ const extractJson = (raw: string): string => {
   if (startFence !== -1) {
     const endFence = raw.indexOf("```", startFence + 3);
     if (endFence !== -1) {
-      return raw.slice(startFence + 3, endFence).replace(/^json\n/, "").trim();
+      return raw
+        .slice(startFence + 3, endFence)
+        .replace(/^json\n/, "")
+        .trim();
     }
   }
   return raw.trim();
@@ -95,10 +98,7 @@ Consider these member details: ${JSON.stringify(profile)}
 Optional notes from the coach: ${notes ?? "(none)"}`;
 };
 
-const callGemini = async (
-  apiKey: string,
-  prompt: string,
-): Promise<string> => {
+const callGemini = async (apiKey: string, prompt: string): Promise<string> => {
   const response = await fetch(GEMINI_API_URL, {
     method: "POST",
     headers: {
@@ -127,7 +127,10 @@ const callGemini = async (
   const data = await response.json();
   const candidates: GeminiCandidate[] = data?.candidates ?? [];
   const parts = candidates[0]?.content?.parts ?? [];
-  const text = parts.map((part) => part.text ?? "").join("").trim();
+  const text = parts
+    .map((part) => part.text ?? "")
+    .join("")
+    .trim();
 
   if (!text) {
     throw new Error("Gemini returned no content");

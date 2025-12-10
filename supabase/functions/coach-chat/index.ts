@@ -11,7 +11,11 @@ interface CoachChatRequest {
   locale?: "tr" | "en";
 }
 
-const buildPrompt = ({ question, profile, locale = "tr" }: CoachChatRequest) => {
+const buildPrompt = ({
+  question,
+  profile,
+  locale = "tr",
+}: CoachChatRequest) => {
   const localeHint =
     locale === "tr"
       ? "Yanıtı Türkçe ver ve gerekiyorsa sonunda kısa İngilizce özet ekle."
@@ -28,14 +32,17 @@ ${profileSnippet}
 Question: ${question}`;
 };
 
-const callHuggingFace = async (apiKey: string, prompt: string): Promise<string> => {
+const callHuggingFace = async (
+  apiKey: string,
+  prompt: string,
+): Promise<string> => {
   const model = Deno.env.get("HF_MODEL") || DEFAULT_MODEL;
   const url = `${HF_API_URL}${model}`;
 
   const response = await fetch(url, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -55,12 +62,12 @@ const callHuggingFace = async (apiKey: string, prompt: string): Promise<string> 
   }
 
   const data = await response.json();
-  
+
   // Farklı model response formatları için kontrol
   if (Array.isArray(data) && data.length > 0) {
     return data[0].generated_text || data[0].text || "";
   }
-  
+
   if (data.generated_text) {
     return data.generated_text;
   }

@@ -33,7 +33,7 @@ const LoginScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   // DEĞİŞİKLİK: signInWithProvider fonksiyonu useAuth'tan çekildi
   const { signIn, requestPasswordReset, signInWithProvider } = useAuth();
-  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<ErrorState>(initialErrors);
@@ -74,21 +74,22 @@ const LoginScreen = () => {
   };
 
   // YENİ FONKSİYON: SSO ile Giriş
-  const handleSSOSignIn = async (provider: 'google' | 'apple') => {
+  const handleSSOSignIn = async (provider: "google" | "apple") => {
     setFormError("");
     setInfoMessage("");
     setLoading(true);
 
     // Context'ten gelen signInWithProvider fonksiyonunu kullan
     const result = await signInWithProvider(provider);
-    
+
     // AuthContext'teki loading state'i genellikle SSO akışını yönetir,
     // ancak yerel loading state'ini de güncelleyelim.
     setLoading(false);
 
     if (!result.ok) {
-      setFormError(result.error ?? `Unable to sign in with ${provider}. Please try again.`);
-      return;
+      setFormError(
+        result.error ?? `Unable to sign in with ${provider}. Please try again.`,
+      );
     }
     // Başarılı olursa, useAuth'taki onAuthStateChange yönlendirmeyi halledecektir.
   };
@@ -175,36 +176,47 @@ const LoginScreen = () => {
               onPress={handleSubmit}
               loading={loading}
             />
-            
+
             {/* YENİ BÖLÜM BAŞLANGICI: SSO Butonları */}
             <View style={styles.separatorContainer}>
-              <View style={[styles.separator, { backgroundColor: theme.colors.subText }]} />
-              <Text style={[styles.separatorText, { color: theme.colors.subText }]}>
+              <View
+                style={[
+                  styles.separator,
+                  { backgroundColor: theme.colors.subText },
+                ]}
+              />
+              <Text
+                style={[styles.separatorText, { color: theme.colors.subText }]}
+              >
                 {t("auth.or", "OR")}
               </Text>
-              <View style={[styles.separator, { backgroundColor: theme.colors.subText }]} />
+              <View
+                style={[
+                  styles.separator,
+                  { backgroundColor: theme.colors.subText },
+                ]}
+              />
             </View>
 
             {/* Google Butonu */}
             <PrimaryButton
               title="Google ile Giriş Yap" // T-key kullanmanızı öneririm: t("auth.loginWithGoogle")
-              onPress={() => handleSSOSignIn('google')}
+              onPress={() => handleSSOSignIn("google")}
               loading={loading}
               variant="tertiary" // Farklı bir stil verebilirsiniz
             />
 
             {/* Apple Butonu */}
             {/* Platform.OS kontrolü, Apple butonu için iyi bir uygulamadır */}
-            {Platform.OS === 'ios' && (
-                <PrimaryButton
-                    title="Apple ile Giriş Yap" // T-key kullanmanızı öneririm: t("auth.loginWithApple")
-                    onPress={() => handleSSOSignIn('apple')}
-                    loading={loading}
-                    variant="tertiary"
-                />
+            {Platform.OS === "ios" && (
+              <PrimaryButton
+                title="Apple ile Giriş Yap" // T-key kullanmanızı öneririm: t("auth.loginWithApple")
+                onPress={() => handleSSOSignIn("apple")}
+                loading={loading}
+                variant="tertiary"
+              />
             )}
             {/* YENİ BÖLÜM BİTİŞİ */}
-
 
             {/* Kayıt Ol Butonu */}
             <PrimaryButton
@@ -262,8 +274,8 @@ const styles = StyleSheet.create({
   },
   // YENİ STİLLER
   separatorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 10,
   },
   separator: {

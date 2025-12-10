@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import * as WebBrowser from "expo-web-browser";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -31,7 +30,8 @@ const SettingsScreen = () => {
   const [language, setLanguage] = useState(
     i18n.language.startsWith("tr") ? "tr" : "en",
   );
-  const [notificationsEnabled, setNotificationsEnabled] = useState(hasPermission);
+  const [notificationsEnabled, setNotificationsEnabled] =
+    useState(hasPermission);
 
   const handleLanguageChange = async (next: "en" | "tr") => {
     setLanguage(next);
