@@ -10,6 +10,8 @@ if [ -z "$PODS_DIR" ]; then
   exit 1
 fi
 
+chmod -R u+w "$PODS_DIR"
+
 echo "🔧 Applying Pods patches..."
 
 # Patch SocketRocket - OSSpinLock deprecation
@@ -37,12 +39,13 @@ fi
 # Patch glog utilities.cc - syscall deprecation
 GLOG_UTIL_FILE="$PODS_DIR/glog/src/utilities.cc"
 if [ -f "$GLOG_UTIL_FILE" ]; then
-  if ! grep -q "pid_t tid = syscall" "$GLOG_UTIL_FILE" | grep -q "#pragma clang diagnostic"; then
+  if grep -q "pid_t tid = syscall" "$GLOG_UTIL_FILE" && ! grep -q "Ignored syscall deprecation" "$GLOG_UTIL_FILE"; then
     echo "  📝 Patching glog utilities.cc..."
     # Wrap syscall usage with pragma (around line 254)
     sed -i '' '/pid_t tid = syscall(__NR_gettid);/i\
 #pragma clang diagnostic push\
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"\
+// Ignored syscall deprecation for legacy compatibility
 ' "$GLOG_UTIL_FILE"
     sed -i '' '/pid_t tid = syscall(__NR_gettid);/a\
 #pragma clang diagnostic pop
@@ -78,6 +81,18 @@ if [ -f "$FOLLY_JSON_FILE" ]; then
     # Add pragma pop at end of file
     echo "" >> "$FOLLY_JSON_FILE"
     echo "#pragma clang diagnostic pop" >> "$FOLLY_JSON_FILE"
+  fi
+fi
+
+# Patch Sentry ThreadMetadata cache for libc++ allocator strictness
+SENTRY_THREAD_CACHE="$PODS_DIR/Sentry/Sources/Sentry/include/SentryThreadMetadataCache.hpp"
+if [ -f "$SENTRY_THREAD_CACHE" ]; then
+  if ! grep -q "#    include <vector>" "$SENTRY_THREAD_CACHE"; then
+    /usr/bin/perl -0pi -e 's/#    include <string>/#    include <string>\n#    include <vector>/' "$SENTRY_THREAD_CACHE"
+  fi
+
+  if grep -q "std::vector<const ThreadHandleMetadataPair>" "$SENTRY_THREAD_CACHE"; then
+    /usr/bin/perl -0pi -e 's/std::vector<const ThreadHandleMetadataPair>/std::vector<ThreadHandleMetadataPair>/' "$SENTRY_THREAD_CACHE"
   fi
 fi
 

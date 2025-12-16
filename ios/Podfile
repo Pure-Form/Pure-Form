@@ -2,6 +2,7 @@ require File.join(File.dirname(`node --print "require.resolve('expo/package.json
 require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
 
 require 'json'
+require 'rubygems'
 podfile_properties = JSON.parse(File.read(File.join(__dir__, 'Podfile.properties.json'))) rescue {}
 
 ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '1' : '0'
@@ -57,6 +58,15 @@ target 'PureLife' do
       :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
     )
 
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |build_configuration|
+        deployment_target = build_configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+        if deployment_target && Gem::Version.new(deployment_target) < Gem::Version.new('13.4')
+          build_configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.4'
+        end
+      end
+    end
+
     # This is necessary for Xcode 14, because it signs resource bundles by default
     # when building for devices.
     installer.target_installation_results.pod_target_installation_results
@@ -66,6 +76,14 @@ target 'PureLife' do
           config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
         end
       end
+    end
+
+    patch_script = File.join(Pod::Config.instance.installation_root, '..', 'scripts', 'patch-pods.sh')
+    pods_root = installer.sandbox.root.to_s
+    if File.exist?(patch_script)
+      system('bash', patch_script, pods_root)
+    else
+      Pod::UI.warn('patch-pods.sh not found; skipping pod patches.')
     end
   end
 
