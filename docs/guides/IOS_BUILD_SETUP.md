@@ -39,12 +39,12 @@ pod install  # scripts/patch-pods.sh otomatik çalışır
 
 ```bash
 # Xcode ile (Önerilen)
-open ios/PureLife.xcworkspace
+open ios/PureForm.xcworkspace
 
 # Komut satırı ile
 cd ios
-xcodebuild -workspace PureLife.xcworkspace \
-  -scheme PureLife \
+xcodebuild -workspace PureForm.xcworkspace \
+  -scheme PureForm \
   -configuration Debug \
   -sdk iphonesimulator \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
@@ -57,8 +57,8 @@ xcodebuild -workspace PureLife.xcworkspace \
 ```bash
 # Çözüm:
 pkill -9 xcodebuild
-rm -rf ~/Library/Developer/Xcode/DerivedData/PureLife-*
-cd ios && xcodebuild clean -workspace PureLife.xcworkspace -scheme PureLife
+rm -rf ~/Library/Developer/Xcode/DerivedData/PureForm-*
+cd ios && xcodebuild clean -workspace PureForm.xcworkspace -scheme PureForm
 ```
 
 ### Patch'lerin Yeniden Uygulanması
@@ -141,7 +141,7 @@ Pure-Form/
 │   │                                          # - Deployment target 13.4
 │   │                                          # - Script phase output paths
 │   │                                          # - GCC_WARN_INHIBIT_ALL_WARNINGS
-│   └── PureLife.xcworkspace
+│   └── PureForm.xcworkspace
 └── package.json                               # postinstall: patch-package
 ```
 
@@ -149,7 +149,7 @@ Pure-Form/
 
 - **Build Status:** ✅ SUCCESS
 - **Real Warnings:** 0 (sıfır!)
-- **Notes:** 5 (sadece PureLife ana projesinin script phase'leri)
+- **Notes:** 5 (sadece PureForm ana projesinin script phase'leri)
 - **System Messages:** 2 (duplicate libraries, AppIntents metadata - zararsız)
 - **Error Count:** 0
 - **Total Patches:** 10 paket

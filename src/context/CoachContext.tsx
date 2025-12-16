@@ -25,7 +25,7 @@ import {
   WeeklyWorkoutPlan,
 } from "@/types/coach";
 
-const STORAGE_KEY = "@purelife:coach";
+const STORAGE_KEY = "@pureform:coach";
 
 type CoachState = {
   profile: GoalProfile | null;

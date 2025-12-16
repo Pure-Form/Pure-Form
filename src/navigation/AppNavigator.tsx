@@ -52,7 +52,7 @@ const AppNavigator = () => {
   );
 
   const linking: LinkingOptions<RootStackParamList> = {
-    prefixes: [createURL("/"), "purelife://", "exp+purelife://"],
+    prefixes: [createURL("/"), "pureform://", "exp+pureform://"],
     config: {
       screens: {
         Onboarding: "onboarding",

@@ -123,7 +123,7 @@ const DashboardScreen = () => {
               })}
             </Text>
             <Text style={[styles.headline, { color: theme.colors.text }]}>
-              Pure Life
+              Pure Form
             </Text>
           </View>
           <View

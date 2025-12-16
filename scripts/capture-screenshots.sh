@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Pure Life - Screenshot Capture Script
+# Pure Form - Screenshot Capture Script
 # Bu script iOS simulator'dan otomatik screenshot alır
 
 set -e
@@ -12,7 +12,7 @@ MARKETING_DIR="$PROJECT_ROOT/assets/marketing/screenshots"
 # Marketing klasörünü oluştur
 mkdir -p "$MARKETING_DIR"
 
-echo "📸 Pure Life Screenshot Capture"
+echo "📸 Pure Form Screenshot Capture"
 echo "================================"
 echo ""
 
@@ -33,7 +33,7 @@ if [ -z "$BOOTED_DEVICE" ]; then
     echo "  1. Xcode'u açın"
     echo "  2. Xcode > Open Developer Tool > Simulator"
     echo "  3. İstediğiniz cihazı seçin (iPhone 15 Pro önerilir)"
-    echo "  4. Pure Life uygulamasını çalıştırın: npm run ios"
+    echo "  4. Pure Form uygulamasını çalıştırın: npm run ios"
     echo "  5. Bu scripti tekrar çalıştırın"
     exit 1
 fi

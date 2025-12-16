@@ -1,6 +1,6 @@
-# Pure Life
+# Pure Form
 
-AI destekli Pure Life mobil uygulaması; günlük kalori takibi, kişisel antrenman planları ve ilerleme analizlerini aynı yerde toplayan iki dilli (Türkçe/İngilizce) bir fitness çözümdür.
+AI destekli Pure Form mobil uygulaması; günlük kalori takibi, kişisel antrenman planları ve ilerleme analizlerini aynı yerde toplayan iki dilli (Türkçe/İngilizce) bir fitness çözümdür.
 
 ## Özellikler
 - **Çift Platform**: Expo ile iOS ve Android desteği.
@@ -96,10 +96,25 @@ Sentry is integrated for production error tracking and performance monitoring.
 
 ## Legal & Privacy
 
-- **Privacy Policy**: [assets/legal/privacy-policy.md](./assets/legal/privacy-policy.md)
-- **Terms of Service**: [assets/legal/terms-of-service.md](./assets/legal/terms-of-service.md)
+- **Privacy Policy**: [docs/privacy-policy.html](./docs/privacy-policy.html)
+- **Terms of Service**: [docs/terms-of-service.html](./docs/terms-of-service.html)
 
-These documents are accessible in-app via Settings > Legal.
+Both documents are bundled in the app and reachable through **Settings → Legal** as well as the public URLs configured in `app.config.ts`.
+
+## Account deletion
+
+Pure Form now complies with Apple's in-app account deletion requirement:
+
+- Users can open **Settings → Data & Privacy → Delete account** to wipe their profile, workout logs, saved AI plans, and Supabase auth record.
+- The UI calls the Supabase Edge Function `delete-account`, which cascades deletions across `workout_logs`, `coach_plans`, and the user entry.
+- Deploy the function and set the service role key before releasing:
+
+```bash
+supabase secrets set SUPABASE_SERVICE_ROLE_KEY="<service-role-key>" --project-ref <project-ref>
+supabase functions deploy delete-account --project-ref <project-ref>
+```
+
+Users are immediately signed out once deletion succeeds.
 
 ## Security
 
@@ -111,7 +126,8 @@ These documents are accessible in-app via Settings > Legal.
 
 ## Store Submission
 
-See [STORE_CHECKLIST.md](./STORE_CHECKLIST.md) for App Store and Play Store submission requirements.
+- Follow [docs/guides/STORE_CHECKLIST.md](./docs/guides/STORE_CHECKLIST.md) for both App Store and Play Store requirements.
+- The checklist now includes App Privacy question answers, metadata, screenshots, and review notes specific to Apple.
 
 ## iOS Build
 

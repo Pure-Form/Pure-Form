@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import * as AuthSession from "expo-auth-session";
 import * as Linking from "expo-linking";
@@ -61,11 +62,13 @@ type AuthContextValue = {
   pendingPasswordReset: boolean;
   // YENİ ALAN: SSO fonksiyonu Context'e eklendi
   signInWithProvider: (provider: Provider) => Promise<AuthResult>;
+  deleteAccount: () => Promise<AuthResult>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 const defaultGoal: AuthUser["goal"] = "maintain";
+const WORKOUT_LOGS_CACHE_KEY = "@pure_life_workout_logs";
 
 const mapUserFromSupabase = (incoming: User): AuthUser => {
   const metadata = (incoming.user_metadata ?? {}) as Partial<
@@ -362,6 +365,56 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setPendingPasswordReset(false);
   }, [setPendingPasswordReset, setUser]);
 
+  const deleteAccount = useCallback(async (): Promise<AuthResult> => {
+    if (!user) {
+      return { ok: false, error: "Not authenticated" };
+    }
+
+    try {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError || !session?.access_token) {
+        const message =
+          sessionError?.message ?? "Session expired, please sign in again";
+        return { ok: false, error: message };
+      }
+
+      const { error } = await supabase.functions.invoke("delete-account", {
+        body: { scrubWorkoutHistory: true },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        logError(error, { context: "deleteAccount" });
+        return {
+          ok: false,
+          error: error.message ?? "Unable to delete account right now",
+        };
+      }
+
+      await AsyncStorage.removeItem(WORKOUT_LOGS_CACHE_KEY);
+      await supabase.auth.signOut();
+      setUser(null);
+      setPendingPasswordReset(false);
+
+      return { ok: true };
+    } catch (error) {
+      logError(error as Error, { context: "deleteAccount" });
+      return {
+        ok: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to delete account right now",
+      };
+    }
+  }, [setPendingPasswordReset, setUser, user]);
+
   const requestPasswordReset = useCallback(
     async (email: string): Promise<AuthResult> => {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -408,6 +461,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       pendingPasswordReset,
       // YENİ ALAN: SSO fonksiyonu context değerine dahil edildi
       signInWithProvider,
+      deleteAccount,
     }),
     [
       completePasswordReset,
@@ -421,6 +475,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       user,
       // Yeni eklenen bağımlılık
       signInWithProvider,
+      deleteAccount,
     ],
   );
 

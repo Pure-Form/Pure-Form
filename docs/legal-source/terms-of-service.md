@@ -1,14 +1,14 @@
-# Terms of Service for Pure Life
+# Terms of Service for Pure Form
 
 **Last Updated:** December 9, 2025
 
 ## Acceptance of Terms
 
-By downloading, installing, or using Pure Life (the "App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the App.
+By downloading, installing, or using Pure Form (the "App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the App.
 
 ## Description of Service
 
-Pure Life is a fitness and nutrition tracking application that provides:
+Pure Form is a fitness and nutrition tracking application that provides:
 - AI-powered personalized workout plans
 - Nutrition tracking and meal planning
 - Progress monitoring and analytics
@@ -41,7 +41,7 @@ You agree NOT to:
 
 ## Medical Disclaimer
 
-**IMPORTANT:** Pure Life is NOT a medical device and does not provide medical advice.
+**IMPORTANT:** Pure Form is NOT a medical device and does not provide medical advice.
 
 - Consult a healthcare professional before starting any fitness program
 - Do not rely solely on the App for health decisions
@@ -52,7 +52,7 @@ You agree NOT to:
 ## Intellectual Property
 
 ### Our Rights
-- All App content, features, and functionality are owned by Pure Life
+- All App content, features, and functionality are owned by Pure Form
 - Trademarks, logos, and service marks are our property
 - You may not copy, modify, or reverse engineer the App
 
@@ -108,7 +108,7 @@ TO THE MAXIMUM EXTENT PERMITTED BY LAW:
 
 ## Indemnification
 
-You agree to indemnify and hold harmless Pure Life from any claims, damages, or expenses arising from:
+You agree to indemnify and hold harmless Pure Form from any claims, damages, or expenses arising from:
 - Your violation of these Terms
 - Your use of the App
 - Your violation of any rights of another user
@@ -132,6 +132,12 @@ We may terminate or suspend your account if:
 - You engage in fraudulent activity
 - Required by law
 - The App is discontinued
+
+## Account Deletion
+
+- Navigate to **Settings → Data & Privacy → Delete Account** to permanently remove your profile, workout logs, AI plans, and Supabase authentication record.
+- Deletion is immediate and irreversible. You can create a new account later using the same email address if you choose to come back.
+- If you experience any issues with the in-app deletion flow, email ahmetsametyuzlu@gmail.com for manual assistance.
 
 ## Geographic Restrictions
 
@@ -179,7 +185,7 @@ You agree to comply with export control laws and not export or re-export the App
 
 ## Entire Agreement
 
-These Terms, along with our Privacy Policy, constitute the entire agreement between you and Pure Life.
+These Terms, along with our Privacy Policy, constitute the entire agreement between you and Pure Form.
 
 ## Severability
 
@@ -206,4 +212,4 @@ Continued use after changes constitutes acceptance of new Terms.
 
 ## Acknowledgment
 
-By using Pure Life, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
+By using Pure Form, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.

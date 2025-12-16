@@ -12,7 +12,7 @@ import { Appearance } from "react-native";
 
 import { AppTheme, darkTheme, lightTheme, ThemeMode } from "@/theme";
 
-const STORAGE_KEY = "@purelife:theme";
+const STORAGE_KEY = "@pureform:theme";
 
 type ThemeContextValue = {
   theme: AppTheme;

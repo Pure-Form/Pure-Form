@@ -1,4 +1,4 @@
-# 🚀 Pure Life - Store Submission Guide
+# 🚀 Pure Form - Store Submission Guide
 
 ## 📱 App Store (iOS) Submission
 
@@ -14,8 +14,8 @@ eas build:list
 ### 2. App Store Connect Hazırlığı
 
 #### A. Gerekli Bilgiler
-- **App Name**: Pure Life
-- **Bundle ID**: com.purelife.app
+- **App Name**: Pure Form
+- **Bundle ID**: com.pureform.app
 - **Version**: 1.0.0
 - **Build Number**: 1 (otomatik artacak)
 - **Primary Language**: Turkish
@@ -26,7 +26,7 @@ eas build:list
 
 **Başlık** (30 karakter max):
 ```
-Pure Life - AI Fitness Coach
+Pure Form - AI Fitness Coach
 ```
 
 **Alt Başlık** (30 karakter max):
@@ -36,9 +36,9 @@ Kişisel Antrenman ve Beslenme
 
 **Açıklama** (4000 karakter max):
 ```
-🏋️ Pure Life ile Hedeflerinize Ulaşın!
+🏋️ Pure Form ile Hedeflerinize Ulaşın!
 
-Pure Life, yapay zeka destekli kişisel fitness koçunuz. Antrenman programları, beslenme planları ve ilerleme takibi ile sağlıklı yaşam hedefinize ulaşın.
+Pure Form, yapay zeka destekli kişisel fitness koçunuz. Antrenman programları, beslenme planları ve ilerleme takibi ile sağlıklı yaşam hedefinize ulaşın.
 
 ✨ ÖNE ÇIKAN ÖZELLİKLER
 
@@ -78,7 +78,7 @@ Pure Life, yapay zeka destekli kişisel fitness koçunuz. Antrenman programları
 • İstediğiniz zaman verilerinizi silebilirsiniz
 • Reklamsız deneyim
 
-💎 NEDEN PURE LIFE?
+💎 NEDEN PURE FORM?
 • %100 Türkçe arayüz
 • Türk mutfağına özel beslenme verisi
 • Yapay zeka destekli kişiselleştirme
@@ -93,7 +93,7 @@ Pure Life, yapay zeka destekli kişisel fitness koçunuz. Antrenman programları
 • Apple Health entegrasyonu (yakında)
 
 ⚠️ ÖNEMLİ NOTLAR
-Pure Life bir sağlık danışmanlığı hizmeti değildir. Medikal tavsiye sunmaz. Ciddi sağlık sorunları için lütfen bir sağlık profesyoneline danışın.
+Pure Form bir sağlık danışmanlığı hizmeti değildir. Medikal tavsiye sunmaz. Ciddi sağlık sorunları için lütfen bir sağlık profesyoneline danışın.
 
 🎁 BAŞLARKEN
 1. Hesap oluşturun (email ile)
@@ -103,10 +103,10 @@ Pure Life bir sağlık danışmanlığı hizmeti değildir. Medikal tavsiye sunm
 5. Antrenmanınıza başlayın!
 
 📧 DESTEK
-Sorularınız için: support@purelife.app
-Geri bildirim: feedback@purelife.app
+Sorularınız için: support@pureform.app
+Geri bildirim: feedback@pureform.app
 
-🌟 Pure Life ile sağlıklı yaşamınız başlıyor!
+🌟 Pure Form ile sağlıklı yaşamınız başlıyor!
 ```
 
 **Anahtar Kelimeler** (100 karakter max):
@@ -121,12 +121,12 @@ fitness,antrenman,spor,beslenme,diyet,kilo,AI,yapay zeka,sağlık
 
 **Support URL**:
 ```
-https://purelife.app/support
+https://pureform.app/support
 ```
 
 **Marketing URL**:
 ```
-https://purelife.app
+https://pureform.app
 ```
 
 **Privacy Policy URL**:
@@ -148,17 +148,17 @@ https://github.com/Pure-Form/Pure-Form/blob/main/assets/legal/privacy-policy.md
 
 #### D. App Store Review Bilgileri
 **Demo Account** (test için gerekli):
-- Email: demo@purelife.app
+- Email: demo@pureform.app
 - Password: Demo123!
 
 **Review Notes**:
 ```
 Merhaba Apple Review Team,
 
-Pure Life, AI destekli bir fitness koçu uygulamasıdır. 
+Pure Form, AI destekli bir fitness koçu uygulamasıdır. 
 
 Test için demo hesap:
-Email: demo@purelife.app
+Email: demo@pureform.app
 Password: Demo123!
 
 Önemli notlar:
@@ -177,10 +177,10 @@ Teşekkürler!
 2. **My Apps > + simgesi > New App**
 3. Bilgileri doldurun:
    - Platform: iOS
-   - Name: Pure Life
+   - Name: Pure Form
    - Primary Language: Turkish
-   - Bundle ID: com.purelife.app
-   - SKU: purelife-ios-001
+   - Bundle ID: com.pureform.app
+   - SKU: pureform-ios-001
 4. **App Information** sekmesi:
    - Category: Health & Fitness
    - Privacy Policy URL ekleyin
@@ -211,8 +211,8 @@ eas build:list
 ### 2. Google Play Console Hazırlığı
 
 #### A. Gerekli Bilgiler
-- **App Name**: Pure Life
-- **Package Name**: com.purelife.app
+- **App Name**: Pure Form
+- **Package Name**: com.pureform.app
 - **Version**: 1.0.0
 - **Version Code**: 2
 - **Default Language**: Turkish (Türkiye)
@@ -223,7 +223,7 @@ eas build:list
 
 **App Name** (50 karakter max):
 ```
-Pure Life - AI Fitness ve Beslenme Koçu
+Pure Form - AI Fitness ve Beslenme Koçu
 ```
 
 **Kısa Açıklama** (80 karakter max):
@@ -233,9 +233,9 @@ AI destekli kişisel antrenman ve beslenme planı. Hedeflerinize ulaşın!
 
 **Tam Açıklama** (4000 karakter max):
 ```
-🏋️ Pure Life ile Hedeflerinize Ulaşın!
+🏋️ Pure Form ile Hedeflerinize Ulaşın!
 
-Pure Life, yapay zeka destekli kişisel fitness koçunuz. Antrenman programları, beslenme planları ve ilerleme takibi ile sağlıklı yaşam hedefinize ulaşın.
+Pure Form, yapay zeka destekli kişisel fitness koçunuz. Antrenman programları, beslenme planları ve ilerleme takibi ile sağlıklı yaşam hedefinize ulaşın.
 
 ✨ ÖNE ÇIKAN ÖZELLİKLER
 
@@ -275,7 +275,7 @@ Pure Life, yapay zeka destekli kişisel fitness koçunuz. Antrenman programları
 • İstediğiniz zaman verilerinizi silebilirsiniz
 • Reklamsız deneyim
 
-💎 NEDEN PURE LIFE?
+💎 NEDEN PURE FORM?
 • %100 Türkçe arayüz
 • Türk mutfağına özel beslenme verisi
 • Yapay zeka destekli kişiselleştirme
@@ -290,7 +290,7 @@ Pure Life, yapay zeka destekli kişisel fitness koçunuz. Antrenman programları
 • Google Fit entegrasyonu (yakında)
 
 ⚠️ ÖNEMLİ NOTLAR
-Pure Life bir sağlık danışmanlığı hizmeti değildir. Medikal tavsiye sunmaz. Ciddi sağlık sorunları için lütfen bir sağlık profesyoneline danışın.
+Pure Form bir sağlık danışmanlığı hizmeti değildir. Medikal tavsiye sunmaz. Ciddi sağlık sorunları için lütfen bir sağlık profesyoneline danışın.
 
 🎁 BAŞLARKEN
 1. Hesap oluşturun (email ile)
@@ -300,10 +300,10 @@ Pure Life bir sağlık danışmanlığı hizmeti değildir. Medikal tavsiye sunm
 5. Antrenmanınıza başlayın!
 
 📧 DESTEK
-Sorularınız için: support@purelife.app
-Geri bildirim: feedback@purelife.app
+Sorularınız için: support@pureform.app
+Geri bildirim: feedback@pureform.app
 
-🌟 Pure Life ile sağlıklı yaşamınız başlıyor!
+🌟 Pure Form ile sağlıklı yaşamınız başlıyor!
 
 ---
 
@@ -352,7 +352,7 @@ https://github.com/Pure-Form/Pure-Form/blob/main/assets/legal/privacy-policy.md
 1. **Play Console'a giriş**: https://play.google.com/console
 2. **Create App**
 3. Bilgileri doldurun:
-   - App name: Pure Life
+   - App name: Pure Form
    - Default language: Turkish
    - App or game: App
    - Free or paid: Free
@@ -360,7 +360,7 @@ https://github.com/Pure-Form/Pure-Form/blob/main/assets/legal/privacy-policy.md
    - App name, descriptions ekleyin
    - Screenshots, icon, feature graphic yükleyin
    - Categorization: Health & Fitness
-   - Contact details: support@purelife.app
+   - Contact details: support@pureform.app
    - Privacy Policy URL
 5. **Content Rating**:
    - Questionnaire'i doldurun
@@ -509,7 +509,7 @@ eas credentials --platform android
 5. Offline çalışır mı?
 
 ### Support Channels
-- **Email**: support@purelife.app (otomatik yanıt + 24h SLA)
+- **Email**: support@pureform.app (otomatik yanıt + 24h SLA)
 - **In-app**: Settings > Help & Support
 - **Social Media**: Twitter, Instagram
 
@@ -577,4 +577,4 @@ npm version major  # 1.0.0 -> 2.0.0
 **App Store Connect**: https://help.apple.com/app-store-connect/
 **Google Play Console**: https://support.google.com/googleplay/android-developer/
 
-**Pure Life Team**: dev@purelife.app
+**Pure Form Team**: dev@pureform.app

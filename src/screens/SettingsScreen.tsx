@@ -1,9 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import Constants from "expo-constants";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
+  Alert,
   Linking,
   Pressable,
   ScrollView,
@@ -24,7 +27,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const SettingsScreen = () => {
   const { theme, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation();
-  const { user, signOut } = useAuth();
+  const { user, signOut, deleteAccount } = useAuth();
   const navigation = useNavigation<NavigationProp>();
   const { hasPermission, requestPermission } = useNotifications();
   const [language, setLanguage] = useState(
@@ -32,10 +35,95 @@ const SettingsScreen = () => {
   );
   const [notificationsEnabled, setNotificationsEnabled] =
     useState(hasPermission);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
+  const extras =
+    (Constants.expoConfig?.extra as Record<string, string | undefined>) ??
+    (Constants.manifest?.extra as Record<string, string | undefined>) ??
+    (Constants.manifestExtra as Record<string, string | undefined> | undefined) ??
+    {};
+
+  const privacyPolicyUrl =
+    extras?.privacyPolicyUrl ??
+    "https://pure-form.github.io/Pure-Form/privacy-policy.html";
+  const termsOfServiceUrl =
+    extras?.termsOfServiceUrl ??
+    "https://pure-form.github.io/Pure-Form/terms-of-service.html";
+  const supportEmail = extras?.supportEmail ?? "ahmetsametyuzlu@gmail.com";
 
   const handleLanguageChange = async (next: "en" | "tr") => {
     setLanguage(next);
     await i18n.changeLanguage(next);
+  };
+
+  const openLink = (url: string) => {
+    if (!url) {
+      Alert.alert(
+        t("settings.linkUnavailableTitle") ?? "Link unavailable",
+        t("settings.linkUnavailableMessage") ??
+          "This resource is not reachable right now.",
+      );
+      return;
+    }
+
+    Linking.openURL(url).catch((error) => {
+      console.warn("Failed to open external link", error);
+      Alert.alert(
+        t("settings.linkUnavailableTitle") ?? "Link unavailable",
+        t("settings.linkUnavailableMessage") ??
+          "This resource is not reachable right now.",
+      );
+    });
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      t("settings.deleteAccountTitle") ?? "Delete account",
+      t("settings.deleteAccountMessage") ??
+        "This will permanently remove your profile, workout logs, and AI plans.",
+      [
+        {
+          text: t("common.cancel") ?? "Cancel",
+          style: "cancel",
+        },
+        {
+          text: t("settings.deleteAccountConfirm") ?? "Delete",
+          style: "destructive",
+          onPress: async () => {
+            setIsDeletingAccount(true);
+            try {
+              const result = await deleteAccount();
+              if (!result.ok) {
+                Alert.alert(
+                  t("settings.deleteAccountErrorTitle") ?? "Failed",
+                  result.error ||
+                    (t("settings.deleteAccountErrorMessage", {
+                      email: supportEmail,
+                    }) ?? "Please try again or email support."),
+                );
+                return;
+              }
+
+              Alert.alert(
+                t("settings.deleteAccountSuccessTitle") ?? "Account deleted",
+                t("settings.deleteAccountSuccessMessage") ??
+                  "Your data has been erased and you have been signed out.",
+              );
+            } catch (error) {
+              console.warn("deleteAccount failed", error);
+              Alert.alert(
+                t("settings.deleteAccountErrorTitle") ?? "Failed",
+                t("settings.deleteAccountErrorMessage", {
+                  email: supportEmail,
+                }) ?? "Please try again or email support.",
+              );
+            } finally {
+              setIsDeletingAccount(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -198,13 +286,7 @@ const SettingsScreen = () => {
             {t("settings.legal") || "Legal"}
           </Text>
           <Pressable
-            onPress={() => {
-              Linking.openURL(
-                "https://raw.githubusercontent.com/Pure-Form/Pure-Form/main/assets/legal/privacy-policy.md",
-              ).catch((error) => {
-                console.warn("Failed to open privacy policy", error);
-              });
-            }}
+            onPress={() => openLink(privacyPolicyUrl)}
             style={[
               styles.row,
               {
@@ -223,13 +305,7 @@ const SettingsScreen = () => {
             />
           </Pressable>
           <Pressable
-            onPress={() => {
-              Linking.openURL(
-                "https://raw.githubusercontent.com/Pure-Form/Pure-Form/main/assets/legal/terms-of-service.md",
-              ).catch((error) => {
-                console.warn("Failed to open terms", error);
-              });
-            }}
+            onPress={() => openLink(termsOfServiceUrl)}
             style={[
               styles.row,
               {
@@ -255,11 +331,10 @@ const SettingsScreen = () => {
           </Text>
           <Pressable
             onPress={() => {
-              Linking.openURL("mailto:ahmetsametyuzlu@gmail.com").catch(
-                (error) => {
-                  console.warn("Failed to open email", error);
-                },
-              );
+              const mailto = `mailto:${supportEmail}?subject=Pure%20Form%20Support`;
+              Linking.openURL(mailto).catch((error) => {
+                console.warn("Failed to open email", error);
+              });
             }}
             style={[
               styles.row,
@@ -277,6 +352,56 @@ const SettingsScreen = () => {
               size={20}
               color={theme.colors.subText}
             />
+          </Pressable>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.subText }]}>
+            {t("settings.dataAndPrivacy") || "Data & Privacy"}
+          </Text>
+          <Text
+            style={[styles.sectionDescription, { color: theme.colors.subText }]}
+          >
+            {t("settings.deleteAccountDescription") ||
+              "Erase your account, workout logs, and AI plans from our servers."}
+          </Text>
+          <Pressable
+            disabled={isDeletingAccount}
+            onPress={handleDeleteAccount}
+            style={[
+              styles.row,
+              styles.destructiveRow,
+              {
+                borderColor: theme.colors.danger,
+                backgroundColor: theme.colors.danger + "11",
+                opacity: isDeletingAccount ? 0.7 : 1,
+              },
+            ]}
+          >
+            <View style={styles.rowLeft}>
+              <Ionicons
+                name="trash-outline"
+                size={22}
+                color={theme.colors.danger}
+              />
+              <Text
+                style={[styles.rowText, { color: theme.colors.danger }]}
+              >
+                {t("settings.deleteAccount") || "Delete account"}
+              </Text>
+            </View>
+            {isDeletingAccount ? (
+              <ActivityIndicator
+                size="small"
+                color={theme.colors.danger}
+              />
+            ) : (
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={theme.colors.danger}
+              />
+            )}
           </Pressable>
         </View>
 
@@ -365,6 +490,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
+  sectionDescription: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
   languageRow: {
     flexDirection: "row",
     gap: 12,
@@ -392,6 +521,9 @@ const styles = StyleSheet.create({
   signOutText: {
     fontSize: 15,
     fontWeight: "600",
+  },
+  destructiveRow: {
+    borderStyle: "dashed",
   },
 });
 

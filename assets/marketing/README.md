@@ -1,4 +1,4 @@
-# Pure Life - Marketing Assets
+# Pure Form - Marketing Assets
 
 Bu klasör App Store ve Google Play Store submission için gerekli marketing materyallerini içerir.
 
@@ -81,9 +81,9 @@ AI destekli fitness: Kişisel antrenman, beslenme ve ilerleme takibi
 
 ### Uzun Açıklama (4000 karakter)
 
-**Pure Life - AI Destekli Kişisel Fitness Yardımcınız**
+**Pure Form - AI Destekli Kişisel Fitness Yardımcınız**
 
-Pure Life, hedeflerinize ulaşmanız için yapay zeka destekli kişiselleştirilmiş antrenman planları, akıllı beslenme önerileri ve detaylı ilerleme takibi sunan kapsamlı bir fitness uygulamasıdır.
+Pure Form, hedeflerinize ulaşmanız için yapay zeka destekli kişiselleştirilmiş antrenman planları, akıllı beslenme önerileri ve detaylı ilerleme takibi sunan kapsamlı bir fitness uygulamasıdır.
 
 **ÖZELLİKLER:**
 
@@ -121,7 +121,7 @@ Pure Life, hedeflerinize ulaşmanız için yapay zeka destekli kişiselleştiril
 - Kullanıcı dostu arayüz
 - Hızlı ve responsive performans
 
-**NEDEN PURE LIFE?**
+**NEDEN PURE FORM?**
 
 ✓ Bilimsel verilere dayalı AI önerileri
 ✓ Kişiye özel hedef belirleme
@@ -137,7 +137,7 @@ Pure Life, hedeflerinize ulaşmanız için yapay zeka destekli kişiselleştiril
 4. Günlük aktivitelerinizi takip edin
 5. İlerleyişinizi görün ve motive olun!
 
-Pure Life ile sağlıklı yaşam yolculuğunuza bugün başlayın!
+Pure Form ile sağlıklı yaşam yolculuğunuza bugün başlayın!
 
 ---
 

@@ -35,7 +35,7 @@ install! 'cocoapods',
 
 prepare_react_native_project!
 
-target 'PureLife' do
+target 'PureForm' do
   use_expo_modules!
   config = use_native_modules!
 
@@ -64,6 +64,14 @@ target 'PureLife' do
         if deployment_target && Gem::Version.new(deployment_target) < Gem::Version.new('13.4')
           build_configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.4'
         end
+      end
+
+      target.shell_script_build_phases.each do |phase|
+        next if phase.output_paths && !phase.output_paths.empty?
+        next if phase.name.nil? || phase.name.strip.empty?
+
+        sanitized_name = phase.name.gsub(/[^A-Za-z0-9_\-]+/, '_')
+        phase.output_paths = ["${DERIVED_FILE_DIR}/#{target.name}-#{sanitized_name}.stamp"]
       end
     end
 

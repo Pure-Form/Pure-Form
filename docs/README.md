@@ -1,6 +1,6 @@
-# Pure Life - Legal Documents
+# Pure Form - Legal Documents
 
-This directory contains the legal documents for Pure Life app, hosted via GitHub Pages.
+This directory contains the legal documents for Pure Form app, hosted via GitHub Pages.
 
 ## 📄 Available Documents
 

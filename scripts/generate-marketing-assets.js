@@ -57,7 +57,7 @@ const buildTextOverlay = () => Buffer.from(`
       .title { font-family: 'Inter', 'Segoe UI', 'Arial', sans-serif; font-size: 88px; font-weight: 700; fill: #FFFFFF; }
       .subtitle { font-family: 'Inter', 'Segoe UI', 'Arial', sans-serif; font-size: 30px; font-weight: 400; fill: #CCDAFF; }
     </style>
-    <text x="0" y="120" class="title">Pure Life</text>
+    <text x="0" y="120" class="title">Pure Form</text>
     <text x="0" y="190" class="subtitle">Fitness &amp; Nutrition Coach</text>
     <text x="0" y="240" class="subtitle">Planla - Takip et - Gelis</text>
   </svg>

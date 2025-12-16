@@ -44,7 +44,7 @@ if (getRNMinorVersion() >= 75) {
   }
 }
 
-rootProject.name = 'Pure Life'
+rootProject.name = 'Pure Form'
 
 dependencyResolutionManagement {
   versionCatalogs {

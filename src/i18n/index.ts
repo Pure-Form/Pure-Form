@@ -83,6 +83,23 @@ const resources = {
         support: "Support",
         contactUs: "Contact Us",
         signOut: "Sign out",
+        linkUnavailableTitle: "Link unavailable",
+        linkUnavailableMessage:
+          "This resource is not reachable right now. Please try again later.",
+        dataAndPrivacy: "Data & Privacy",
+        deleteAccount: "Delete account",
+        deleteAccountDescription:
+          "Erase your profile, workout logs, and AI plans from our servers.",
+        deleteAccountTitle: "Delete account",
+        deleteAccountMessage:
+          "This will permanently remove your profile, workout logs, AI prompts, and saved preferences. This action cannot be undone.",
+        deleteAccountConfirm: "Yes, delete my account",
+        deleteAccountSuccessTitle: "Account deleted",
+        deleteAccountSuccessMessage:
+          "We erased your data and signed you out. You can create a new account anytime.",
+        deleteAccountErrorTitle: "Could not delete account",
+        deleteAccountErrorMessage:
+          "Please try again or email {{email}} for help.",
       },
       profile: {
         editProfile: "Edit Profile",
@@ -229,6 +246,23 @@ const resources = {
         support: "Destek",
         contactUs: "Bize Ulaşın",
         signOut: "Çıkış yap",
+        linkUnavailableTitle: "Bağlantı açılamıyor",
+        linkUnavailableMessage:
+          "Kaynağa şu anda ulaşılamıyor. Lütfen daha sonra tekrar dene.",
+        dataAndPrivacy: "Veri ve Gizlilik",
+        deleteAccount: "Hesabı sil",
+        deleteAccountDescription:
+          "Profilini, antrenman kayıtlarını ve AI planlarını kalıcı olarak kaldır.",
+        deleteAccountTitle: "Hesabı sil",
+        deleteAccountMessage:
+          "Bu işlem profilini, antrenman kayıtlarını, AI koç sorularını ve tüm tercihlerini kalıcı olarak siler. Geri alınamaz.",
+        deleteAccountConfirm: "Evet, hesabımı sil",
+        deleteAccountSuccessTitle: "Hesap silindi",
+        deleteAccountSuccessMessage:
+          "Tüm verilerin kaldırıldı ve oturumun kapatıldı. Dilediğinde yeni hesap oluşturabilirsin.",
+        deleteAccountErrorTitle: "Hesap silinemedi",
+        deleteAccountErrorMessage:
+          "Lütfen tekrar dene veya destek için {{email}} adresine yaz.",
       },
       profile: {
         editProfile: "Profili Düzenle",

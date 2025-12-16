@@ -1,10 +1,10 @@
-# Privacy Policy for Pure Life
+# Privacy Policy for Pure Form
 
 **Last Updated:** December 9, 2025
 
 ## Introduction
 
-Pure Life ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application (the "App").
+Pure Form ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application (the "App").
 
 ## Information We Collect
 
@@ -72,13 +72,23 @@ You have the right to:
 
 To exercise these rights, contact us at: ahmetsametyuzlu@gmail.com
 
+## How to Delete Your Account
+
+You can delete your account directly inside the Pure Form app:
+
+1. Open **Settings**.
+2. Tap **Data & Privacy**.
+3. Choose **Delete Account** and confirm.
+
+This action immediately erases your profile, workout logs, AI plans, and Supabase authentication record. If you run into issues, reach out to ahmetsametyuzlu@gmail.com and we will assist you manually.
+
 ## Data Retention
 
 We retain your personal information for as long as your account is active or as needed to provide services. You can request account deletion at any time through the App settings or by contacting us.
 
 ## Children's Privacy
 
-Pure Life is not intended for users under 13 years of age. We do not knowingly collect personal information from children under 13. If you become aware that a child has provided us with personal information, please contact us.
+Pure Form is not intended for users under 13 years of age. We do not knowingly collect personal information from children under 13. If you become aware that a child has provided us with personal information, please contact us.
 
 ## International Data Transfers
 

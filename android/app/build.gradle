@@ -109,9 +109,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.purelife.app'
+    namespace 'com.pureform.app'
     defaultConfig {
-        applicationId 'com.purelife.app'
+        applicationId 'com.pureform.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 2

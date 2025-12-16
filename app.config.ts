@@ -2,12 +2,12 @@ import type { ExpoConfig } from "@expo/config-types";
 import "dotenv/config";
 
 const config: ExpoConfig = {
-  name: "Pure Life",
-  slug: "pure-life",
+  name: "Pure Form",
+  slug: "pure-form",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
-  scheme: "purelife",
+  scheme: "pureform",
   userInterfaceStyle: "automatic",
   splash: {
     image: "./assets/splash.png",

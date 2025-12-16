@@ -177,7 +177,7 @@ VALUES (auth.uid(), 'MON', 'Chest & Triceps', NOW());
 - [ ] Verify sync after reconnect
 
 ### Test Users
-- Use demo account: `demo@purelife.app` / `Demo123!`
+- Use demo account: `demo@pureform.app` / `Demo123!`
 
 ## Performance
 
@@ -253,4 +253,4 @@ type ExerciseLog = {
 
 ## License
 
-Part of Pure Life app. All rights reserved.
+Part of Pure Form app. All rights reserved.
