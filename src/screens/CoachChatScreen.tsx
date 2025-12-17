@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { aiCoachEnabled } from "@/constants/featureFlags";
 import { useCoach } from "@/context/CoachContext";
 import { useTheme } from "@/context/ThemeContext";
 import { askCoachQuestion } from "@/services/aiCoachChat";
@@ -96,6 +97,37 @@ const CoachChatScreen = () => {
       });
     }
   };
+
+  if (!aiCoachEnabled) {
+    return (
+      <SafeAreaView
+        style={[styles.safeArea, { backgroundColor: theme.colors.background }]}
+      >
+        <View style={styles.disabledContainer}>
+          <View
+            style={[styles.disabledIcon, { backgroundColor: theme.colors.card }]}
+          >
+            <Ionicons
+              name="chatbox-ellipses-outline"
+              size={28}
+              color={theme.colors.subText}
+            />
+          </View>
+          <Text style={[styles.disabledTitle, { color: theme.colors.text }]}>
+            {t("coachAI.disabledTitle", "AI Koçu geçici olarak devre dışı")}
+          </Text>
+          <Text
+            style={[styles.disabledSubtitle, { color: theme.colors.subText }]}
+          >
+            {t(
+              "coachAI.disabledSubtitle",
+              "Bu özellik üzerinde çalışıyoruz. Lütfen yakında tekrar kontrol et.",
+            )}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const renderMessage = ({ item }: { item: Message }) => {
     const isUser = item.role === "user";
@@ -209,6 +241,29 @@ const CoachChatScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+  },
+  disabledContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 32,
+    gap: 12,
+  },
+  disabledIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  disabledTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  disabledSubtitle: {
+    fontSize: 14,
+    textAlign: "center",
   },
   keyboardView: {
     flex: 1,

@@ -1,0 +1,1 @@
+export const aiCoachEnabled = false;

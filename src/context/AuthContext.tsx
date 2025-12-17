@@ -317,7 +317,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
 
       const { error } = await supabase.functions.invoke("delete-account", {
-        body: { scrubWorkoutHistory: true },
+        body: {
+          scrubWorkoutHistory: true,
+          accessToken: session.access_token,
+        },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },

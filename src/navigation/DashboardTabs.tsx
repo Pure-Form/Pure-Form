@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
+import { aiCoachEnabled } from "@/constants/featureFlags";
 import { useTheme } from "@/context/ThemeContext";
 import PlannerNavigator from "@/navigation/PlannerNavigator";
 import CoachChatScreen from "@/screens/CoachChatScreen";
@@ -68,11 +69,13 @@ const DashboardTabs = () => {
         component={NutritionLibraryScreen}
         options={{ title: t("nutrition.tabTitle") }}
       />
-      <Tab.Screen
-        name="CoachAI"
-        component={CoachChatScreen}
-        options={{ title: t("dashboard.aiCoachHeading") }}
-      />
+      {aiCoachEnabled ? (
+        <Tab.Screen
+          name="CoachAI"
+          component={CoachChatScreen}
+          options={{ title: t("dashboard.aiCoachHeading") }}
+        />
+      ) : null}
       <Tab.Screen
         name="Settings"
         component={SettingsScreen}

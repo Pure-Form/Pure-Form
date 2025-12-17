@@ -27,11 +27,26 @@ serve(async (req) => {
     return jsonResponse(405, { error: "Method not allowed" });
   }
 
+  let payload: Record<string, unknown> = {};
+  try {
+    payload = (await req.json()) as Record<string, unknown>;
+  } catch (_error) {
+    payload = {};
+  }
+
   const authHeader = req.headers.get("Authorization");
-  const accessToken = authHeader?.split(" ")[1]?.trim();
-  if (!authHeader || !accessToken) {
+  const headerToken = authHeader?.split(" ")[1]?.trim();
+  const bodyToken =
+    typeof payload.accessToken === "string" && payload.accessToken.trim().length > 0
+      ? payload.accessToken.trim()
+      : undefined;
+
+  const accessToken = bodyToken ?? headerToken;
+  if (!accessToken) {
     return jsonResponse(401, { error: "Missing access token" });
   }
+
+  const effectiveAuthHeader = authHeader ?? `Bearer ${accessToken}`;
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
@@ -44,7 +59,7 @@ serve(async (req) => {
   const userClient = createClient(supabaseUrl, supabaseAnonKey, {
     global: {
       headers: {
-        Authorization: authHeader,
+        Authorization: effectiveAuthHeader,
       },
     },
   });
