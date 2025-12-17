@@ -28,7 +28,8 @@ serve(async (req) => {
   }
 
   const authHeader = req.headers.get("Authorization");
-  if (!authHeader) {
+  const accessToken = authHeader?.split(" ")[1]?.trim();
+  if (!authHeader || !accessToken) {
     return jsonResponse(401, { error: "Missing access token" });
   }
 
@@ -51,7 +52,7 @@ serve(async (req) => {
   const {
     data: { user },
     error: getUserError,
-  } = await userClient.auth.getUser();
+  } = await userClient.auth.getUser(accessToken);
 
   if (getUserError || !user) {
     return jsonResponse(401, { error: "Unauthorized" });
@@ -90,9 +91,11 @@ serve(async (req) => {
   }
 
   if (cleanupErrors.length > 0) {
-    return jsonResponse(500, {
-      error: "Failed to fully delete account",
-      details: cleanupErrors,
+    console.error("delete-account warnings", cleanupErrors);
+    return jsonResponse(200, {
+      success: true,
+      deletedUserId: user.id,
+      warnings: cleanupErrors,
     });
   }
 
